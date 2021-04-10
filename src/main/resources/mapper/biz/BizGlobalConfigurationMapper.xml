@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.pettyfer.caas.framework.biz.mapper.BizGlobalConfigurationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.biz.entity.BizGlobalConfiguration">
+        <id column="id" property="id" />
+        <result column="docker_registry_path" property="dockerRegistryPath" />
+        <result column="docker_registry_username" property="dockerRegistryUsername" />
+        <result column="docker_registry_password" property="dockerRegistryPassword" />
+        <result column="del_flag" property="delFlag" />
+        <result column="creator" property="creator" />
+        <result column="create_time" property="createTime" />
+        <result column="modifier" property="modifier" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="group_id" property="groupId" />
+        <result column="tenant_id" property="tenantId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, docker_registry_path, docker_registry_username, docker_registry_password, del_flag, creator, create_time, modifier, modify_time, group_id, tenant_id
+    </sql>
+
+</mapper>

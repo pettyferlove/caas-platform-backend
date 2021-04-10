@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.pettyfer.caas.framework.biz.mapper.BizSqlBuildMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.biz.entity.BizSqlBuild">
+    <result column="id" property="id" />
+    <result column="del_flag" property="delFlag" />
+    <result column="creator" property="creator" />
+    <result column="create_time" property="createTime" />
+    <result column="modifier" property="modifier" />
+    <result column="modify_time" property="modifyTime" />
+        <result column="namespace_id" property="namespaceId" />
+        <result column="project_name" property="projectName" />
+        <result column="describe_info" property="describeInfo" />
+        <result column="depository_type" property="depositoryType" />
+        <result column="remote_path" property="remotePath" />
+        <result column="remote_branch" property="remoteBranch" />
+        <result column="env" property="env" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="config" property="config" />
+        <result column="sql_from" property="sqlFrom" />
+        <result column="sql_to" property="sqlTo" />
+        <result column="env_type" property="envType" />
+        <result column="auth_type" property="authType" />
+        <result column="full" property="full" />
+        <result column="group_id" property="groupId" />
+        <result column="tenant_id" property="tenantId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        del_flag,
+        creator,
+        create_time,
+        modifier,
+        modify_time,
+        namespace_id,
+        project_name, describe_info, depository_type, remote_path, remote_branch, env, username, password, config, sql_from, sql_to, env_type, auth_type, full ,group_id, tenant_id
+    </sql>
+    <select id="page" resultType="com.github.pettyfer.caas.framework.core.model.SqlBuildListView">
+        select
+            <include refid="Base_Column_List"></include>,
+            (select h.id from biz_sql_build_history h where t.id = h.build_id and h.del_flag = 0 order by create_time desc limit 1) history_id,
+            (select h.job_id from biz_sql_build_history h where t.id = h.build_id and h.del_flag = 0 order by create_time desc limit 1) job,
+            (select h.build_status from biz_sql_build_history h where t.id = h.build_id and h.del_flag = 0 order by create_time desc limit 1) last_state,
+            (select h.create_time from biz_sql_build_history h where t.id = h.build_id and h.del_flag = 0 order by create_time desc limit 1) last_build_time
+        from biz_sql_build t
+        ${ew.customSqlSegment}
+    </select>
+
+</mapper>

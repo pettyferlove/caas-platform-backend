@@ -1,0 +1,82 @@
+# 开发配置-本地环境
+logging:
+  config: classpath:conf/logback-dev.xml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+    shutdown:
+      enabled: true
+server:
+  port: 8885
+  http2:
+    enabled: true
+  undertow:
+    io-threads: 16
+    worker-threads: 256
+    buffer-size: 1024
+    direct-buffers: true
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB # 最大附件大小
+      max-request-size: 10MB
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    static-path-pattern: /static/**
+  redis:
+    host: 127.0.0.1
+    password:
+    port: 6379
+    lettuce:
+      shutdown-timeout: 100
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: 30
+        min-idle: 0
+  datasource:
+    name: caas
+    url: jdbc:mysql://127.0.0.1:3306/caas?characterEncoding=utf8&zeroDateTimeBehavior=CONVERT_TO_NULL&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    druid:
+      filters: stat
+      max-active: 200
+      initial-size: 1
+      max-wait: 60000
+      min-idle: 1
+      time-between-eviction-runs-millis: 60000
+      min-evictableIdle-time-millis: 300000
+      validation-query: select 'x'
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      pool-prepared-statements: true
+      max-open-prepared-statements: 20
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*Mapper.xml
+  #实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: com.github.pettyfer.caas.framework.biz
+  global-config:
+    banner: false
+    db-config:
+      capital-mode: false
+      id-type: ASSIGN_ID
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+    call-setters-on-nulls: true
+kubernetes:
+  client:
+    master-url: http://127.0.0.1:8001
+    token: eyJhbGciOiJSUzI1NiIsImtpZCI6IkRhT1ZzZk9sSGs2S1Vya3phVVdwSGhKZFF2MUFoSVY4NzVrODBxaWRObWsifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJkZWZhdWx0LXRva2VuLWZkMmZmIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImRlZmF1bHQiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiJlNzQ3ZDgzMS00MGE1LTRhZGEtYjM2My1hMmJhZTk1NDA5OTEiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06ZGVmYXVsdCJ9.X1QtI4W0H9r_-QXcx9S4zohKtgX7c1fg869CrA0g1dqGIBhRDUKaBB57oXLVl-nLvbZFVAShJrFMiF033hleF23uoPebD6HwdYBz26OEGz9INxCfLCHXGuY06IqV9EmFO31XkvGJP9VdMN9OmcLnoQhwZV2xlu21aMkv6ueajYZL0L9WuU6AG01j1iahYEwqpsSwgVsC-C1yfzSXaJI0lpn4jZ4xSCSMvLYLsN-aFA354DIp0gUFnGG1DUZZ7s6sMbVTiaJVrSCOEAYqKQruYVacvdXO07C-lFMl2ZOXXP20PqFTrypgweKQ6cSf2YF1M6RxakYZp_nLzwNqJVTVCA

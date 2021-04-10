@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: kubernetes-caas
+    group: caas
+  profiles:
+    active: dev-windows

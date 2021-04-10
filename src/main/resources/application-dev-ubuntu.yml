@@ -1,0 +1,87 @@
+# 开发配置-公司环境
+logging:
+  config: classpath:conf/logback-dev.xml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: ALWAYS
+    shutdown:
+      enabled: true
+server:
+  port: 8885
+  http2:
+    enabled: true
+  undertow:
+    io-threads: 16
+    worker-threads: 256
+    buffer-size: 1024
+    direct-buffers: true
+spring:
+  servlet:
+    multipart:
+      max-file-size: 500MB # 最大附件大小
+      max-request-size: 500MB
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    static-path-pattern: /static/**
+  redis:
+    host: 127.0.0.1
+    password:
+    port: 6379
+    lettuce:
+      shutdown-timeout: 100
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: 30
+        min-idle: 0
+  datasource:
+    name: caas
+    url: jdbc:mysql://127.0.0.1:3306/caas?characterEncoding=utf8&zeroDateTimeBehavior=CONVERT_TO_NULL&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    druid:
+      filters: stat
+      max-active: 200
+      initial-size: 1
+      max-wait: 60000
+      min-idle: 1
+      time-between-eviction-runs-millis: 60000
+      min-evictableIdle-time-millis: 300000
+      validation-query: select 'x'
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      pool-prepared-statements: true
+      max-open-prepared-statements: 20
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*Mapper.xml
+  #实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: com.github.pettyfer.caas.framework.biz
+  global-config:
+    banner: false
+    db-config:
+      capital-mode: false
+      id-type: ASSIGN_ID
+      logic-delete-value: 'null'
+      logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+    call-setters-on-nulls: true
+kubernetes:
+  client:
+    master-url: https://192.168.13.57:6443
+    token: eyJhbGciOiJSUzI1NiIsImtpZCI6ImcyczVkdENyVThhaGhyeGpaX0RIaDJOM1U5WVh6TVh5Y0hqRXRGZ2RWZ1UifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJhZG1pbi11c2VyLXRva2VuLXI1bGw3Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImFkbWluLXVzZXIiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI4Nzg5YjE0Zi00ZDI5LTRiMWEtYjdjNy0xZWUzYWU5NmY0MjUiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06YWRtaW4tdXNlciJ9.IXcoYQLOB7tl4_HqohAOS0WYdp3lxFwsvg8rWDcjTjnMpS0nkx-T5zOlJP5My4vkSJg7_M3bGRE1tKJfDuqRHAnrldoqlNznhoYoefpLGap18d_5fmB7dtttWsTVqq9N5OXtfrNJGs8PNO3cEGiF3wqRIQVvP62tF2HrtaDa8qqMtrHfU9c7nYpm8MzOngVbc0II-0seNWgri5lguvn1pUHadoMHqzEOAuTFbyrGU5inV575UWL2J1j0cbXViQZAWPIoItosfmQH4s5eIT43IkC0N1B8SXAnWLYWqoJR2MbxXKUiPZ7QP73eFddIp7_TTxnbrXXRnJqAJlD5kt1zEg
+    cert: certs/ca.crt
+attachment:
+  local:
+    name: user-center-local
+    root: D:\\attachment\\

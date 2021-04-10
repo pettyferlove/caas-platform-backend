@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings>
+
+    <localRepository>
+        /usr/cache/maven
+    </localRepository>
+
+    <mirrors>
+        <mirror>
+            <id>AliYun</id>
+            <mirrorOf>*</mirrorOf>
+            <name>AliYun</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public</url>
+        </mirror>
+    </mirrors>
+
+</settings>

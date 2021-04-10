@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.pettyfer.caas.framework.biz.mapper.BizUserConfigurationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.biz.entity.BizUserConfiguration">
+    <result column="id" property="id" />
+    <result column="del_flag" property="delFlag" />
+    <result column="creator" property="creator" />
+    <result column="create_time" property="createTime" />
+    <result column="modifier" property="modifier" />
+    <result column="modify_time" property="modifyTime" />
+        <result column="gitlab_home_path" property="gitlabHomePath" />
+        <result column="gitlab_api_token" property="gitlabApiToken" />
+        <result column="private_key" property="privateKey" />
+        <result column="user_key_id" property="userKeyId" />
+        <result column="group_id" property="groupId" />
+        <result column="tenant_id" property="tenantId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        del_flag,
+        creator,
+        create_time,
+        modifier,
+        modify_time,
+        gitlab_home_path, gitlab_api_token, private_key, user_key_id, group_id, tenant_id
+    </sql>
+
+</mapper>

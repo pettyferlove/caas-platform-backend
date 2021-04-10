@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.pettyfer.caas.framework.biz.mapper.BizProjectBuildMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.biz.entity.BizProjectBuild">
+        <id column="id" property="id" />
+        <result column="namespace_id" property="namespaceId" />
+        <result column="project_id" property="projectId" />
+        <result column="project_hook_id" property="projectHookId" />
+        <result column="project_name" property="projectName" />
+        <result column="source_project_name" property="sourceProjectName" />
+        <result column="source_project_web_url" property="sourceProjectWebUrl" />
+        <result column="images_depository_alias" property="imagesDepositoryAlias" />
+        <result column="images_depository_id" property="imagesDepositoryId" />
+        <result column="persistent_build_file" property="persistentBuildFile" />
+        <result column="branch" property="branch" />
+        <result column="trigger_method" property="triggerMethod" />
+        <result column="clone_url" property="cloneUrl" />
+        <result column="open_auto_build" property="openAutoBuild" />
+        <result column="need_build_project" property="needBuildProject" />
+        <result column="build_tool" property="buildTool" />
+        <result column="build_command" property="buildCommand" />
+        <result column="build_params" property="buildParams" />
+        <result column="need_build_image" property="needBuildImage" />
+        <result column="dockerfile_already_exists" property="dockerfileAlreadyExists" />
+        <result column="dockerfile_path" property="dockerfilePath" />
+        <result column="dockerfile_content" property="dockerfileContent" />
+        <result column="env_type" property="envType" />
+        <result column="del_flag" property="delFlag" />
+        <result column="creator" property="creator" />
+        <result column="create_time" property="createTime" />
+        <result column="modifier" property="modifier" />
+        <result column="modify_time" property="modifyTime" />
+        <result column="group_id" property="groupId" />
+        <result column="tenant_id" property="tenantId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, namespace_id, project_id, project_hook_id, project_name, source_project_name, source_project_web_url, images_depository_alias, images_depository_id, persistent_build_file, branch, trigger_method, clone_url, open_auto_build, need_build_project, build_tool, build_command, build_params, dockerfile_already_exists, dockerfile_path, dockerfile_content, env_type, del_flag, creator, create_time, modifier, modify_time, group_id, tenant_id
+    </sql>
+    <select id="queryProjectBuildList" resultType="com.github.pettyfer.caas.framework.core.model.ProjectBuildListView">
+        select
+            <include refid="Base_Column_List"></include>,
+            (select h.id from biz_project_build_history h where t.id = h.build_id and h.del_flag = 0 order by create_time desc limit 1) history_id,
+            (select h.job_id from biz_project_build_history h where t.id = h.build_id and h.del_flag = 0 order by create_time desc limit 1) job,
+            (select h.build_status from biz_project_build_history h where t.id = h.build_id and h.del_flag = 0 order by create_time desc limit 1) last_state,
+            (select h.create_time from biz_project_build_history h where t.id = h.build_id and h.del_flag = 0 order by create_time desc limit 1) last_build_time
+        from biz_project_build t
+        ${ew.customSqlSegment}
+    </select>
+
+</mapper>
