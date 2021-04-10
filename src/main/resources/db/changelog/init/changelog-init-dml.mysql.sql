@@ -11,3 +11,5 @@ INSERT INTO system_user (id, login_name, user_name, password, user_sex, user_bor
 --changeset Petty:caas-init-dml-3
 INSERT INTO system_user_role (id, user_id, role_id, del_flag, creator, create_time, modifier, modify_time, group_id, tenant_id) VALUES ('0000000000000000001', '0000000000000000001', '0000000000000000001', 0, NULL, NULL, NULL, NULL, NULL, NULL);
 
+--changeset Petty:caas-init-dml-4
+INSERT INTO system_oauth_client_details (id, client_id, resource_ids, client_secret, scope, authorized_grant_types, web_server_redirect_uri, authorities, access_token_validity, refresh_token_validity, additional_information, auto_approve, del_flag, creator, create_time, modifier, modify_time, group_id, tenant_id) VALUES ('0000000000000000001', 'caas', NULL, '123456', 'application', 'password,refresh_token,authorization_code,client_credentials,mobile,wechat', 'http://127.0.0.1:8089/login', NULL, 36000, 36000, NULL, 'false', 0, NULL, NULL, NULL, NULL, NULL, NULL);
