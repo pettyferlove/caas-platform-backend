@@ -10,12 +10,12 @@ import com.github.pettyfer.caas.framework.biz.entity.BizNamespace;
 import com.github.pettyfer.caas.framework.biz.service.IBizApplicationDeploymentNetworkService;
 import com.github.pettyfer.caas.framework.biz.service.IBizApplicationDeploymentService;
 import com.github.pettyfer.caas.framework.biz.service.IBizNamespaceService;
+import com.github.pettyfer.caas.framework.core.service.INamespaceCoreService;
 import com.github.pettyfer.caas.framework.engine.kubernetes.model.NamespaceDetailView;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.INamespaceService;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.ISecretService;
 import com.github.pettyfer.caas.global.constants.EnvConstant;
 import com.github.pettyfer.caas.global.constants.KubernetesConstant;
-import com.github.pettyfer.caas.framework.core.service.INamespaceCoreService;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -95,7 +95,7 @@ public class NamespaceCoreServiceImpl implements INamespaceCoreService {
         BizNamespace bizNamespace = bizNamespaceService.get(id);
         List<BizApplicationDeployment> bizApplicationDeployments = bizApplicationDeploymentService.list(Wrappers.<BizApplicationDeployment>lambdaQuery().eq(BizApplicationDeployment::getNamespaceId, id).eq(BizApplicationDeployment::getDelFlag, false));
         List<String> bizApplicationDeploymentIds = bizApplicationDeployments.stream().map(BizApplicationDeployment::getId).collect(Collectors.toList());
-        if(!bizApplicationDeploymentIds.isEmpty()){
+        if (!bizApplicationDeploymentIds.isEmpty()) {
             bizApplicationDeploymentService.remove(Wrappers.<BizApplicationDeployment>lambdaQuery().in(BizApplicationDeployment::getId, bizApplicationDeploymentIds));
             bizApplicationDeploymentNetworkService.remove(Wrappers.<BizApplicationDeploymentNetwork>lambdaQuery().in(BizApplicationDeploymentNetwork::getDeploymentId, bizApplicationDeploymentIds));
         }
@@ -120,7 +120,6 @@ public class NamespaceCoreServiceImpl implements INamespaceCoreService {
     private Namespace buildNamespace(BizNamespace namespace) {
         Map<String, String> label = new HashMap<>();
         label.put("istio-injection", namespace.getIstio() ? "enable" : "disable");
-        label.put(KubernetesConstant.DESCRIPTION_LABEL, namespace.getDescription());
         label.put(KubernetesConstant.ENVIRONMENT_LABEL, EnvConstant.transform(namespace.getEnvType()));
         return new NamespaceBuilder()
                 .withApiVersion("v1")
