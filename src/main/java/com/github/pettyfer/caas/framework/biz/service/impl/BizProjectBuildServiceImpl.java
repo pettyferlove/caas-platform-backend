@@ -72,10 +72,11 @@ public class BizProjectBuildServiceImpl extends ServiceImpl<BizProjectBuildMappe
     }
 
     @Override
-    public List<ProjectBuildSelect> select() {
+    public List<ProjectBuildSelect> select(Integer envType) {
         LambdaQueryWrapper<BizProjectBuild> queryWrapper = Wrappers.<BizProjectBuild>lambdaQuery()
                 .orderByDesc(BizProjectBuild::getCreateTime)
                 .eq(BizProjectBuild::getDelFlag, 0)
+                .eq(ObjectUtil.isNotNull(envType), BizProjectBuild::getEnvType, envType)
                 .eq(BizProjectBuild::getCreator, SecurityUtil.getUser().getId());
         List<BizProjectBuild> list = this.list(queryWrapper);
         Optional<List<ProjectBuildSelect>> autoBuildSelects = Optional.ofNullable(ConverterUtil.convertList(BizProjectBuild.class, ProjectBuildSelect.class, list));

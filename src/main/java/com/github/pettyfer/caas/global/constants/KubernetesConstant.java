@@ -18,6 +18,8 @@ public interface KubernetesConstant {
      */
     String GLOBAL_LABEL = ROOT_LABEL + "-app";
 
+    String BUILD_LABEL = ROOT_LABEL + "-build";
+
     String K8S_LABEL = "k8s-app";
 
 }

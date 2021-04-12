@@ -71,8 +71,8 @@ public class ProjectBuildApi {
     }
 
     @GetMapping("/select")
-    public R<List<ProjectBuildSelect>> select() {
-        return new R<>(bizProjectBuildService.select());
+    public R<List<ProjectBuildSelect>> select(Integer envType) {
+        return new R<>(bizProjectBuildService.select(envType));
     }
 
 

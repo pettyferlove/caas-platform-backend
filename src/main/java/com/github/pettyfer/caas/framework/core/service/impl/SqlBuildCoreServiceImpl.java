@@ -16,6 +16,7 @@ import com.github.pettyfer.caas.framework.engine.kubernetes.service.IJobService;
 import com.github.pettyfer.caas.global.constants.BuildStatus;
 import com.github.pettyfer.caas.global.constants.EnvConstant;
 import com.github.pettyfer.caas.global.constants.GlobalConstant;
+import com.github.pettyfer.caas.global.constants.KubernetesConstant;
 import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
 import com.github.pettyfer.caas.framework.core.service.ISqlBuildCoreService;
 import com.github.pettyfer.caas.utils.LoadBalanceUtil;
@@ -235,8 +236,8 @@ public class SqlBuildCoreServiceImpl implements ISqlBuildCoreService {
 
     private Map<String, String> fetchBuildLabel(String value, String envType) {
         Map<String, String> label = new HashMap<>();
-        label.put("build", value);
-        label.put("environment", envType);
+        label.put(KubernetesConstant.BUILD_LABEL, value);
+        label.put(KubernetesConstant.ENVIRONMENT_LABEL, envType);
         return label;
     }
 

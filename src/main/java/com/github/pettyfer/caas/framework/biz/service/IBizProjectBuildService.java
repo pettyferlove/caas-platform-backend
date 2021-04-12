@@ -64,7 +64,7 @@ public interface IBizProjectBuildService extends IService<BizProjectBuild> {
      * 获取自动构建下拉框数据
      * @return 集合
      */
-    List<ProjectBuildSelect> select();
+    List<ProjectBuildSelect> select(Integer envType);
 
     /**
      * 更新自动构建触发状态
