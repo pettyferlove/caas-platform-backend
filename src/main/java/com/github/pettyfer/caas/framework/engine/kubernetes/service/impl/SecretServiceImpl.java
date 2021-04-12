@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pettyfer.caas.framework.biz.service.IBizGlobalConfigurationService;
 import com.github.pettyfer.caas.framework.core.model.GlobalConfiguration;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.ISecretService;
+import com.google.common.base.Preconditions;
 import io.fabric8.kubernetes.api.model.Secret;
 import io.fabric8.kubernetes.api.model.SecretBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -38,6 +39,9 @@ public class SecretServiceImpl implements ISecretService {
     @SneakyThrows
     public String createRegistrySecret(String namespace) {
         GlobalConfiguration globalConfiguration = globalConfigurationService.loadConfig();
+        Preconditions.checkNotNull(globalConfiguration.getDockerRegistryPath(), "未配置镜像仓库");
+        Preconditions.checkNotNull(globalConfiguration.getDockerRegistryUsername(), "未配置镜像仓库用户名");
+        Preconditions.checkNotNull(globalConfiguration.getDockerRegistryPassword(), "未配置镜像仓库用户密码");
         JSONObject json = new JSONObject();
         JSONObject auths = new JSONObject();
         JSONObject server = new JSONObject();

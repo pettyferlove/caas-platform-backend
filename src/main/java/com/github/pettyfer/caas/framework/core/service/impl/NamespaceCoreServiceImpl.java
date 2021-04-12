@@ -80,12 +80,18 @@ public class NamespaceCoreServiceImpl implements INamespaceCoreService {
     public Boolean create(BizNamespace namespace) {
         String id = bizNamespaceService.create(namespace);
         namespaceService.create(buildNamespace(namespace));
-        String registrySecret = secretService.createRegistrySecret(namespace.getName());
-        LambdaUpdateWrapper<BizNamespace> updateWrapper = Wrappers.<BizNamespace>lambdaUpdate();
-        updateWrapper.set(BizNamespace::getRegistrySecretName, registrySecret);
-        updateWrapper.eq(BizNamespace::getId, id);
-        updateWrapper.eq(BizNamespace::getDelFlag, false);
-        bizNamespaceService.update(updateWrapper);
+        try {
+            String registrySecret = secretService.createRegistrySecret(namespace.getName());
+            LambdaUpdateWrapper<BizNamespace> updateWrapper = Wrappers.<BizNamespace>lambdaUpdate();
+            updateWrapper.set(BizNamespace::getRegistrySecretName, registrySecret);
+            updateWrapper.eq(BizNamespace::getId, id);
+            updateWrapper.eq(BizNamespace::getDelFlag, false);
+            bizNamespaceService.update(updateWrapper);
+        } catch (Exception e) {
+            // 如果发生异常则删除命名空间
+            namespaceService.delete(namespace.getName());
+            throw new RuntimeException(e.getMessage());
+        }
         return true;
     }
 
