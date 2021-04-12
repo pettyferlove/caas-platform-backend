@@ -1,5 +1,8 @@
 package com.github.pettyfer.caas.framework.biz.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -25,7 +28,10 @@ public class BizNamespaceServiceImpl extends ServiceImpl<BizNamespaceMapper, Biz
 
     @Override
     public IPage<BizNamespace> page(BizNamespace bizNamespace, Page<BizNamespace> page) {
-        return this.page(page, Wrappers.lambdaQuery(bizNamespace).orderByDesc(BizNamespace::getCreateTime));
+        LambdaQueryWrapper<BizNamespace> queryWrapper = Wrappers.<BizNamespace>lambdaQuery().orderByDesc(BizNamespace::getCreateTime);
+        queryWrapper.eq(ObjectUtil.isNotNull(bizNamespace.getEnvType()), BizNamespace::getEnvType, bizNamespace.getEnvType());
+        queryWrapper.likeRight(StrUtil.isNotEmpty(bizNamespace.getName()), BizNamespace::getName, bizNamespace.getName());
+        return this.page(page, queryWrapper);
     }
 
     @Override
