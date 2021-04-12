@@ -22,6 +22,7 @@ import com.github.pettyfer.caas.global.constants.BuildStatus;
 import com.github.pettyfer.caas.global.constants.EnvConstant;
 import com.github.pettyfer.caas.global.constants.GlobalConstant;
 import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
+import com.github.pettyfer.caas.utils.LoadBalanceUtil;
 import com.github.pettyfer.caas.utils.SecurityUtil;
 import com.github.pettyfer.caas.utils.URLResolutionUtil;
 import com.google.common.base.Preconditions;
@@ -279,15 +280,8 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 env.put("JOB_NAME", jobName);
                 env.put("FILE_ID", jobName);
                 env.put("USER_ID", projectBuild.getCreator());
-
-
                 env.put("NOTIFICATION_FLAG", "project");
-
-                try {
-                    env.put("REMOTE_SERVER", InetAddress.getLocalHost().getHostAddress() + ":" + environment.getProperty("local.server.port"));
-                } catch (Exception e) {
-                    throw new BaseRuntimeException("无法获取服务器IP");
-                }
+                env.put("REMOTE_SERVER", LoadBalanceUtil.chooseServer(globalConfiguration.getClusterServer()));
 
                 StringBuilder imageName = new StringBuilder();
                 String tagName = String.valueOf(System.currentTimeMillis());

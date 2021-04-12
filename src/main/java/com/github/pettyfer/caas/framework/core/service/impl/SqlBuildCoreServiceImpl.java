@@ -10,20 +10,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pettyfer.caas.framework.biz.entity.BizNamespace;
 import com.github.pettyfer.caas.framework.biz.entity.BizSqlBuild;
 import com.github.pettyfer.caas.framework.biz.entity.BizSqlBuildHistory;
-import com.github.pettyfer.caas.framework.biz.service.IBizNamespaceService;
-import com.github.pettyfer.caas.framework.biz.service.IBizSqlBuildHistoryService;
-import com.github.pettyfer.caas.framework.biz.service.IBizSqlBuildService;
-import com.github.pettyfer.caas.framework.biz.service.IBizUserConfigurationService;
+import com.github.pettyfer.caas.framework.biz.service.*;
+import com.github.pettyfer.caas.framework.core.model.*;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.IJobService;
 import com.github.pettyfer.caas.global.constants.BuildStatus;
 import com.github.pettyfer.caas.global.constants.EnvConstant;
 import com.github.pettyfer.caas.global.constants.GlobalConstant;
 import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
-import com.github.pettyfer.caas.framework.core.model.BuildStepView;
-import com.github.pettyfer.caas.framework.core.model.SqlBuildHistorySelectView;
-import com.github.pettyfer.caas.framework.core.model.SqlBuildListView;
-import com.github.pettyfer.caas.framework.core.model.UserConfiguration;
 import com.github.pettyfer.caas.framework.core.service.ISqlBuildCoreService;
+import com.github.pettyfer.caas.utils.LoadBalanceUtil;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.batch.Job;
 import io.fabric8.kubernetes.api.model.batch.JobBuilder;
@@ -32,7 +27,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.InetAddress;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,14 +47,17 @@ public class SqlBuildCoreServiceImpl implements ISqlBuildCoreService {
 
     private final IBizUserConfigurationService userConfigurationService;
 
+    private final IBizGlobalConfigurationService globalConfigurationService;
+
     private final IJobService jobService;
 
-    public SqlBuildCoreServiceImpl(Environment environment, IBizSqlBuildService bizSqlBuildService, IBizSqlBuildHistoryService bizSqlBuildHistoryService, IBizNamespaceService bizNamespaceService, IBizUserConfigurationService userConfigurationService, IJobService jobService) {
+    public SqlBuildCoreServiceImpl(Environment environment, IBizSqlBuildService bizSqlBuildService, IBizSqlBuildHistoryService bizSqlBuildHistoryService, IBizNamespaceService bizNamespaceService, IBizUserConfigurationService userConfigurationService, IBizGlobalConfigurationService globalConfigurationService, IJobService jobService) {
         this.environment = environment;
         this.bizSqlBuildService = bizSqlBuildService;
         this.bizSqlBuildHistoryService = bizSqlBuildHistoryService;
         this.bizNamespaceService = bizNamespaceService;
         this.userConfigurationService = userConfigurationService;
+        this.globalConfigurationService = globalConfigurationService;
         this.jobService = jobService;
     }
 
@@ -118,6 +115,7 @@ public class SqlBuildCoreServiceImpl implements ISqlBuildCoreService {
             String jobName = "build-" + UUID.randomUUID().toString();
             BizSqlBuild sqlBuild = buildOptional.get();
             UserConfiguration userConfiguration = userConfigurationService.loadConfig(sqlBuild.getCreator());
+            GlobalConfiguration globalConfiguration = globalConfigurationService.loadConfig();
             Optional<BizNamespace> bizNamespaceOptional = Optional.ofNullable(bizNamespaceService.get(sqlBuild.getNamespaceId()));
             if (bizNamespaceOptional.isPresent()) {
                 BizNamespace namespace = bizNamespaceOptional.get();
@@ -140,11 +138,7 @@ public class SqlBuildCoreServiceImpl implements ISqlBuildCoreService {
                 env.put("FORM", sqlBuild.getSqlFrom());
                 env.put("TO", sqlBuild.getSqlTo());
                 env.put("NOTIFICATION_FLAG", "sql");
-                try {
-                    env.put("REMOTE_SERVER", InetAddress.getLocalHost().getHostAddress() + ":" + environment.getProperty("local.server.port"));
-                } catch (Exception e) {
-                    throw new BaseRuntimeException("无法获取服务器IP");
-                }
+                env.put("REMOTE_SERVER", LoadBalanceUtil.chooseServer(globalConfiguration.getClusterServer()));
 
                 String envType = EnvConstant.transform(sqlBuild.getEnvType());
 

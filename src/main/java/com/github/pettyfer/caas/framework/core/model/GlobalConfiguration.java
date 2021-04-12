@@ -33,4 +33,8 @@ public class GlobalConfiguration implements Serializable {
 
     @ApiModelProperty(value = "Docker镜像私有仓库用户密码")
     private String dockerRegistryPassword;
+
+    @ApiModelProperty(value = "CAAS集群地址;号分隔")
+    private String clusterServer;
+
 }
