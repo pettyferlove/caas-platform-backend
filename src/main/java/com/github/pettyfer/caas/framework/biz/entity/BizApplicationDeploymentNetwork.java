@@ -42,6 +42,9 @@ public class BizApplicationDeploymentNetwork extends BaseEntity<BizApplicationDe
     @ApiModelProperty(value = "目标端口号")
     private Integer targetPort;
 
+    @ApiModelProperty(value = "环境信息")
+    private Integer envType;
+
     @ApiModelProperty(value = "项目组ID")
     private String groupId;
 

@@ -9,6 +9,7 @@
         <result column="protocol" property="protocol" />
         <result column="port" property="port" />
         <result column="target_port" property="targetPort" />
+        <result column="env_type" property="envType" />
         <result column="del_flag" property="delFlag" />
         <result column="creator" property="creator" />
         <result column="create_time" property="createTime" />
@@ -20,7 +21,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, deployment_id, protocol, port, target_port, del_flag, creator, create_time, modifier, modify_time, group_id, tenant_id
+        id, deployment_id, protocol, port, target_port, env_type, del_flag, creator, create_time, modifier, modify_time, group_id, tenant_id
     </sql>
 
 </mapper>

@@ -1,17 +1,12 @@
 package com.github.pettyfer.caas.framework.core.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.github.pettyfer.caas.global.datatype.CustomLocalDateTimeDeserializer;
-import com.github.pettyfer.caas.global.datatype.CustomLocalDateTimeSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -55,6 +50,9 @@ public class ApplicationDeploymentDetailView implements Serializable {
     @NotNull(message = "镜像Tag不能为空")
     private String imageTag;
 
+    @ApiModelProperty(value = "应用环境变量")
+    private String environmentVariable;
+
     @ApiModelProperty(value = "镜像拉取规则")
     private String imagePullStrategy;
 
@@ -85,22 +83,19 @@ public class ApplicationDeploymentDetailView implements Serializable {
     @ApiModelProperty(value = "外部访问IP，以英文,分隔")
     private String externalIp;
 
+    @ApiModelProperty(value = "环境信息")
+    private Integer envType;
+
     @ApiModelProperty(value = "创建人")
     private String creator;
 
     @ApiModelProperty(value = "创建时间")
-    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
-    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
-    @DateTimeFormat( pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
     @ApiModelProperty(value = "修改人")
     private String modifier;
 
     @ApiModelProperty(value = "修改时间")
-    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
-    @JsonSerialize(using = CustomLocalDateTimeSerializer.class)
-    @DateTimeFormat( pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime modifyTime;
 
     private Map<String, String> labels;

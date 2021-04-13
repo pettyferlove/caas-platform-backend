@@ -25,7 +25,12 @@ public class NetworkServiceImpl implements INetworkService {
     }
 
     @Override
-    public void deleteWithLabel(String namespace, String deploymentName) {
-        kubernetesClient.services().inNamespace(namespace).withLabel(KubernetesConstant.GLOBAL_LABEL, deploymentName).delete();
+    public void deleteWithLabel(String namespace, String name) {
+        kubernetesClient.services().inNamespace(namespace).withLabel(KubernetesConstant.GLOBAL_LABEL, name).delete();
+    }
+
+    @Override
+    public void delete(String namespace, String name) {
+        kubernetesClient.services().inNamespace(namespace).withName(name).delete();
     }
 }

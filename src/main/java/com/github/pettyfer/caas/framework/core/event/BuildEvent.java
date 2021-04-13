@@ -9,7 +9,7 @@ public class BuildEvent extends ApplicationEvent {
 
     private static final long serialVersionUID = 1L;
 
-    private String autoBuildId;
+    private String projectBuildId;
 
     /**
      * 自动构建项目名
@@ -21,19 +21,19 @@ public class BuildEvent extends ApplicationEvent {
      */
     private String tag;
 
-    public BuildEvent(Object source,String autoBuildId, String imageName, String tag) {
+    public BuildEvent(Object source, String projectBuildId, String imageName, String tag) {
         super(source);
-        this.autoBuildId = autoBuildId;
+        this.projectBuildId = projectBuildId;
         this.imageName = imageName;
         this.tag = tag;
     }
 
-    public String getAutoBuildId() {
-        return autoBuildId;
+    public String getProjectBuildId() {
+        return projectBuildId;
     }
 
-    public void setAutoBuildId(String autoBuildId) {
-        this.autoBuildId = autoBuildId;
+    public void setProjectBuildId(String autoBuildId) {
+        this.projectBuildId = autoBuildId;
     }
 
     public String getImageName() {

@@ -31,4 +31,7 @@ public class ApplicationDeploymentNetworkView implements Serializable {
     @ApiModelProperty(value = "目标端口号")
     private Integer targetPort;
 
+    @ApiModelProperty(value = "环境信息")
+    private Integer envType;
+
 }

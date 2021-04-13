@@ -52,6 +52,9 @@ public class BizApplicationDeployment extends BaseEntity<BizApplicationDeploymen
     @ApiModelProperty(value = "镜像Tag")
     private String imageTag;
 
+    @ApiModelProperty(value = "应用环境变量")
+    private String environmentVariable;
+
     @ApiModelProperty(value = "镜像拉取规则")
     private String imagePullStrategy;
 
@@ -81,6 +84,9 @@ public class BizApplicationDeployment extends BaseEntity<BizApplicationDeploymen
 
     @ApiModelProperty(value = "外部访问IP，以英文,分隔")
     private String externalIp;
+
+    @ApiModelProperty(value = "环境信息")
+    private Integer envType;
 
     @ApiModelProperty(value = "项目组ID")
     private String groupId;

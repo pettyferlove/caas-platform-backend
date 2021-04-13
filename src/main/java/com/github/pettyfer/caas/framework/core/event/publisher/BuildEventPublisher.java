@@ -18,8 +18,8 @@ public class BuildEventPublisher {
         this.context = context;
     }
 
-    public void push(String autoBuildId, String imageName, String tag) {
-        context.publishEvent(new BuildEvent(this,autoBuildId, imageName, tag));
+    public void push(String projectBuildId, String imageName, String tag) {
+        context.publishEvent(new BuildEvent(this,projectBuildId, imageName, tag));
     }
 
 }

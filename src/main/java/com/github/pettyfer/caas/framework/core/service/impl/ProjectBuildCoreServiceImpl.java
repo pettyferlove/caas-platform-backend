@@ -14,6 +14,7 @@ import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuild;
 import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuildHistory;
 import com.github.pettyfer.caas.framework.biz.service.*;
 import com.github.pettyfer.caas.framework.core.event.GitlabPushDetails;
+import com.github.pettyfer.caas.framework.core.event.publisher.BuildEventPublisher;
 import com.github.pettyfer.caas.framework.core.model.*;
 import com.github.pettyfer.caas.framework.core.service.IProjectBuildCoreService;
 import com.github.pettyfer.caas.framework.engine.docker.register.service.IHarborService;
@@ -35,11 +36,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.models.GitlabProject;
 import org.gitlab.api.models.GitlabProjectHook;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.net.InetAddress;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,8 +50,6 @@ import java.util.stream.Collectors;
 public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
 
     private final String HOOKS_ENDPOINT = "http://192.168.51.67:8885/api/v1/hooks/gitlab/";
-
-    private final Environment environment;
 
     private final IBizGlobalConfigurationService bizGlobalConfigurationService;
 
@@ -72,8 +69,9 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
 
     private final IJobService jobService;
 
-    public ProjectBuildCoreServiceImpl(Environment environment, IBizGlobalConfigurationService bizGlobalConfigurationService, IBizUserConfigurationService bizUserConfigurationService, IBizProjectBuildService bizProjectBuildService, IBizProjectBuildHistoryService bizProjectBuildHistoryService, IHarborService harborService, IBizImagesDepositoryService bizImagesDepositoryService, IBizUserConfigurationService userConfigurationService, IBizNamespaceService bizNamespaceService, IJobService jobService) {
-        this.environment = environment;
+    private final BuildEventPublisher publisher;
+
+    public ProjectBuildCoreServiceImpl(IBizGlobalConfigurationService bizGlobalConfigurationService, IBizUserConfigurationService bizUserConfigurationService, IBizProjectBuildService bizProjectBuildService, IBizProjectBuildHistoryService bizProjectBuildHistoryService, IHarborService harborService, IBizImagesDepositoryService bizImagesDepositoryService, IBizUserConfigurationService userConfigurationService, IBizNamespaceService bizNamespaceService, IJobService jobService, BuildEventPublisher publisher) {
         this.bizGlobalConfigurationService = bizGlobalConfigurationService;
         this.bizUserConfigurationService = bizUserConfigurationService;
         this.bizProjectBuildService = bizProjectBuildService;
@@ -83,6 +81,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         this.userConfigurationService = userConfigurationService;
         this.bizNamespaceService = bizNamespaceService;
         this.jobService = jobService;
+        this.publisher = publisher;
     }
 
 
@@ -254,7 +253,15 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         LambdaUpdateWrapper<BizProjectBuildHistory> updateWrapper = Wrappers.<BizProjectBuildHistory>lambdaUpdate();
         updateWrapper.set(BizProjectBuildHistory::getBuildStatus, status.getValue());
         updateWrapper.eq(BizProjectBuildHistory::getJobId, jobId);
-        bizProjectBuildHistoryService.update(updateWrapper);
+        if(bizProjectBuildHistoryService.update(updateWrapper)){
+            LambdaQueryWrapper<BizProjectBuildHistory> queryWrapper = Wrappers.<BizProjectBuildHistory>lambdaQuery();
+            queryWrapper.eq(BizProjectBuildHistory::getJobId, jobId);
+            BizProjectBuildHistory history = bizProjectBuildHistoryService.getOne(queryWrapper);
+            String[] image = history.getImageFullName().split(":");
+            publisher.push(history.getBuildId(), image[0], image[1]);
+        } else {
+            // TODO 消息通知
+        }
     }
 
     public Boolean startBuild(String id) {

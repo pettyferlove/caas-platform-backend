@@ -2,6 +2,8 @@ package com.github.pettyfer.caas.framework.core.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -12,27 +14,24 @@ import com.github.pettyfer.caas.framework.biz.entity.BizNamespace;
 import com.github.pettyfer.caas.framework.biz.service.IBizApplicationDeploymentNetworkService;
 import com.github.pettyfer.caas.framework.biz.service.IBizApplicationDeploymentService;
 import com.github.pettyfer.caas.framework.biz.service.IBizNamespaceService;
+import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentDetailView;
+import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentListView;
+import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentNetworkView;
+import com.github.pettyfer.caas.framework.core.service.IApplicationDeploymentCoreService;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.IDeploymentService;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.INetworkService;
+import com.github.pettyfer.caas.global.constants.EnvConstant;
 import com.github.pettyfer.caas.global.constants.KubernetesConstant;
 import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
 import com.github.pettyfer.caas.utils.ConverterUtil;
-import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentListView;
-import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentNetworkView;
-import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentDetailView;
-import com.github.pettyfer.caas.framework.core.service.IApplicationDeploymentCoreService;
-import io.fabric8.kubernetes.api.model.IntOrString;
-import io.fabric8.kubernetes.api.model.ServiceBuilder;
-import io.fabric8.kubernetes.api.model.ServicePort;
+import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -72,13 +71,16 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                 String deploymentId = bizApplicationDeploymentService.create(namespaceId, bizApplicationDeployment);
                 bizApplicationDeploymentNetworkService.batchInsert(deploymentId, deploymentDetail.getNetworks());
 
-                // 组装部署配置
-                Deployment deployment = buildDeployment(namespaceOptional.get(), deploymentDetail);
-                deploymentService.create(namespaceOptional.get().getName(), deployment);
+                try {
+                    Deployment deployment = buildDeployment(namespaceOptional.get(), deploymentDetail);
+                    deploymentService.create(namespaceOptional.get().getName(), deployment);
 
-                // 组装网络配置
-                if (StrUtil.isNotEmpty(deploymentDetail.getNetwork()) && !"none".equals(deploymentDetail.getNetwork())) {
-                    networkService.createOrUpdate(namespaceOptional.get().getName(), buildService(deploymentDetail));
+                    if (StrUtil.isNotEmpty(deploymentDetail.getNetwork()) && !"none".equals(deploymentDetail.getNetwork())) {
+                        networkService.createOrUpdate(namespaceOptional.get().getName(), buildService(deploymentDetail));
+                    }
+                } catch (Exception ignored) {
+                    deploymentService.delete(namespaceOptional.get().getName(), deploymentDetail.getName());
+                    networkService.delete(namespaceOptional.get().getName(), deploymentDetail.getName());
                 }
 
                 return deploymentId;
@@ -240,20 +242,27 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
             servicePort.setTargetPort(new IntOrString(n.getTargetPort()));
             servicePorts.add(servicePort);
         }
-        return new ServiceBuilder()
+
+        ServiceBuilder builder = new ServiceBuilder()
                 .withNewMetadata()
                 .withName(deploymentDetail.getName())
-                .addToLabels(KubernetesConstant.GLOBAL_LABEL, deploymentDetail.getName())
-                .addToLabels(KubernetesConstant.K8S_LABEL, deploymentDetail.getName())
-                .endMetadata()
-                .withNewSpec()
-                .addAllToPorts(servicePorts)
-                .addToSelector(KubernetesConstant.GLOBAL_LABEL, deploymentDetail.getName())
-                .addToSelector(KubernetesConstant.K8S_LABEL, deploymentDetail.getName())
-                .withType(deploymentDetail.getNetworkType())
-                .withExternalIPs(deploymentDetail.getExternalIp().split(","))
-                .endSpec()
-                .build();
+                .withLabels(fetchLabel(deploymentDetail.getName(), EnvConstant.transform(deploymentDetail.getEnvType()), deploymentDetail.getImageTag()))
+                .endMetadata();
+        if (StrUtil.isNotEmpty(deploymentDetail.getExternalIp())) {
+            builder.withNewSpec()
+                    .addAllToPorts(servicePorts)
+                    .withSelector(fetchMatchLabel(deploymentDetail.getName(), EnvConstant.transform(deploymentDetail.getEnvType())))
+                    .withType(deploymentDetail.getNetworkType())
+                    .withExternalIPs(deploymentDetail.getExternalIp().split(","))
+                    .endSpec();
+        } else {
+            builder.withNewSpec()
+                    .addAllToPorts(servicePorts)
+                    .withSelector(fetchMatchLabel(deploymentDetail.getName(), EnvConstant.transform(deploymentDetail.getEnvType())))
+                    .withType(deploymentDetail.getNetworkType())
+                    .endSpec();
+        }
+        return builder.build();
     }
 
     /**
@@ -266,31 +275,27 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
         return new DeploymentBuilder()
                 .withNewMetadata()
                 .withName(deploymentDetail.getName())
-                .addToLabels(KubernetesConstant.GLOBAL_LABEL, deploymentDetail.getName())
-                .addToLabels(KubernetesConstant.K8S_LABEL, deploymentDetail.getName())
-                .addToLabels(KubernetesConstant.VERSION_LABEL, deploymentDetail.getImageTag())
+                .withLabels(fetchLabel(deploymentDetail.getName(), EnvConstant.transform(deploymentDetail.getEnvType()), deploymentDetail.getImageTag()))
                 .endMetadata()
                 .withNewSpec()
                 .withReplicas(deploymentDetail.getInstancesNumber())
                 .withNewTemplate()
                 .withNewMetadata()
-                .addToLabels(KubernetesConstant.GLOBAL_LABEL, deploymentDetail.getName())
-                .addToLabels(KubernetesConstant.K8S_LABEL, deploymentDetail.getName())
-                .addToLabels(KubernetesConstant.VERSION_LABEL, deploymentDetail.getImageTag())
+                .withLabels(fetchLabel(deploymentDetail.getName(), EnvConstant.transform(deploymentDetail.getEnvType()), deploymentDetail.getImageTag()))
                 .endMetadata()
                 .withNewSpec()
                 .withNodeName(deploymentDetail.getNode())
                 .addNewContainer()
                 .withName(deploymentDetail.getName())
                 .withImage(deploymentDetail.getImageName() + ":" + deploymentDetail.getImageTag())
+                .withEnv(fetchEnv(deploymentDetail.getEnvironmentVariable()))
                 .withImagePullPolicy(deploymentDetail.getImagePullStrategy())
                 .endContainer()
                 .addNewImagePullSecret(namespace.getRegistrySecretName())
                 .endSpec()
                 .endTemplate()
                 .withNewSelector()
-                .addToMatchLabels(KubernetesConstant.GLOBAL_LABEL, deploymentDetail.getName())
-                .addToMatchLabels(KubernetesConstant.K8S_LABEL, deploymentDetail.getName())
+                .withMatchLabels(fetchMatchLabel(deploymentDetail.getName(), EnvConstant.transform(deploymentDetail.getEnvType())))
                 .endSelector()
                 .withStrategy(buildStrategy(deploymentDetail))
                 .withRevisionHistoryLimit(deploymentDetail.getRevisionHistoryLimit())
@@ -310,6 +315,36 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
         }
         return deploymentStrategyBuilder
                 .build();
+    }
+
+    private List<EnvVar> fetchEnv(String environmentVariable) {
+        JSONArray env = JSONArray.parseArray(environmentVariable);
+        List<EnvVar> list = new ArrayList<>();
+        for (Object o : env) {
+            JSONObject next = (JSONObject) o;
+            list.add(new EnvVarBuilder()
+                    .withName(next.getString("key"))
+                    .withValue(next.getString("value"))
+                    .build());
+        }
+        return list;
+    }
+
+    private Map<String, String> fetchLabel(String name, String envType, String version) {
+        Map<String, String> label = new HashMap<>();
+        label.put(KubernetesConstant.K8S_LABEL, name);
+        label.put(KubernetesConstant.GLOBAL_LABEL, name);
+        label.put(KubernetesConstant.ENVIRONMENT_LABEL, envType);
+        label.put(KubernetesConstant.VERSION_LABEL, version);
+        return label;
+    }
+
+    private Map<String, String> fetchMatchLabel(String name, String envType) {
+        Map<String, String> label = new HashMap<>();
+        label.put(KubernetesConstant.K8S_LABEL, name);
+        label.put(KubernetesConstant.GLOBAL_LABEL, name);
+        label.put(KubernetesConstant.ENVIRONMENT_LABEL, envType);
+        return label;
     }
 
 }

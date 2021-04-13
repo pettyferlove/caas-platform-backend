@@ -12,6 +12,7 @@
         <result column="images_depository_id" property="imagesDepositoryId" />
         <result column="image_name" property="imageName" />
         <result column="image_tag" property="imageTag" />
+        <result column="environment_variable" property="environmentVariable" />
         <result column="image_pull_strategy" property="imagePullStrategy" />
         <result column="instances_number" property="instancesNumber" />
         <result column="strategy_type" property="strategyType" />
@@ -21,6 +22,7 @@
         <result column="network" property="network" />
         <result column="node" property="node" />
         <result column="external_ip" property="externalIp" />
+        <result column="env_type" property="envType" />
         <result column="del_flag" property="delFlag" />
         <result column="creator" property="creator" />
         <result column="create_time" property="createTime" />
@@ -32,7 +34,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, name, namespace_id, description_content, auto_build_id, images_depository_id, image_name, image_tag, image_pull_strategy, instances_number, strategy_type, max_surge, max_unavaible, revision_history_limit, network, node, external_ip, del_flag, creator, create_time, modifier, modify_time, group_id, tenant_id
+        id, name, namespace_id, description_content, auto_build_id, images_depository_id, image_name, image_tag, environment_variable, image_pull_strategy, instances_number, strategy_type, max_surge, max_unavaible, revision_history_limit, network, node, external_ip, env_type, del_flag, creator, create_time, modifier, modify_time, group_id, tenant_id
     </sql>
 
 </mapper>
