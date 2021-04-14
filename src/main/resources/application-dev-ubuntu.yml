@@ -85,3 +85,13 @@ attachment:
   local:
     name: user-center-local
     root: D:\\attachment\\
+build:
+  images:
+    svn-pull: 192.168.13.61/tools/build-subversion-tool:1.0.0
+    git-pull: 192.168.13.61/tools/build-git-tool:1.0.0
+    sql-build: 192.168.13.61/tools/build-sql-tool:1.0.0
+    persistence: 192.168.13.61/tools/build-persistence-tool:1.0.0
+    maven-build: 192.168.13.61/tools/build-maven-tool:1.0.0
+    nodejs-build: 192.168.13.61/tools/build-nodejs-tool:1.0.0
+    docker-build: 192.168.13.61/tools/build-docker-tool:1.0.0
+    notification: 192.168.13.61/tools/build-notification-tool:1.0.0

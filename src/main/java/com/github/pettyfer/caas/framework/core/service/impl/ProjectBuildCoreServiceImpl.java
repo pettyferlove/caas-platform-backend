@@ -24,6 +24,7 @@ import com.github.pettyfer.caas.global.constants.EnvConstant;
 import com.github.pettyfer.caas.global.constants.GlobalConstant;
 import com.github.pettyfer.caas.global.constants.KubernetesConstant;
 import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
+import com.github.pettyfer.caas.global.properties.BuildImageProperties;
 import com.github.pettyfer.caas.utils.LoadBalanceUtil;
 import com.github.pettyfer.caas.utils.SecurityUtil;
 import com.github.pettyfer.caas.utils.URLResolutionUtil;
@@ -51,6 +52,8 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
 
     private final String HOOKS_ENDPOINT = "http://192.168.51.67:8885/api/v1/hooks/gitlab/";
 
+    private final BuildImageProperties imageProperties;
+
     private final IBizGlobalConfigurationService bizGlobalConfigurationService;
 
     private final IBizUserConfigurationService bizUserConfigurationService;
@@ -71,7 +74,8 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
 
     private final BuildEventPublisher publisher;
 
-    public ProjectBuildCoreServiceImpl(IBizGlobalConfigurationService bizGlobalConfigurationService, IBizUserConfigurationService bizUserConfigurationService, IBizProjectBuildService bizProjectBuildService, IBizProjectBuildHistoryService bizProjectBuildHistoryService, IHarborService harborService, IBizImagesDepositoryService bizImagesDepositoryService, IBizUserConfigurationService userConfigurationService, IBizNamespaceService bizNamespaceService, IJobService jobService, BuildEventPublisher publisher) {
+    public ProjectBuildCoreServiceImpl(BuildImageProperties imageProperties, IBizGlobalConfigurationService bizGlobalConfigurationService, IBizUserConfigurationService bizUserConfigurationService, IBizProjectBuildService bizProjectBuildService, IBizProjectBuildHistoryService bizProjectBuildHistoryService, IHarborService harborService, IBizImagesDepositoryService bizImagesDepositoryService, IBizUserConfigurationService userConfigurationService, IBizNamespaceService bizNamespaceService, IJobService jobService, BuildEventPublisher publisher) {
+        this.imageProperties = imageProperties;
         this.bizGlobalConfigurationService = bizGlobalConfigurationService;
         this.bizUserConfigurationService = bizUserConfigurationService;
         this.bizProjectBuildService = bizProjectBuildService;
@@ -423,7 +427,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         if (depositoryType == 2) {
             containers.add(new ContainerBuilder()
                     .withName("svn-pull")
-                    .withImage("192.168.13.61/tools/build-subversion-tool:1.0.0")
+                    .withImage(imageProperties.getImages().get("svn-pull"))
                     .withImagePullPolicy("Always")
                     .withEnv(fetchEnv(env))
                     .withVolumeMounts(fetchVolumeMount())
@@ -431,7 +435,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         } else {
             containers.add(new ContainerBuilder()
                     .withName("git-pull")
-                    .withImage("192.168.13.61/tools/build-git-tool:1.0.0")
+                    .withImage(imageProperties.getImages().get("git-pull"))
                     .withImagePullPolicy("Always")
                     .withEnv(fetchEnv(env))
                     .withVolumeMounts(fetchVolumeMount())
@@ -443,7 +447,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
             case "maven":
                 containers.add(new ContainerBuilder()
                         .withName("maven-build")
-                        .withImage("192.168.13.61/tools/build-maven-tool:1.0.0")
+                        .withImage(imageProperties.getImages().get("maven-build"))
                         .withImagePullPolicy("Always")
                         .withEnv(fetchEnv(env))
                         .withVolumeMounts(fetchVolumeMount())
@@ -453,7 +457,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
             case "yarn":
                 containers.add(new ContainerBuilder()
                         .withName("nodejs-build")
-                        .withImage("192.168.13.61/tools/build-nodejs-tool:1.0.0")
+                        .withImage(imageProperties.getImages().get("nodejs-build"))
                         .withImagePullPolicy("Always")
                         .withEnv(fetchEnv(env))
                         .withVolumeMounts(fetchVolumeMount())
@@ -467,7 +471,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         if (needPersistent == 1) {
             containers.add(new ContainerBuilder()
                     .withName("persistence")
-                    .withImage("192.168.13.61/tools/build-persistence-tool:1.0.0")
+                    .withImage(imageProperties.getImages().get("persistence"))
                     .withImagePullPolicy("Always")
                     .withEnv(fetchEnv(env))
                     .withVolumeMounts(fetchVolumeMount())
@@ -477,7 +481,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         if (needBuildImage == 1) {
             containers.add(new ContainerBuilder()
                     .withName("docker-build")
-                    .withImage("192.168.13.61/tools/build-docker-tool:1.0.0")
+                    .withImage(imageProperties.getImages().get("docker-build"))
                     .withImagePullPolicy("Always")
                     .withEnv(fetchEnv(env))
                     .withVolumeMounts(fetchVolumeMount())
@@ -491,7 +495,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         List<Container> containers = new LinkedList<>();
         containers.add(new ContainerBuilder()
                 .withName("notification")
-                .withImage("192.168.13.61/tools/build-notification-tool:1.0.0")
+                .withImage(imageProperties.getImages().get("notification"))
                 .withImagePullPolicy("Always")
                 .withEnv(fetchEnv(env))
                 .withVolumeMounts(fetchVolumeMount())

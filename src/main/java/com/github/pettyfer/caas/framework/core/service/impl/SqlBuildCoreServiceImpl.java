@@ -19,6 +19,7 @@ import com.github.pettyfer.caas.global.constants.GlobalConstant;
 import com.github.pettyfer.caas.global.constants.KubernetesConstant;
 import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
 import com.github.pettyfer.caas.framework.core.service.ISqlBuildCoreService;
+import com.github.pettyfer.caas.global.properties.BuildImageProperties;
 import com.github.pettyfer.caas.utils.LoadBalanceUtil;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.batch.Job;
@@ -38,6 +39,8 @@ import java.util.stream.Collectors;
 @Service
 public class SqlBuildCoreServiceImpl implements ISqlBuildCoreService {
 
+    private final BuildImageProperties imageProperties;
+
     private final Environment environment;
 
     private final IBizSqlBuildService bizSqlBuildService;
@@ -52,7 +55,8 @@ public class SqlBuildCoreServiceImpl implements ISqlBuildCoreService {
 
     private final IJobService jobService;
 
-    public SqlBuildCoreServiceImpl(Environment environment, IBizSqlBuildService bizSqlBuildService, IBizSqlBuildHistoryService bizSqlBuildHistoryService, IBizNamespaceService bizNamespaceService, IBizUserConfigurationService userConfigurationService, IBizGlobalConfigurationService globalConfigurationService, IJobService jobService) {
+    public SqlBuildCoreServiceImpl(BuildImageProperties imageProperties, Environment environment, IBizSqlBuildService bizSqlBuildService, IBizSqlBuildHistoryService bizSqlBuildHistoryService, IBizNamespaceService bizNamespaceService, IBizUserConfigurationService userConfigurationService, IBizGlobalConfigurationService globalConfigurationService, IJobService jobService) {
+        this.imageProperties = imageProperties;
         this.environment = environment;
         this.bizSqlBuildService = bizSqlBuildService;
         this.bizSqlBuildHistoryService = bizSqlBuildHistoryService;
@@ -275,7 +279,7 @@ public class SqlBuildCoreServiceImpl implements ISqlBuildCoreService {
         if (depositoryType == 2) {
             containers.add(new ContainerBuilder()
                     .withName("svn-pull")
-                    .withImage("192.168.13.61/tools/build-subversion-tool:1.0.0")
+                    .withImage(imageProperties.getImages().get("svn-pull"))
                     .withImagePullPolicy("Always")
                     .withEnv(fetchEnv(env))
                     .withVolumeMounts(fetchVolumeMount())
@@ -283,7 +287,7 @@ public class SqlBuildCoreServiceImpl implements ISqlBuildCoreService {
         } else {
             containers.add(new ContainerBuilder()
                     .withName("git-pull")
-                    .withImage("192.168.13.61/tools/build-git-tool:1.0.0")
+                    .withImage(imageProperties.getImages().get("git-pull"))
                     .withImagePullPolicy("Always")
                     .withEnv(fetchEnv(env))
                     .withVolumeMounts(fetchVolumeMount())
@@ -292,14 +296,14 @@ public class SqlBuildCoreServiceImpl implements ISqlBuildCoreService {
 
         containers.add(new ContainerBuilder()
                 .withName("sql-build")
-                .withImage("192.168.13.61/tools/build-sql-tool:1.0.0")
+                .withImage(imageProperties.getImages().get("sql-build"))
                 .withImagePullPolicy("Always")
                 .withEnv(fetchEnv(env))
                 .withVolumeMounts(fetchVolumeMount())
                 .build());
         containers.add(new ContainerBuilder()
                 .withName("persistence")
-                .withImage("192.168.13.61/tools/build-persistence-tool:1.0.0")
+                .withImage(imageProperties.getImages().get("persistence"))
                 .withImagePullPolicy("Always")
                 .withEnv(fetchEnv(env))
                 .withVolumeMounts(fetchVolumeMount())
@@ -311,7 +315,7 @@ public class SqlBuildCoreServiceImpl implements ISqlBuildCoreService {
         List<Container> containers = new LinkedList<>();
         containers.add(new ContainerBuilder()
                 .withName("notification")
-                .withImage("192.168.13.61/tools/build-notification-tool:1.0.0")
+                .withImage(imageProperties.getImages().get("notification"))
                 .withImagePullPolicy("Always")
                 .withEnv(fetchEnv(env))
                 .withVolumeMounts(fetchVolumeMount())
