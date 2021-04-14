@@ -4,6 +4,7 @@ LABEL description="基础工具镜像"
 
 ARG GLIBC_VERSION=2.29-r0
 ARG GLIBC_DOWNLOAD_URL=https://github.com/sgerrand/alpine-pkg-glibc/releases/download/${GLIBC_VERSION}
+# 替换为国内镜像源
 RUN set -eux && sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
 RUN apk update &&\
     apk upgrade &&\

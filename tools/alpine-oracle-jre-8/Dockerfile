@@ -1,4 +1,4 @@
-FROM pettyfer/apline-base:1.1.0
+FROM pettyfer/alpine-base:1.0.0
 LABEL maintainer="Alex Pettyfer <pettyferlove@live.cn>"
 LABEL description="基础工具镜像-Oracle JRE 8"
 
