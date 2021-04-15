@@ -1,5 +1,8 @@
 package com.github.pettyfer.caas.framework.biz.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -46,7 +49,12 @@ public class BizApplicationDeploymentServiceImpl extends ServiceImpl<BizApplicat
 
     @Override
     public IPage<BizApplicationDeployment> page(String namespaceId, BizApplicationDeployment bizApplicationDeployment, Page<BizApplicationDeployment> page) {
-        return this.page(page, Wrappers.lambdaQuery(bizApplicationDeployment).eq(BizApplicationDeployment::getNamespaceId, namespaceId).orderByDesc(BizApplicationDeployment::getCreateTime));
+        LambdaQueryWrapper<BizApplicationDeployment> queryWrapper = Wrappers.<BizApplicationDeployment>lambdaQuery()
+                .eq(BizApplicationDeployment::getNamespaceId, namespaceId)
+                .likeRight(StrUtil.isNotEmpty(bizApplicationDeployment.getName()), BizApplicationDeployment::getName, bizApplicationDeployment.getName())
+                .eq(ObjectUtil.isNotNull(bizApplicationDeployment.getEnvType()), BizApplicationDeployment::getEnvType, bizApplicationDeployment.getEnvType())
+                .orderByDesc(BizApplicationDeployment::getCreateTime);
+        return this.page(page, queryWrapper);
     }
 
     @Override
