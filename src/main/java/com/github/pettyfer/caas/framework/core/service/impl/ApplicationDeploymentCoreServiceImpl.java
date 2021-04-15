@@ -193,7 +193,7 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
         if (namespaceOptional.isPresent()) {
             ApplicationDeploymentDetailView applicationDeploymentDetailView = bizApplicationDeploymentService.get(id);
             Optional<Deployment> deploymentOptional = Optional.ofNullable(deploymentService.get(namespaceOptional.get().getName(), applicationDeploymentDetailView.getName()));
-            if(deploymentOptional.isPresent()) {
+            if (deploymentOptional.isPresent()) {
                 Deployment deployment = deploymentOptional.get();
                 applicationDeploymentDetailView.setLabels(deployment.getMetadata().getLabels());
                 applicationDeploymentDetailView.setReadyReplicas(deployment.getStatus().getReadyReplicas());
@@ -326,55 +326,59 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
 
     private List<Volume> fetchVolume(List<ApplicationDeploymentMountView> volumeViews) {
         List<Volume> volumes = new ArrayList<>();
-        volumeViews.forEach(i->{
-            VolumeBuilder volumeBuilder = new VolumeBuilder();
-            volumeBuilder.withName(i.getMountName());
-            if("ConfigMap".equals(i.getVolumeType())){
-                Optional<BizConfig> bizConfig = Optional.ofNullable(bizConfigService.get(i.getConfigId()));
-                if(bizConfig.isPresent()) {
-                    BizConfig config = bizConfig.get();
-                    volumeBuilder.withNewConfigMap()
-                            .withName(config.getConfigName())
-                            .endConfigMap();
-                } else {
-                    throw new BaseRuntimeException("配置文件不存在");
+        volumeViews.forEach(i -> {
+            if (StrUtil.isNotEmpty(i.getVolumeType())) {
+                VolumeBuilder volumeBuilder = new VolumeBuilder();
+                volumeBuilder.withName(i.getMountName());
+                if ("ConfigMap".equals(i.getVolumeType())) {
+                    Optional<BizConfig> bizConfig = Optional.ofNullable(bizConfigService.get(i.getConfigId()));
+                    if (bizConfig.isPresent()) {
+                        BizConfig config = bizConfig.get();
+                        volumeBuilder.withNewConfigMap()
+                                .withName(config.getConfigName())
+                                .endConfigMap();
+                    } else {
+                        throw new BaseRuntimeException("配置文件不存在");
+                    }
+                } else if ("EmptyDir".equals(i.getVolumeType())) {
+                    volumeBuilder.withEmptyDir(new EmptyDirVolumeSource());
+                } else if ("HostPath".equals(i.getVolumeType())) {
+                    volumeBuilder.withHostPath(new HostPathVolumeSourceBuilder()
+                            .withPath(i.getVolumePath())
+                            .withType("DirectoryOrCreate")
+                            .build());
+                } else if ("PersistentVolumeClaim".equals(i.getVolumeType())) {
+                    volumeBuilder.withPersistentVolumeClaim(new PersistentVolumeClaimVolumeSourceBuilder()
+                            .withClaimName(i.getVolumeName())
+                            .withReadOnly(false)
+                            .build());
                 }
-            } else if("EmptyDir".equals(i.getVolumeType())){
-                volumeBuilder.withEmptyDir(new EmptyDirVolumeSource());
-            } else if("HostPath".equals(i.getVolumeType())){
-                volumeBuilder.withHostPath(new HostPathVolumeSourceBuilder()
-                        .withPath(i.getVolumePath())
-                        .withType("DirectoryOrCreate")
-                        .build());
-            } else if("PersistentVolumeClaim".equals(i.getVolumeType())){
-                volumeBuilder.withPersistentVolumeClaim(new PersistentVolumeClaimVolumeSourceBuilder()
-                        .withClaimName(i.getVolumeName())
-                        .withReadOnly(false)
-                        .build());
+                volumes.add(volumeBuilder.build());
             }
-            volumes.add(volumeBuilder.build());
         });
         return volumes;
     }
 
     private List<VolumeMount> fetchVolumeMount(List<ApplicationDeploymentMountView> volumeViews) {
         List<VolumeMount> volumeMounts = new ArrayList<>();
-        volumeViews.forEach(i-> {
-            VolumeMountBuilder volumeMountBuilder = new VolumeMountBuilder();
-            volumeMountBuilder.withName(i.getMountName());
-            if("ConfigMap".equals(i.getVolumeType())){
-                Optional<BizConfig> bizConfig = Optional.ofNullable(bizConfigService.get(i.getConfigId()));
-                if(bizConfig.isPresent()) {
-                    BizConfig config = bizConfig.get();
-                    volumeMountBuilder.withMountPath(i.getMountPath() + "/" + config.getFileName());
-                    volumeMountBuilder.withSubPath(config.getFileName());
+        volumeViews.forEach(i -> {
+            if (StrUtil.isNotEmpty(i.getVolumeType())) {
+                VolumeMountBuilder volumeMountBuilder = new VolumeMountBuilder();
+                volumeMountBuilder.withName(i.getMountName());
+                if ("ConfigMap".equals(i.getVolumeType())) {
+                    Optional<BizConfig> bizConfig = Optional.ofNullable(bizConfigService.get(i.getConfigId()));
+                    if (bizConfig.isPresent()) {
+                        BizConfig config = bizConfig.get();
+                        volumeMountBuilder.withMountPath(i.getMountPath() + "/" + config.getFileName());
+                        volumeMountBuilder.withSubPath(config.getFileName());
+                    } else {
+                        throw new BaseRuntimeException("配置文件不存在");
+                    }
                 } else {
-                    throw new BaseRuntimeException("配置文件不存在");
+                    volumeMountBuilder.withMountPath(i.getMountPath());
                 }
-            } else {
-                volumeMountBuilder.withMountPath(i.getMountPath());
+                volumeMounts.add(volumeMountBuilder.build());
             }
-            volumeMounts.add(volumeMountBuilder.build());
         });
         return volumeMounts;
     }
@@ -398,10 +402,12 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
         List<EnvVar> list = new ArrayList<>();
         for (Object o : env) {
             JSONObject next = (JSONObject) o;
-            list.add(new EnvVarBuilder()
-                    .withName(next.getString("key"))
-                    .withValue(next.getString("value"))
-                    .build());
+            if (!next.isEmpty()) {
+                list.add(new EnvVarBuilder()
+                        .withName(next.getString("key"))
+                        .withValue(next.getString("value"))
+                        .build());
+            }
         }
         return list;
     }
