@@ -1,7 +1,7 @@
 package com.github.pettyfer.caas.framework.biz.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.github.pettyfer.caas.framework.biz.entity.BizApplicationDeploymentVolume;
+import com.github.pettyfer.caas.framework.biz.entity.BizApplicationDeploymentMount;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.github.pettyfer.caas.framework.biz.entity.BizApplicationDeploymentVol
  * @author Petty
  * @since 2021-04-13
  */
-public interface BizApplicationDeploymentVolumeMapper extends BaseMapper<BizApplicationDeploymentVolume> {
+public interface BizApplicationDeploymentMountMapper extends BaseMapper<BizApplicationDeploymentMount> {
 
 }

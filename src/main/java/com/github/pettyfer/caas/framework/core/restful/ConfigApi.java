@@ -3,6 +3,7 @@ package com.github.pettyfer.caas.framework.core.restful;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pettyfer.caas.framework.biz.entity.BizConfig;
+import com.github.pettyfer.caas.framework.core.model.ConfigSelectView;
 import com.github.pettyfer.caas.framework.core.service.IConfigCoreService;
 import com.github.pettyfer.caas.global.constants.ApiConstant;
 import com.github.pettyfer.caas.global.model.R;
@@ -10,6 +11,7 @@ import com.github.pettyfer.caas.framework.core.model.ConfigListView;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author Pettyfer
@@ -49,5 +51,9 @@ public class ConfigApi {
         return new R<Boolean>(configCoreService.delete(id));
     }
 
+    @GetMapping("select/{namespaceId}")
+    public R<List<ConfigSelectView>> configSelect(@PathVariable String namespaceId) {
+        return new R<List<ConfigSelectView>>(configCoreService.configSelect(namespaceId));
+    }
 
 }

@@ -117,4 +117,6 @@ public class ApplicationDeploymentDetailView implements Serializable {
 
     private List<ApplicationDeploymentNetworkView> networks;
 
+    private List<ApplicationDeploymentMountView> mounts;
+
 }

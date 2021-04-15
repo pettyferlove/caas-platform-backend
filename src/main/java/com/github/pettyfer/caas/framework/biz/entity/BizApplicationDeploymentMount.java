@@ -26,12 +26,18 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value="BizApplicationDeploymentVolume对象", description="")
-public class BizApplicationDeploymentVolume extends BaseEntity<BizApplicationDeploymentVolume> {
+@ApiModel(value="BizApplicationDeploymentMount对象", description="")
+public class BizApplicationDeploymentMount extends BaseEntity<BizApplicationDeploymentMount> {
 
     private static final long serialVersionUID = 1L;
 
     private String deploymentId;
+
+    @ApiModelProperty(value = "挂载名称")
+    private String mountName;
+
+    @ApiModelProperty(value = "挂载地址")
+    private String mountPath;
 
     @ApiModelProperty(value = "卷名")
     private String volumeName;
@@ -44,12 +50,6 @@ public class BizApplicationDeploymentVolume extends BaseEntity<BizApplicationDep
 
     @ApiModelProperty(value = "配置文件ID")
     private String configId;
-
-    @ApiModelProperty(value = "挂载名称")
-    private String mountName;
-
-    @ApiModelProperty(value = "挂载地址")
-    private String mountPath;
 
     @ApiModelProperty(value = "项目组ID")
     private String groupId;

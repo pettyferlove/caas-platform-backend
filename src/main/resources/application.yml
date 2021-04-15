@@ -4,3 +4,7 @@ spring:
     group: caas
   profiles:
     active: dev-ubuntu
+jasypt:
+  encryptor:
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator

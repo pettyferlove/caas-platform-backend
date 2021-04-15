@@ -1,23 +1,29 @@
 package com.github.pettyfer.caas.framework.core.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pettyfer.caas.framework.biz.entity.BizConfig;
 import com.github.pettyfer.caas.framework.biz.entity.BizNamespace;
 import com.github.pettyfer.caas.framework.biz.service.IBizConfigService;
 import com.github.pettyfer.caas.framework.biz.service.IBizNamespaceService;
+import com.github.pettyfer.caas.framework.core.model.ConfigSelectView;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.IConfigMapService;
 import com.github.pettyfer.caas.global.constants.EnvConstant;
 import com.github.pettyfer.caas.global.constants.KubernetesConstant;
 import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
 import com.github.pettyfer.caas.framework.core.model.ConfigListView;
 import com.github.pettyfer.caas.framework.core.service.IConfigCoreService;
+import com.github.pettyfer.caas.utils.ConverterUtil;
 import io.fabric8.kubernetes.api.model.ConfigMap;
 import io.fabric8.kubernetes.api.model.ConfigMapBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -93,6 +99,17 @@ public class ConfigCoreServiceImpl implements IConfigCoreService {
         return bizConfigService.delete(id);
     }
 
+    @Override
+    public List<ConfigSelectView> configSelect(String namespaceId) {
+        Optional<BizNamespace> bizNamespaceOptional = Optional.ofNullable(bizNamespaceService.get(namespaceId));
+        if (bizNamespaceOptional.isPresent()) {
+            LambdaQueryWrapper<BizConfig> queryWrapper = Wrappers.<BizConfig>lambdaQuery();
+            List<BizConfig> list = bizConfigService.list(queryWrapper);
+            return Optional.ofNullable(ConverterUtil.convertList(BizConfig.class, ConfigSelectView.class, list)).orElseGet(ArrayList::new);
+        } else {
+            throw new BaseRuntimeException("命名空间不存在");
+        }
+    }
 
     private ConfigMap buildConfigMap(BizNamespace namespace, BizConfig config) {
         return new ConfigMapBuilder()
@@ -104,6 +121,5 @@ public class ConfigCoreServiceImpl implements IConfigCoreService {
                 .endMetadata()
                 .addToData(config.getFileName(), config.getContent())
                 .build();
-
     }
 }

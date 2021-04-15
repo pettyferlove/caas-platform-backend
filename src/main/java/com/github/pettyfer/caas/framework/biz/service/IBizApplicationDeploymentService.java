@@ -3,8 +3,8 @@ package com.github.pettyfer.caas.framework.biz.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentDetailView;
 import com.github.pettyfer.caas.framework.biz.entity.BizApplicationDeployment;
+import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentDetailView;
 
 /**
  * <p>
@@ -62,6 +62,11 @@ public interface IBizApplicationDeploymentService extends IService<BizApplicatio
 
     Boolean update(BizApplicationDeployment bizApplicationDeployment);
 
+    /**
+     * 触发自动更新时更新部分应用信息
+     * @param bizApplicationDeployment 应用信息
+     * @return 是否成功
+     */
     Boolean updateForRobot(BizApplicationDeployment bizApplicationDeployment);
 
 }

@@ -78,20 +78,20 @@ mybatis-plus:
     call-setters-on-nulls: true
 kubernetes:
   client:
-    master-url: ENC('7kfJ+Em3YOFKRkh5o4CMlYH08+BNNVZQc4xK0CLOh6lc3fHulm/xXBMrv1PJrOO9UYGU4CsZNLE=')
-    token: ENC('02iLTr8wCpFebxvwbkHMSRFVHvBExrGtUh+cpQIvEsWAXQzU0oDG8HXRJT6DIFTEb7mUZOo3FkJNuWlvinXlJF4HklD6E2kwg7lI/u1b27Df/3YSV9onP4h89BFB7VQ1RzC8a1PUE5CfsqxKBkQOF9oCTTvtOOxYiN8T3vYPPo05XiOnmPvPdb+M3za231fVYHHJljl/LGA24HI29YUwa7jTT7scyz7+qmpspug3V7l69xbSnAvLpBC/kjtz0vCA2L2ErtTj1gCfB7cImHXuFmXkW6v0fJZ85BJJpmwgu1Qv1d489N2bPWpzPlBuGNO2cHvfAUuEV9SWZ8sm1BLZk/y76MYky1MkZgJ+cslob48mDWh7Lf9vLK2M38kKjTjc0rtmAUND1IG4ABiY9XgxTlC7HNEpXU44Y/wDDxsxMcG+wCkpXdZ3O9bVAKmH8fDIhW8S8j51acvM9HiyNVHahRs/3NZXTYTO0wKazTcqWC+eS/ngC529OMhVD/NBzNTuAKwg16xmLrqxbRJRsg3I2+UYsuISXVzZYrCVlkoFE2r4cIdusD6jK05VxZSUm04dO2NmyY4S/r44KbFwYb+eXvt6PtwpcR29B8e2ZFTinBS894WdywG9jejW3zO73HghixKXMtFg/oSyKjoK2qGW1/OaZt8HUOGqzaB5FN3BDzAoDRC0EOQm8gO1Qt1TMtSHnNLCwzDktjQRP09WNgEpikEEdCsi6qCxZXMFugGMUH2IPKUn7QEwrMDSBo0iaxvBKgA1J1E8l0L5zceo3wBu7/95nCCpv827EdHkNNsbquQio98Tw2wnCFIvNV8eHKBOyCVfSyzKPES3/rKL7inLFJzeRiQq20zIFxUcSTapWqc2Ns5tvkEIZjl57xqVzhSWSa1WvhZoaR/M/IlwmOsWotHWjin8qyfIoacAxynE9+YW2zbilc/FdS6zii5PPZZKWBisNPZU44R4ZncY7FT1VP99ic0t5Aggr+D6quFk8/83ADIat0PDxW+ZLz6CacGyVNSIv1h0/HjAcOtXObX8LmPOBgq+p1dFlIXP2HU1QtPNghfwgdvRKNTSaBB+8AVTPgr0VeB70uBIvtXshfirbDnxJAl2iJwadFs3cgDt64XEV3RSOvcU3UtzmEHXVYeUJsm9ttXaL03lz44moylevwVZlD3STlhSfJu6dBZgAR3vsmZPDy0sTUhDU2A+B2VtlTExZM5+TVJRI0DIqnFWCfQMCPqhX1ZW')
-    cert: certs/ubuntu/ca.crt
+    master-url: ENC('C5RmVP5CbuPGoaJ/7AT1q50iFO++Fb7vq+ORiEUKCqwI71HwoGbyZA==')
+    token: ENC('RQMYQAZk7YXeDs+NtDLk5b79wQhmma/5KUmF8bTbHM+clzDtLQUWpGpQYGjrhd/jyVQA3N0VaLSSuGF8rnRb2lO/guJWrISX63c8lus/MrPWXnizKPydajxK75Xx3tXwSGitkRI49FwZV3YzWQtWiVq2kh8JPZ03MlO0OqU7LMg5FAavaj5Vaq6vREaQh//pD6WueUjRDF/l7F7F/qAJipL+/j3ibfwBlO+spGrEW6htZ477y6jJ7CA6/rXhF6oPKDqayTBforufDoaco5JBn+dePJ4FUHfv/iKvtWpu4uH75ErPGXqSeAllD58yUIV8ncoJbAv8k5uuz5zld+t30kJyaOgcK3s0NvsBsIp/7IB8r4VftzTn8X+JIkq6GYR0VYfgmdFs6F6Mxl2jMlTJ5b/xyYGA8HjIGgLKatWjEYvgt6qQuzdLGI+PP+SW1Im0UTaXrwwSnmWvm2OIyFvPw8+CNpSGVOc/ToGHtyifb85OiLX91Wku6TFCPxHOuHIu7FUMTsekC5EqSgrYDZvF3PUt6lBKVYzu3y2+WeSKhes31Xv15jLL8dffWAdR/DLK1hyk/xvlFXihUmjN83Vac+umlEh4saBQg8nQ7guhWqqxJyvc3CDsVbil5uKGz615ujJrYbUiV1wZ/6u6Fj9+Z/U6T1SROU+9qanScxeNCKTGSf0fohbeV2b//4zi1JOnSdVmDEFoMCOcHdDlg/L0E5H/Irh+xw39RIb+RvQGoRIcA9B8z/U2KzM+ylhsKGihldTtPBjk86Sod5LRsnwYo7Uvj1YWLSX5uly+LxldBsgdpCUh8/kVnpsy21xU7Tfm3NEp7Kf29btVSeDybzlAG3EZ2zmNPNYo2ZEpFie/ZoBb3nTCfjEtDAXRHxZYxdo6B1yHuexEvQ7YXJYOHpS/45xNGE5SV1tQNYrog94O8njvtLNC0NmzlvNvLxD0saVZc8o4SKIAuPtwn5n+udeClUL7kJ5O4koN9jfdAloaBktUxmk7H0sJAKb58I3b9a03hB+UMpFeAktKLcEhz/YM9J/YqtuIM5XOCv8q3diq0tpM5uCQSxbV0cLWn576e1dMEMAfvDhPYvG3dnYAd6tx3aE5He1xL2/8zdUTmO1DS8hcywWEvufVvC6urzXowXwFVC4ZL8qNZdsmXASJ2Zo0xnHG/dX0IT8jJY/9D+i+S0Owck6tkBTwsY7tqkooRqAU23gbbPssrKpUiOlVAva8hym8+tDb5b8L')
+    cert: certs/centos/ca.crt
 attachment:
   local:
     name: user-center-local
     root: D:\\attachment\\
 build:
   images:
-    svn-pull: 192.168.0.4/tools/build-subversion-tool:1.0.0
-    git-pull: 192.168.0.4/tools/build-git-tool:1.0.0
-    sql-build: 192.168.0.4/tools/build-sql-tool:1.0.0
-    persistence: 192.168.0.4/tools/build-persistence-tool:1.0.0
-    maven-build: 192.168.0.4/tools/build-maven-tool:1.0.0
-    nodejs-build: 192.168.0.4/tools/build-nodejs-tool:1.0.0
-    docker-build: 192.168.0.4/tools/build-docker-tool:1.0.0
-    notification: 192.168.0.4/tools/build-notification-tool:1.0.0
+    svn-pull: 192.168.13.61/tools/build-subversion-tool:1.0.0
+    git-pull: 192.168.13.61/tools/build-git-tool:1.0.0
+    sql-build: 192.168.13.61/tools/build-sql-tool:1.0.0
+    persistence: 192.168.13.61/tools/build-persistence-tool:1.0.0
+    maven-build: 192.168.13.61/tools/build-maven-tool:1.0.0
+    nodejs-build: 192.168.13.61/tools/build-nodejs-tool:1.0.0
+    docker-build: 192.168.13.61/tools/build-docker-tool:1.0.0
+    notification: 192.168.13.61/tools/build-notification-tool:1.0.0

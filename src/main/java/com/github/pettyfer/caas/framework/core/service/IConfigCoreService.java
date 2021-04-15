@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pettyfer.caas.framework.biz.entity.BizConfig;
 import com.github.pettyfer.caas.framework.core.model.ConfigListView;
+import com.github.pettyfer.caas.framework.core.model.ConfigSelectView;
+
+import java.util.List;
 
 /**
  * @author Pettyfer
@@ -46,4 +49,7 @@ public interface IConfigCoreService {
      * @return 删除结果
      */
     Boolean delete(String id);
+
+    List<ConfigSelectView> configSelect(String namespaceId);
+
 }

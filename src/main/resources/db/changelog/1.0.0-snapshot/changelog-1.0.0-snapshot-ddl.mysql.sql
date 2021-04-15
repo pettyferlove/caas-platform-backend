@@ -38,3 +38,13 @@ create table biz_application_deployment_volume
     group_id      varchar(128)     null comment '项目组ID',
     tenant_id     varchar(128)     null comment '租户ID'
 );
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-5
+alter table biz_namespace modify env_type tinyint unsigned default 1 null comment '环境类型';
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-6
+alter table biz_application_deployment_volume modify mount_name varchar(128) null comment '挂载名称' after deployment_id;
+
+alter table biz_application_deployment_volume modify mount_path varchar(255) null comment '挂载地址' after mount_name;
+
+rename table biz_application_deployment_volume to biz_application_deployment_mount;

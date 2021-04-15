@@ -8,14 +8,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.pettyfer.caas.framework.biz.entity.BizApplicationDeployment;
-import com.github.pettyfer.caas.framework.biz.entity.BizApplicationDeploymentNetwork;
-import com.github.pettyfer.caas.framework.biz.entity.BizNamespace;
-import com.github.pettyfer.caas.framework.biz.service.IBizApplicationDeploymentNetworkService;
-import com.github.pettyfer.caas.framework.biz.service.IBizApplicationDeploymentService;
-import com.github.pettyfer.caas.framework.biz.service.IBizNamespaceService;
+import com.github.pettyfer.caas.framework.biz.entity.*;
+import com.github.pettyfer.caas.framework.biz.service.*;
 import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentDetailView;
 import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentListView;
+import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentMountView;
 import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentNetworkView;
 import com.github.pettyfer.caas.framework.core.service.IApplicationDeploymentCoreService;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.IDeploymentService;
@@ -46,15 +43,21 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
 
     private final IBizApplicationDeploymentNetworkService bizApplicationDeploymentNetworkService;
 
+    private final IBizApplicationDeploymentMountService bizApplicationDeploymentVolumeService;
+
+    private final IBizConfigService bizConfigService;
+
     private final IBizNamespaceService bizNamespaceService;
 
     private final IDeploymentService deploymentService;
 
     private final INetworkService networkService;
 
-    public ApplicationDeploymentCoreServiceImpl(IBizApplicationDeploymentService bizApplicationDeploymentService, IBizApplicationDeploymentNetworkService bizApplicationDeploymentNetworkService, IDeploymentService deploymentService, IBizNamespaceService bizNamespaceService, INetworkService networkService) {
+    public ApplicationDeploymentCoreServiceImpl(IBizApplicationDeploymentService bizApplicationDeploymentService, IBizApplicationDeploymentNetworkService bizApplicationDeploymentNetworkService, IBizApplicationDeploymentMountService bizApplicationDeploymentVolumeService, IBizConfigService bizConfigService, IDeploymentService deploymentService, IBizNamespaceService bizNamespaceService, INetworkService networkService) {
         this.bizApplicationDeploymentService = bizApplicationDeploymentService;
         this.bizApplicationDeploymentNetworkService = bizApplicationDeploymentNetworkService;
+        this.bizApplicationDeploymentVolumeService = bizApplicationDeploymentVolumeService;
+        this.bizConfigService = bizConfigService;
         this.deploymentService = deploymentService;
         this.bizNamespaceService = bizNamespaceService;
         this.networkService = networkService;
@@ -70,6 +73,7 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                 ConverterUtil.convert(deploymentDetail, bizApplicationDeployment);
                 String deploymentId = bizApplicationDeploymentService.create(namespaceId, bizApplicationDeployment);
                 bizApplicationDeploymentNetworkService.batchInsert(deploymentId, deploymentDetail.getNetworks());
+                bizApplicationDeploymentVolumeService.batchInsert(deploymentId, deploymentDetail.getMounts());
 
                 try {
                     Deployment deployment = buildDeployment(namespaceOptional.get(), deploymentDetail);
@@ -107,13 +111,23 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                 if (update) {
                     bizApplicationDeploymentNetworkService.remove(Wrappers.<BizApplicationDeploymentNetwork>lambdaQuery().eq(BizApplicationDeploymentNetwork::getDeploymentId, deploymentId));
                     bizApplicationDeploymentNetworkService.batchInsert(deploymentId, deploymentDetail.getNetworks());
-                }
-                Deployment deployment = buildDeployment(namespaceOptional.get(), deploymentDetail);
-                deploymentService.update(namespaceOptional.get().getName(), bizApplicationDeployment.getName(), deployment);
 
-                if (StrUtil.isNotEmpty(deploymentDetail.getNetwork()) && !"none".equals(deploymentDetail.getNetwork())) {
-                    networkService.createOrUpdate(namespaceOptional.get().getName(), buildService(deploymentDetail));
+                    bizApplicationDeploymentVolumeService.remove(Wrappers.<BizApplicationDeploymentMount>lambdaQuery().eq(BizApplicationDeploymentMount::getDeploymentId, deploymentId));
+                    bizApplicationDeploymentVolumeService.batchInsert(deploymentId, deploymentDetail.getMounts());
                 }
+
+                try {
+                    Deployment deployment = buildDeployment(namespaceOptional.get(), deploymentDetail);
+                    deploymentService.update(namespaceOptional.get().getName(), bizApplicationDeployment.getName(), deployment);
+
+                    if (StrUtil.isNotEmpty(deploymentDetail.getNetwork()) && !"none".equals(deploymentDetail.getNetwork())) {
+                        networkService.createOrUpdate(namespaceOptional.get().getName(), buildService(deploymentDetail));
+                    }
+                } catch (Exception ignored) {
+                    deploymentService.delete(namespaceOptional.get().getName(), deploymentDetail.getName());
+                    networkService.delete(namespaceOptional.get().getName(), deploymentDetail.getName());
+                }
+
                 return update;
             } catch (DuplicateKeyException e) {
                 throw new BaseRuntimeException("已存在同名部署");
@@ -178,13 +192,18 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
         Optional<BizNamespace> namespaceOptional = Optional.ofNullable(bizNamespaceService.get(namespaceId));
         if (namespaceOptional.isPresent()) {
             ApplicationDeploymentDetailView applicationDeploymentDetailView = bizApplicationDeploymentService.get(id);
-            Deployment deployment = deploymentService.get(namespaceOptional.get().getName(), applicationDeploymentDetailView.getName());
-            applicationDeploymentDetailView.setLabels(deployment.getMetadata().getLabels());
-            applicationDeploymentDetailView.setReadyReplicas(deployment.getStatus().getReadyReplicas());
-            applicationDeploymentDetailView.setAvailableReplicas(deployment.getStatus().getAvailableReplicas());
-            applicationDeploymentDetailView.setUnavailableReplicas(deployment.getStatus().getUnavailableReplicas());
-            applicationDeploymentDetailView.setUpdatedReplicas(deployment.getStatus().getUpdatedReplicas());
-            applicationDeploymentDetailView.setReplicas(deployment.getStatus().getReplicas());
+            Optional<Deployment> deploymentOptional = Optional.ofNullable(deploymentService.get(namespaceOptional.get().getName(), applicationDeploymentDetailView.getName()));
+            if(deploymentOptional.isPresent()) {
+                Deployment deployment = deploymentOptional.get();
+                applicationDeploymentDetailView.setLabels(deployment.getMetadata().getLabels());
+                applicationDeploymentDetailView.setReadyReplicas(deployment.getStatus().getReadyReplicas());
+                applicationDeploymentDetailView.setAvailableReplicas(deployment.getStatus().getAvailableReplicas());
+                applicationDeploymentDetailView.setUnavailableReplicas(deployment.getStatus().getUnavailableReplicas());
+                applicationDeploymentDetailView.setUpdatedReplicas(deployment.getStatus().getUpdatedReplicas());
+                applicationDeploymentDetailView.setReplicas(deployment.getStatus().getReplicas());
+            } else {
+                throw new BaseRuntimeException("命名空间不存在该应用或应用部署失败");
+            }
             return applicationDeploymentDetailView;
         } else {
             throw new BaseRuntimeException("命名空间不存在");
@@ -290,7 +309,9 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                 .withImage(deploymentDetail.getImageName() + ":" + deploymentDetail.getImageTag())
                 .withEnv(fetchEnv(deploymentDetail.getEnvironmentVariable()))
                 .withImagePullPolicy(deploymentDetail.getImagePullStrategy())
+                .withVolumeMounts(fetchVolumeMount(deploymentDetail.getMounts()))
                 .endContainer()
+                .withVolumes(fetchVolume(deploymentDetail.getMounts()))
                 .addNewImagePullSecret(namespace.getRegistrySecretName())
                 .endSpec()
                 .endTemplate()
@@ -301,6 +322,61 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                 .withRevisionHistoryLimit(deploymentDetail.getRevisionHistoryLimit())
                 .endSpec()
                 .build();
+    }
+
+    private List<Volume> fetchVolume(List<ApplicationDeploymentMountView> volumeViews) {
+        List<Volume> volumes = new ArrayList<>();
+        volumeViews.forEach(i->{
+            VolumeBuilder volumeBuilder = new VolumeBuilder();
+            volumeBuilder.withName(i.getMountName());
+            if("ConfigMap".equals(i.getVolumeType())){
+                Optional<BizConfig> bizConfig = Optional.ofNullable(bizConfigService.get(i.getConfigId()));
+                if(bizConfig.isPresent()) {
+                    BizConfig config = bizConfig.get();
+                    volumeBuilder.withNewConfigMap()
+                            .withName(config.getConfigName())
+                            .endConfigMap();
+                } else {
+                    throw new BaseRuntimeException("配置文件不存在");
+                }
+            } else if("EmptyDir".equals(i.getVolumeType())){
+                volumeBuilder.withEmptyDir(new EmptyDirVolumeSource());
+            } else if("HostPath".equals(i.getVolumeType())){
+                volumeBuilder.withHostPath(new HostPathVolumeSourceBuilder()
+                        .withPath(i.getVolumePath())
+                        .withType("DirectoryOrCreate")
+                        .build());
+            } else if("PersistentVolumeClaim".equals(i.getVolumeType())){
+                volumeBuilder.withPersistentVolumeClaim(new PersistentVolumeClaimVolumeSourceBuilder()
+                        .withClaimName(i.getVolumeName())
+                        .withReadOnly(false)
+                        .build());
+            }
+            volumes.add(volumeBuilder.build());
+        });
+        return volumes;
+    }
+
+    private List<VolumeMount> fetchVolumeMount(List<ApplicationDeploymentMountView> volumeViews) {
+        List<VolumeMount> volumeMounts = new ArrayList<>();
+        volumeViews.forEach(i-> {
+            VolumeMountBuilder volumeMountBuilder = new VolumeMountBuilder();
+            volumeMountBuilder.withName(i.getMountName());
+            if("ConfigMap".equals(i.getVolumeType())){
+                Optional<BizConfig> bizConfig = Optional.ofNullable(bizConfigService.get(i.getConfigId()));
+                if(bizConfig.isPresent()) {
+                    BizConfig config = bizConfig.get();
+                    volumeMountBuilder.withMountPath(i.getMountPath() + "/" + config.getFileName());
+                    volumeMountBuilder.withSubPath(config.getFileName());
+                } else {
+                    throw new BaseRuntimeException("配置文件不存在");
+                }
+            } else {
+                volumeMountBuilder.withMountPath(i.getMountPath());
+            }
+            volumeMounts.add(volumeMountBuilder.build());
+        });
+        return volumeMounts;
     }
 
     private DeploymentStrategy buildStrategy(ApplicationDeploymentDetailView deploymentDetail) {

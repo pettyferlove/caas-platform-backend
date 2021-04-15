@@ -51,4 +51,16 @@ public class KubernetesClientAutoConfiguration {
         return new DefaultKubernetesClient(config);
     }
 
+    @Bean
+    @SneakyThrows
+    @Profile("dev-centos")
+    KubernetesClient kubernetesClientForCentos() {
+        Config config = new ConfigBuilder()
+                .withMasterUrl(properties.getMasterUrl())
+                .withOauthToken(properties.getToken())
+                .withCaCertFile(Paths.get(ClassLoader.getSystemResource(properties.getCert()).toURI()).toString())
+                .build();
+        return new DefaultKubernetesClient(config);
+    }
+
 }
