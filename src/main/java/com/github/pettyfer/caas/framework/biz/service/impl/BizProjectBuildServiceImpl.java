@@ -65,7 +65,6 @@ public class BizProjectBuildServiceImpl extends ServiceImpl<BizProjectBuildMappe
 
     @Override
     public Boolean update(BizProjectBuild bizProjectBuild) {
-        bizProjectBuild.setImagesDepositoryAlias(SecurityUtil.getUser().getUsername() + "-" + bizProjectBuild.getImagesDepositoryAlias());
         bizProjectBuild.setModifier(SecurityUtil.getUser().getId());
         bizProjectBuild.setModifyTime(LocalDateTime.now());
         return this.updateById(bizProjectBuild);

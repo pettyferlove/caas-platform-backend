@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.base.Preconditions;
 import com.github.pettyfer.caas.framework.biz.entity.BizNamespace;
 import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuild;
 import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuildHistory;
@@ -26,9 +27,7 @@ import com.github.pettyfer.caas.global.constants.KubernetesConstant;
 import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
 import com.github.pettyfer.caas.global.properties.BuildImageProperties;
 import com.github.pettyfer.caas.utils.LoadBalanceUtil;
-import com.github.pettyfer.caas.utils.SecurityUtil;
 import com.github.pettyfer.caas.utils.URLResolutionUtil;
-import com.google.common.base.Preconditions;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.batch.Job;
 import io.fabric8.kubernetes.api.model.batch.JobBuilder;
@@ -124,18 +123,23 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
     @Override
     @Transactional(rollbackFor = Throwable.class)
     public String create(BizProjectBuild projectBuild) {
-        String id = IdWorker.getIdStr();
-        projectBuild.setId(id);
-        projectBuild.setImagesDepositoryAlias(SecurityUtil.getUser().getUsername() + "-" + projectBuild.getImagesDepositoryAlias());
-        if (StrUtil.isNotEmpty(projectBuild.getProjectId())) {
-            String sourceProjectHookId = this.createSourceProjectHook(id, projectBuild.getProjectId());
-            projectBuild.setProjectHookId(sourceProjectHookId);
+        Optional<BizNamespace> namespaceOptional = Optional.ofNullable(bizNamespaceService.get(projectBuild.getNamespaceId()));
+        if (namespaceOptional.isPresent()) {
+            String id = IdWorker.getIdStr();
+            projectBuild.setId(id);
+            projectBuild.setImagesDepositoryAlias(namespaceOptional.get().getName());
+            if (StrUtil.isNotEmpty(projectBuild.getProjectId())) {
+                String sourceProjectHookId = this.createSourceProjectHook(id, projectBuild.getProjectId());
+                projectBuild.setProjectHookId(sourceProjectHookId);
+            }
+            String projectId = harborService.createProject(projectBuild.getImagesDepositoryAlias());
+            bizImagesDepositoryService.create(projectId, projectBuild.getImagesDepositoryAlias());
+            projectBuild.setImagesDepositoryId(projectId);
+            bizProjectBuildService.create(projectBuild);
+            return id;
+        } else {
+            throw new BaseRuntimeException("命名空间不存在");
         }
-        String projectId = harborService.createProject(projectBuild.getImagesDepositoryAlias());
-        bizImagesDepositoryService.create(projectId, projectBuild.getImagesDepositoryAlias());
-        projectBuild.setImagesDepositoryId(projectId);
-        bizProjectBuildService.create(projectBuild);
-        return id;
     }
 
     @Override
@@ -352,7 +356,9 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 if (projectBuild.getPersistentBuildFile() == 1) {
                     history.setFileId(jobName);
                 }
-                history.setImageFullName(imageName.append(":").append(tagName).toString());
+                if (projectBuild.getNeedBuildImage() == 1) {
+                    history.setImageFullName(imageName.append(":").append(tagName).toString());
+                }
                 bizProjectBuildHistoryService.create(history);
             } else {
                 throw new BaseRuntimeException("命名空间不存在");
