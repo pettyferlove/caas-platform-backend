@@ -48,3 +48,15 @@ alter table biz_application_deployment_volume modify mount_name varchar(128) nul
 alter table biz_application_deployment_volume modify mount_path varchar(255) null comment '挂载地址' after mount_name;
 
 rename table biz_application_deployment_volume to biz_application_deployment_mount;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-7
+create or replace view user_list_view as
+select u.id, u.login_name, u.user_name, u.user_avatar, group_concat(r.role_name) roles, u.create_time
+from system_user u
+         left join system_user_role ur on u.id = ur.user_id
+         left join system_role r on ur.role_id = r.id group by u.id;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-8
+create unique index project_unique_index on biz_project_build (project_name, namespace_id, del_flag);
+
+create unique index project_unique_index on biz_sql_build (project_name, namespace_id, del_flag);

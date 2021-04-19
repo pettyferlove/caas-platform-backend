@@ -4,12 +4,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pettyfer.caas.framework.biz.entity.BizSqlBuild;
 import com.github.pettyfer.caas.framework.biz.entity.BizSqlBuildHistory;
-import com.github.pettyfer.caas.framework.core.service.ISqlBuildCoreService;
-import com.github.pettyfer.caas.global.constants.ApiConstant;
-import com.github.pettyfer.caas.global.model.R;
 import com.github.pettyfer.caas.framework.core.model.BuildStepView;
 import com.github.pettyfer.caas.framework.core.model.SqlBuildHistorySelectView;
 import com.github.pettyfer.caas.framework.core.model.SqlBuildListView;
+import com.github.pettyfer.caas.framework.core.service.ISqlBuildCoreService;
+import com.github.pettyfer.caas.global.constants.ApiConstant;
+import com.github.pettyfer.caas.global.model.R;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -39,13 +39,18 @@ public class SqlBuildApi {
     }
 
     @PutMapping
-    public R<Boolean> update(@Valid BizSqlBuild sqlBuild) {
+    public R<Boolean> update(@Valid @RequestBody BizSqlBuild sqlBuild) {
         return new R<Boolean>(sqlBuildCoreService.update(sqlBuild));
     }
 
     @PostMapping
-    public R<String> create(@Valid BizSqlBuild sqlBuild) {
+    public R<String> create(@Valid @RequestBody BizSqlBuild sqlBuild) {
         return new R<String>(sqlBuildCoreService.create(sqlBuild));
+    }
+
+    @DeleteMapping("/{id}")
+    public R<Boolean> delete(@PathVariable String id) {
+        return new R<Boolean>(sqlBuildCoreService.delete(id));
     }
 
     @PostMapping("build/{id}")

@@ -35,4 +35,7 @@ public interface ISqlBuildCoreService {
     BuildStepView logStep(String buildId, String jobId);
 
     Boolean deleteHistory(String historyId);
+
+    Boolean delete(String id);
+
 }

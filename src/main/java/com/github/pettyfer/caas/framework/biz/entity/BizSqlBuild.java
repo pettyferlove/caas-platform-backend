@@ -10,7 +10,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
+
+;
 
 /**
  * <p>
@@ -32,9 +35,11 @@ public class BizSqlBuild extends BaseEntity<BizSqlBuild> {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "命名空间")
+    @NotEmpty(message = "必须指定命名空间")
     private String namespaceId;
 
     @ApiModelProperty(value = "项目名称")
+    @NotEmpty(message = "项目名称不能为空")
     private String projectName;
 
     @ApiModelProperty(value = "项目中文描述")

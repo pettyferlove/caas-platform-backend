@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
 /**
@@ -32,12 +33,14 @@ public class BizProjectBuild extends BaseEntity<BizProjectBuild> {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "命名空间ID")
+    @NotEmpty(message = "必须指定命名空间")
     private String namespaceId;
 
     @ApiModelProperty(value = "项目ID")
     private String projectId;
 
     @ApiModelProperty(value = "项目名称")
+    @NotEmpty(message = "项目名称不能为空")
     private String projectName;
 
     @ApiModelProperty(value = "Clone地址")

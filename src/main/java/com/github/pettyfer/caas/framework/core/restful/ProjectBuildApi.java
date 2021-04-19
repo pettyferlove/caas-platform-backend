@@ -5,13 +5,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuild;
 import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuildHistory;
 import com.github.pettyfer.caas.framework.biz.service.IBizProjectBuildService;
-import com.github.pettyfer.caas.framework.core.service.IProjectBuildCoreService;
-import com.github.pettyfer.caas.global.constants.ApiConstant;
-import com.github.pettyfer.caas.global.model.R;
 import com.github.pettyfer.caas.framework.core.model.BuildStepView;
 import com.github.pettyfer.caas.framework.core.model.ProjectBuildHistorySelectView;
 import com.github.pettyfer.caas.framework.core.model.ProjectBuildListView;
 import com.github.pettyfer.caas.framework.core.model.ProjectBuildSelect;
+import com.github.pettyfer.caas.framework.core.service.IProjectBuildCoreService;
+import com.github.pettyfer.caas.global.constants.ApiConstant;
+import com.github.pettyfer.caas.global.model.R;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -44,12 +44,12 @@ public class ProjectBuildApi {
     }
 
     @PutMapping
-    public R<Boolean> update(@Valid BizProjectBuild projectBuild) {
+    public R<Boolean> update(@Valid @RequestBody BizProjectBuild projectBuild) {
         return new R<>(bizProjectBuildService.update(projectBuild));
     }
 
     @PostMapping
-    public R<String> create(@Valid BizProjectBuild projectBuild) {
+    public R<String> create(@Valid @RequestBody BizProjectBuild projectBuild) {
         return new R<>(projectBuildCoreService.create(projectBuild));
     }
 

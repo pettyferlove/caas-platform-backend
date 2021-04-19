@@ -73,13 +73,10 @@ ALTER TABLE biz_application_deployment ADD CONSTRAINT name_del_flag_unique_index
 ALTER TABLE system_role ADD CONSTRAINT `role` UNIQUE (`role`, del_flag, tenant_id);
 
 --changeset Petty:caas-init-ddl-21
-ALTER TABLE biz_project_build ADD CONSTRAINT system_auto_build_id_del_flag_project_name_uindex UNIQUE (id, del_flag, project_name);
-
---changeset Petty:caas-init-ddl-22
 CREATE INDEX role_code ON system_user_role(role_id);
 
---changeset Petty:caas-init-ddl-23
+--changeset Petty:caas-init-ddl-22
 CREATE INDEX system_auto_build_log_auto_build_id_index ON biz_project_build_history(build_id);
 
---changeset Petty:caas-init-ddl-24
+--changeset Petty:caas-init-ddl-23
 CREATE INDEX user_code ON system_user_role(user_id);

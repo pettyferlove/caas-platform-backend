@@ -1,44 +1,45 @@
-package com.github.pettyfer.caas.framework.system.entity;
+package com.github.pettyfer.caas.framework.system.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.pettyfer.caas.global.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
- * <p>
- * 用户信息
- * </p>
- *
- * @author Petty
- * @since 2021-03-26
+ * @author Pettyfer
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value="SystemUser对象", description="用户信息")
-public class SystemUser extends BaseEntity<SystemUser> {
+@ApiModel(value="用户信息", description="用户信息")
+public class UserDetailsView implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private String id;
+
     @ApiModelProperty(value = "用户登录名")
+    @NotEmpty(message = "用户登录名不能为空")
     private String loginName;
 
     @ApiModelProperty(value = "用户全名")
+    @NotEmpty(message = "用户全名不能为空")
     private String userName;
 
     @ApiModelProperty(value = "账号密码")
+    @NotEmpty(message = "账号密码不能为空")
     private String password;
 
     @ApiModelProperty(value = "性别")
@@ -71,13 +72,7 @@ public class SystemUser extends BaseEntity<SystemUser> {
     @ApiModelProperty(value = "是否有效 0 无效 1 有效")
     private Integer status;
 
-    @ApiModelProperty(value = "租户ID")
-    private String tenantId;
-
-
-    @Override
-    protected Serializable pkVal() {
-        return null;
-    }
+    @NotEmpty(message = "角色不能为空")
+    private List<String> roleIds = new ArrayList<>();
 
 }

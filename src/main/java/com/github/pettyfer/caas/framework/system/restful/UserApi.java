@@ -1,10 +1,18 @@
 package com.github.pettyfer.caas.framework.system.restful;
 
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.pettyfer.caas.framework.system.entity.UserListView;
+import com.github.pettyfer.caas.framework.system.model.UserDetailsView;
+import com.github.pettyfer.caas.framework.system.service.ISystemUserService;
+import com.github.pettyfer.caas.framework.system.service.IUserListViewService;
 import com.github.pettyfer.caas.global.constants.ApiConstant;
+import com.github.pettyfer.caas.global.model.R;
 import io.swagger.annotations.Api;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * <p>
@@ -18,5 +26,34 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(ApiConstant.API_V1_PREFIX + "/user")
 public class UserApi {
+
+    private final IUserListViewService userListViewService;
+
+    private final ISystemUserService systemUserService;
+
+    public UserApi(IUserListViewService userListViewService, ISystemUserService systemUserService) {
+        this.userListViewService = userListViewService;
+        this.systemUserService = systemUserService;
+    }
+
+    @GetMapping("page")
+    public R<IPage<UserListView>> page(UserListView user, Page<UserListView> page) {
+        return new R<IPage<UserListView>>(userListViewService.page(user, page));
+    }
+
+    @GetMapping("/{id}")
+    public R<UserDetailsView> get(@PathVariable String id) {
+        return new R<UserDetailsView>(systemUserService.get(id));
+    }
+
+    @PutMapping
+    public R<Boolean> update(@Valid @RequestBody UserDetailsView userDetails) {
+        return new R<Boolean>(systemUserService.update(userDetails));
+    }
+
+    @PostMapping
+    public R<String> create(@Valid @RequestBody UserDetailsView userDetails) {
+        return new R<String>(systemUserService.create(userDetails));
+    }
 
 }

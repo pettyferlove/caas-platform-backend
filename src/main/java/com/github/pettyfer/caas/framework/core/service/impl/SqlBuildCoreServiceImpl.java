@@ -238,6 +238,11 @@ public class SqlBuildCoreServiceImpl implements ISqlBuildCoreService {
         }
     }
 
+    @Override
+    public Boolean delete(String id) {
+        return bizSqlBuildService.delete(id);
+    }
+
     private Map<String, String> fetchBuildLabel(String value, String envType) {
         Map<String, String> label = new HashMap<>();
         label.put(KubernetesConstant.BUILD_LABEL, value);
