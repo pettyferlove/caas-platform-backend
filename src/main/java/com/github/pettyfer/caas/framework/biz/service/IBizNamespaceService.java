@@ -56,4 +56,6 @@ public interface IBizNamespaceService extends IService<BizNamespace> {
      */
     Boolean update(BizNamespace bizNamespace);
 
+    Boolean checkNamespace();
+
 }

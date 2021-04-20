@@ -40,9 +40,6 @@ public class BizNamespace extends BaseEntity<BizNamespace> {
     @ApiModelProperty(value = "描述信息")
     private String description;
 
-    @ApiModelProperty(value = "环境类型")
-    private Integer envType;
-
     @ApiModelProperty(value = "仓库访问密钥")
     private String registrySecretName;
 

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.pettyfer.caas.framework.system.entity.SystemUser;
 import com.github.pettyfer.caas.framework.system.model.UserDetailsView;
+import com.github.pettyfer.caas.framework.system.model.UserInitConfig;
 
 /**
  * <p>
@@ -56,4 +57,8 @@ public interface ISystemUserService extends IService<SystemUser> {
      * @return Boolean
      */
     Boolean update(UserDetailsView systemUser);
+
+    Boolean checkConfig();
+
+    Boolean initConfig(UserInitConfig initConfig);
 }

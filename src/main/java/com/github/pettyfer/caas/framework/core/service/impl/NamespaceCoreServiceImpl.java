@@ -126,7 +126,6 @@ public class NamespaceCoreServiceImpl implements INamespaceCoreService {
     private Namespace buildNamespace(BizNamespace namespace) {
         Map<String, String> label = new HashMap<>();
         label.put("istio-injection", namespace.getIstio() ? "enable" : "disable");
-        label.put(KubernetesConstant.ENVIRONMENT_LABEL, EnvConstant.transform(namespace.getEnvType()));
         return new NamespaceBuilder()
                 .withApiVersion("v1")
                 .withKind("Namespace")

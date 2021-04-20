@@ -6,10 +6,15 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pettyfer.caas.framework.biz.service.IBizGlobalConfigurationService;
+import com.github.pettyfer.caas.framework.biz.service.IBizNamespaceService;
+import com.github.pettyfer.caas.framework.biz.service.IBizUserConfigurationService;
+import com.github.pettyfer.caas.framework.core.service.INamespaceCoreService;
 import com.github.pettyfer.caas.framework.system.entity.SystemUser;
 import com.github.pettyfer.caas.framework.system.entity.SystemUserRole;
 import com.github.pettyfer.caas.framework.system.mapper.SystemUserMapper;
 import com.github.pettyfer.caas.framework.system.model.UserDetailsView;
+import com.github.pettyfer.caas.framework.system.model.UserInitConfig;
 import com.github.pettyfer.caas.framework.system.service.ISystemUserRoleService;
 import com.github.pettyfer.caas.framework.system.service.ISystemUserService;
 import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
@@ -39,10 +44,22 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
 
     private final ISystemUserRoleService userRoleService;
 
+    private final IBizUserConfigurationService userConfigurationService;
+
+    private final IBizGlobalConfigurationService globalConfigurationService;
+
+    private final IBizNamespaceService namespaceService;
+
+    private final INamespaceCoreService namespaceCoreService;
+
     private final PasswordEncoder passwordEncoder;
 
-    public SystemUserServiceImpl(ISystemUserRoleService userRoleService, PasswordEncoder passwordEncoder) {
+    public SystemUserServiceImpl(ISystemUserRoleService userRoleService, IBizUserConfigurationService userConfigurationService, IBizGlobalConfigurationService globalConfigurationService, IBizNamespaceService namespaceService, INamespaceCoreService namespaceCoreService, PasswordEncoder passwordEncoder) {
         this.userRoleService = userRoleService;
+        this.userConfigurationService = userConfigurationService;
+        this.globalConfigurationService = globalConfigurationService;
+        this.namespaceService = namespaceService;
+        this.namespaceCoreService = namespaceCoreService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -84,8 +101,8 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
         if (this.save(systemUser)) {
             List<SystemUserRole> systemUserRoles = new ArrayList<>();
             List<String> roleIds = detailsView.getRoleIds();
-            for (String roleId: roleIds) {
-                if(StrUtil.isNotEmpty(roleId)){
+            for (String roleId : roleIds) {
+                if (StrUtil.isNotEmpty(roleId)) {
                     SystemUserRole systemUserRole = new SystemUserRole();
                     systemUserRole.setUserId(systemUser.getId());
                     systemUserRole.setRoleId(roleId);
@@ -94,7 +111,7 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
                     systemUserRoles.add(systemUserRole);
                 }
             }
-            if(!systemUserRoles.isEmpty()){
+            if (!systemUserRoles.isEmpty()) {
                 userRoleService.saveBatch(systemUserRoles);
             }
             return systemUser.getId();
@@ -108,7 +125,7 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
     public Boolean update(UserDetailsView detailsView) {
         SystemUser systemUser = Optional.ofNullable(ConverterUtil.convert(detailsView, new SystemUser())).orElseGet(SystemUser::new);
         systemUser.setPassword(null);
-        if(StrUtil.isNotEmpty(systemUser.getId())){
+        if (StrUtil.isNotEmpty(systemUser.getId())) {
             systemUser.setModifier(Objects.requireNonNull(SecurityUtil.getUser()).getId());
             systemUser.setModifyTime(LocalDateTime.now());
             LambdaQueryWrapper<SystemUserRole> queryWrapper = Wrappers.<SystemUserRole>lambdaQuery();
@@ -116,8 +133,8 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
             userRoleService.remove(queryWrapper);
             List<SystemUserRole> systemUserRoles = new ArrayList<>();
             List<String> roleIds = detailsView.getRoleIds();
-            for (String roleId: roleIds) {
-                if(StrUtil.isNotEmpty(roleId)){
+            for (String roleId : roleIds) {
+                if (StrUtil.isNotEmpty(roleId)) {
                     SystemUserRole systemUserRole = new SystemUserRole();
                     systemUserRole.setUserId(systemUser.getId());
                     systemUserRole.setRoleId(roleId);
@@ -126,7 +143,7 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
                     systemUserRoles.add(systemUserRole);
                 }
             }
-            if(!systemUserRoles.isEmpty()){
+            if (!systemUserRoles.isEmpty()) {
                 userRoleService.saveBatch(systemUserRoles);
             }
             return this.updateById(systemUser);
@@ -134,6 +151,29 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
             throw new BaseRuntimeException("修改失败");
         }
 
+    }
+
+    @Override
+    public Boolean checkConfig() {
+        globalConfigurationService.checkConfiguration();
+        userConfigurationService.checkConfiguration();
+        namespaceService.checkNamespace();
+        return true;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Throwable.class)
+    public Boolean initConfig(UserInitConfig initConfig) {
+        try {
+            this.checkConfig();
+        } catch (Exception e) {
+            if(SecurityUtil.getRoles().contains("ADMIN")){
+                globalConfigurationService.create(initConfig.getGlobalConfiguration());
+            }
+            userConfigurationService.create(initConfig.getUserConfiguration());
+            namespaceCoreService.create(initConfig.getNamespace());
+        }
+        return true;
     }
 
 }

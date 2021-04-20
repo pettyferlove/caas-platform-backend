@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pettyfer.caas.framework.system.entity.UserListView;
 import com.github.pettyfer.caas.framework.system.model.UserDetailsView;
+import com.github.pettyfer.caas.framework.system.model.UserInitConfig;
 import com.github.pettyfer.caas.framework.system.service.ISystemUserService;
 import com.github.pettyfer.caas.framework.system.service.IUserListViewService;
 import com.github.pettyfer.caas.global.constants.ApiConstant;
@@ -54,6 +55,16 @@ public class UserApi {
     @PostMapping
     public R<String> create(@Valid @RequestBody UserDetailsView userDetails) {
         return new R<String>(systemUserService.create(userDetails));
+    }
+
+    @GetMapping("/check/config")
+    public R<Boolean> checkConfig(){
+        return new R<Boolean>(systemUserService.checkConfig());
+    }
+
+    @PostMapping("/init/config")
+    public R<Boolean> initConfig(@RequestBody UserInitConfig initConfig) {
+        return new R<>(systemUserService.initConfig(initConfig));
     }
 
 }

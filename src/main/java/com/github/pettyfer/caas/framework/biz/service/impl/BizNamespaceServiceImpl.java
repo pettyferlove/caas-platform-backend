@@ -1,6 +1,5 @@
 package com.github.pettyfer.caas.framework.biz.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -10,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pettyfer.caas.framework.biz.entity.BizNamespace;
 import com.github.pettyfer.caas.framework.biz.mapper.BizNamespaceMapper;
 import com.github.pettyfer.caas.framework.biz.service.IBizNamespaceService;
+import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
 import com.github.pettyfer.caas.utils.SecurityUtil;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +29,6 @@ public class BizNamespaceServiceImpl extends ServiceImpl<BizNamespaceMapper, Biz
     @Override
     public IPage<BizNamespace> page(BizNamespace bizNamespace, Page<BizNamespace> page) {
         LambdaQueryWrapper<BizNamespace> queryWrapper = Wrappers.<BizNamespace>lambdaQuery().orderByDesc(BizNamespace::getCreateTime);
-        queryWrapper.eq(ObjectUtil.isNotNull(bizNamespace.getEnvType()), BizNamespace::getEnvType, bizNamespace.getEnvType());
         queryWrapper.likeRight(StrUtil.isNotEmpty(bizNamespace.getName()), BizNamespace::getName, bizNamespace.getName());
         return this.page(page, queryWrapper);
     }
@@ -60,6 +59,18 @@ public class BizNamespaceServiceImpl extends ServiceImpl<BizNamespaceMapper, Biz
         bizNamespace.setModifier(SecurityUtil.getUser().getId());
         bizNamespace.setModifyTime(LocalDateTime.now());
         return this.updateById(bizNamespace);
+    }
+
+    @Override
+    public Boolean checkNamespace() {
+        LambdaQueryWrapper<BizNamespace> queryWrapper = Wrappers.<BizNamespace>lambdaQuery();
+        queryWrapper.eq(BizNamespace::getCreator, SecurityUtil.getUser().getId());
+        queryWrapper.eq(BizNamespace::getDelFlag, 0);
+        int count = this.count(queryWrapper);
+        if(count<1){
+            throw new BaseRuntimeException("用户未配置命名空间");
+        }
+        return true;
     }
 
 }
