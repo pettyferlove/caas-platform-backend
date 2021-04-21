@@ -18,7 +18,7 @@ import java.io.Serializable;
  * </p>
  *
  * @author Petty
- * @since 2021-04-12
+ * @since 2021-04-20
  */
 @Data
 @NoArgsConstructor
@@ -73,19 +73,10 @@ public class BizApplicationDeployment extends BaseEntity<BizApplicationDeploymen
     @ApiModelProperty(value = "历史版本最多保存数量")
     private Integer revisionHistoryLimit;
 
-    @ApiModelProperty(value = "网络设置")
-    private String network;
-
-    @ApiModelProperty(value = "网络类型")
-    private String networkType;
-
     @ApiModelProperty(value = "指定部署节点")
     private String node;
 
-    @ApiModelProperty(value = "外部访问IP，以英文,分隔")
-    private String externalIp;
-
-    @ApiModelProperty(value = "环境信息")
+    @ApiModelProperty(value = "环境类型")
     private Integer envType;
 
     @ApiModelProperty(value = "项目组ID")

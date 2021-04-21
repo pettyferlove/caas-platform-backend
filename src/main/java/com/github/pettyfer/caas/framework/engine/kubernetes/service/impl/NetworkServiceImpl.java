@@ -1,7 +1,7 @@
 package com.github.pettyfer.caas.framework.engine.kubernetes.service.impl;
 
-import com.github.pettyfer.caas.global.constants.KubernetesConstant;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.INetworkService;
+import com.github.pettyfer.caas.global.constants.KubernetesConstant;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.extern.slf4j.Slf4j;
@@ -32,5 +32,10 @@ public class NetworkServiceImpl implements INetworkService {
     @Override
     public void delete(String namespace, String name) {
         kubernetesClient.services().inNamespace(namespace).withName(name).delete();
+    }
+
+    @Override
+    public Service get(String namespace, String name) {
+        return kubernetesClient.services().inNamespace(namespace).withName(name).get();
     }
 }

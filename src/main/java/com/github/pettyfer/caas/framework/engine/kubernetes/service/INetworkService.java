@@ -29,4 +29,6 @@ public interface INetworkService {
      */
     void delete(String namespace, String name);
 
+    Service get(String namespace, String name);
+
 }

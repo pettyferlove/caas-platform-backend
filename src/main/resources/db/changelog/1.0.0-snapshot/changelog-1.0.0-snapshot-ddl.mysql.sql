@@ -60,3 +60,46 @@ from system_user u
 create unique index project_unique_index on biz_project_build (project_name, namespace_id, del_flag);
 
 create unique index project_unique_index on biz_sql_build (project_name, namespace_id, del_flag);
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-9
+alter table biz_application_deployment_network add network_name varchar(128) null comment '网络名称' after deployment_id;
+
+alter table biz_application_deployment_network drop column protocol;
+
+alter table biz_application_deployment_network add network varchar(64) null comment '网络设置' after network_name;
+
+alter table biz_application_deployment_network drop column port;
+
+alter table biz_application_deployment_network add network_type varchar(64) null comment '网络类型' after network;
+
+alter table biz_application_deployment_network drop column target_port;
+
+alter table biz_application_deployment_network add external_ip int null comment '外部访问IP，以英文,分隔' after network_type;
+
+alter table biz_application_deployment_network add port_map varchar(1000) null comment '端口映射表' after external_ip;
+
+alter table biz_application_deployment drop column network;
+
+alter table biz_application_deployment drop column network_type;
+
+alter table biz_application_deployment drop column external_ip;
+
+rename table biz_application_deployment_network to biz_network;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-10
+alter table biz_network change port_map ports varchar(1000) null comment '端口映射表';
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-11
+alter table biz_network modify external_ip varchar(400) null comment '外部访问IP，以英文,分隔';
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-12
+alter table biz_network add match_label varchar(1000) null comment '匹配标签' after network;
+
+alter table biz_network change network_name name varchar(128) null comment '服务名称';
+
+rename table biz_network to biz_service_discovery;
+
+alter table biz_service_discovery comment '服务发现';
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-13
+alter table biz_service_discovery add namespace_id varchar(128) null after id;

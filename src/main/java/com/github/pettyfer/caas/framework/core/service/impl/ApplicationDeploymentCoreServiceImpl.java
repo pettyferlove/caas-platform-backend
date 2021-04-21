@@ -2,6 +2,7 @@ package com.github.pettyfer.caas.framework.core.service.impl;
 
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -13,7 +14,7 @@ import com.github.pettyfer.caas.framework.biz.service.*;
 import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentDetailView;
 import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentListView;
 import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentMountView;
-import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentNetworkView;
+import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentPortView;
 import com.github.pettyfer.caas.framework.core.service.IApplicationDeploymentCoreService;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.IDeploymentService;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.INetworkService;
@@ -41,7 +42,7 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
 
     private final IBizApplicationDeploymentService bizApplicationDeploymentService;
 
-    private final IBizApplicationDeploymentNetworkService bizApplicationDeploymentNetworkService;
+    private final IBizServiceDiscoveryService bizServiceDiscoveryService;
 
     private final IBizApplicationDeploymentMountService bizApplicationDeploymentVolumeService;
 
@@ -53,9 +54,9 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
 
     private final INetworkService networkService;
 
-    public ApplicationDeploymentCoreServiceImpl(IBizApplicationDeploymentService bizApplicationDeploymentService, IBizApplicationDeploymentNetworkService bizApplicationDeploymentNetworkService, IBizApplicationDeploymentMountService bizApplicationDeploymentVolumeService, IBizConfigService bizConfigService, IDeploymentService deploymentService, IBizNamespaceService bizNamespaceService, INetworkService networkService) {
+    public ApplicationDeploymentCoreServiceImpl(IBizApplicationDeploymentService bizApplicationDeploymentService, IBizServiceDiscoveryService bizServiceDiscoveryService, IBizApplicationDeploymentMountService bizApplicationDeploymentVolumeService, IBizConfigService bizConfigService, IDeploymentService deploymentService, IBizNamespaceService bizNamespaceService, INetworkService networkService) {
         this.bizApplicationDeploymentService = bizApplicationDeploymentService;
-        this.bizApplicationDeploymentNetworkService = bizApplicationDeploymentNetworkService;
+        this.bizServiceDiscoveryService = bizServiceDiscoveryService;
         this.bizApplicationDeploymentVolumeService = bizApplicationDeploymentVolumeService;
         this.bizConfigService = bizConfigService;
         this.deploymentService = deploymentService;
@@ -72,7 +73,15 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                 BizApplicationDeployment bizApplicationDeployment = new BizApplicationDeployment();
                 ConverterUtil.convert(deploymentDetail, bizApplicationDeployment);
                 String deploymentId = bizApplicationDeploymentService.create(namespaceId, bizApplicationDeployment);
-                bizApplicationDeploymentNetworkService.batchInsert(deploymentId, deploymentDetail.getNetworks());
+
+
+                BizServiceDiscovery bizServiceDiscovery = new BizServiceDiscovery();
+                ConverterUtil.convert(deploymentDetail, bizServiceDiscovery);
+                bizServiceDiscovery.setNamespaceId(namespaceId);
+                bizServiceDiscovery.setDeploymentId(deploymentId);
+                bizServiceDiscovery.setName(deploymentDetail.getName());
+                bizServiceDiscovery.setMatchLabel(JSON.toJSONString(fetchMatchLabel(deploymentDetail.getName(), EnvConstant.transform(deploymentDetail.getEnvType()))));
+                bizServiceDiscoveryService.create(bizServiceDiscovery);
                 bizApplicationDeploymentVolumeService.batchInsert(deploymentId, deploymentDetail.getMounts());
 
                 try {
@@ -109,8 +118,15 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                 ConverterUtil.convert(deploymentDetail, bizApplicationDeployment);
                 Boolean update = bizApplicationDeploymentService.update(namespaceId, bizApplicationDeployment);
                 if (update) {
-                    bizApplicationDeploymentNetworkService.remove(Wrappers.<BizApplicationDeploymentNetwork>lambdaQuery().eq(BizApplicationDeploymentNetwork::getDeploymentId, deploymentId));
-                    bizApplicationDeploymentNetworkService.batchInsert(deploymentId, deploymentDetail.getNetworks());
+                    bizServiceDiscoveryService.remove(Wrappers.<BizServiceDiscovery>lambdaQuery().eq(BizServiceDiscovery::getDeploymentId, deploymentId));
+                    BizServiceDiscovery bizServiceDiscovery = new BizServiceDiscovery();
+                    ConverterUtil.convert(deploymentDetail, bizServiceDiscovery);
+                    bizServiceDiscovery.setId(null);
+                    bizServiceDiscovery.setNamespaceId(namespaceId);
+                    bizServiceDiscovery.setDeploymentId(deploymentId);
+                    bizServiceDiscovery.setName(deploymentDetail.getName());
+                    bizServiceDiscovery.setMatchLabel(JSON.toJSONString(fetchMatchLabel(deploymentDetail.getName(), EnvConstant.transform(deploymentDetail.getEnvType()))));
+                    bizServiceDiscoveryService.create(bizServiceDiscovery);
 
                     bizApplicationDeploymentVolumeService.remove(Wrappers.<BizApplicationDeploymentMount>lambdaQuery().eq(BizApplicationDeploymentMount::getDeploymentId, deploymentId));
                     bizApplicationDeploymentVolumeService.batchInsert(deploymentId, deploymentDetail.getMounts());
@@ -178,7 +194,7 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
         if (namespaceOptional.isPresent()) {
             BizApplicationDeployment deployment = bizApplicationDeploymentService.getById(id);
             bizApplicationDeploymentService.delete(id);
-            bizApplicationDeploymentNetworkService.remove(Wrappers.<BizApplicationDeploymentNetwork>lambdaQuery().eq(BizApplicationDeploymentNetwork::getDeploymentId, id));
+            bizServiceDiscoveryService.remove(Wrappers.<BizServiceDiscovery>lambdaQuery().eq(BizServiceDiscovery::getDeploymentId, id));
             deploymentService.delete(namespaceOptional.get().getName(), deployment.getName());
             networkService.deleteWithLabel(namespaceOptional.get().getName(), deployment.getName());
         } else {
@@ -250,9 +266,9 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
      * @return Service
      */
     private io.fabric8.kubernetes.api.model.Service buildService(ApplicationDeploymentDetailView deploymentDetail) {
-        List<ApplicationDeploymentNetworkView> networks = deploymentDetail.getNetworks();
+        List<ApplicationDeploymentPortView> ports = JSONArray.parseArray(deploymentDetail.getPorts(), ApplicationDeploymentPortView.class);
         List<ServicePort> servicePorts = new ArrayList<>();
-        for (ApplicationDeploymentNetworkView n : networks) {
+        for (ApplicationDeploymentPortView n : ports) {
             ServicePort servicePort = new ServicePort();
             servicePort.setName(deploymentDetail.getName() + "-http-" + RandomUtil.randomString(5));
             servicePort.setAppProtocol(n.getProtocol());

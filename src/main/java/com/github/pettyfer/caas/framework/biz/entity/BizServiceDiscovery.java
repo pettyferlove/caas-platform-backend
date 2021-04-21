@@ -14,11 +14,11 @@ import java.io.Serializable;
 
 /**
  * <p>
- * 应用网络设置
+ * 服务发现
  * </p>
  *
  * @author Petty
- * @since 2021-04-12
+ * @since 2021-04-20
  */
 @Data
 @NoArgsConstructor
@@ -26,23 +26,34 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value="BizApplicationDeploymentNetwork对象", description="应用网络设置")
-public class BizApplicationDeploymentNetwork extends BaseEntity<BizApplicationDeploymentNetwork> {
+@ApiModel(value="BizServiceDiscovery对象", description="服务发现")
+public class BizServiceDiscovery extends BaseEntity<BizServiceDiscovery> {
 
     private static final long serialVersionUID = 1L;
 
     private String deploymentId;
 
-    @ApiModelProperty(value = "通讯协议")
-    private String protocol;
+    private String namespaceId;
 
-    @ApiModelProperty(value = "端口号")
-    private Integer port;
+    @ApiModelProperty(value = "服务发现名称")
+    private String name;
 
-    @ApiModelProperty(value = "目标端口号")
-    private Integer targetPort;
+    @ApiModelProperty(value = "网络设置")
+    private String network;
 
-    @ApiModelProperty(value = "环境信息")
+    @ApiModelProperty(value = "匹配标签")
+    private String matchLabel;
+
+    @ApiModelProperty(value = "网络类型")
+    private String networkType;
+
+    @ApiModelProperty(value = "外部访问IP，以英文,分隔")
+    private String externalIp;
+
+    @ApiModelProperty(value = "端口映射表")
+    private String ports;
+
+    @ApiModelProperty(value = "环境类型")
     private Integer envType;
 
     @ApiModelProperty(value = "项目组ID")
@@ -57,4 +68,6 @@ public class BizApplicationDeploymentNetwork extends BaseEntity<BizApplicationDe
         return null;
     }
 
+    public void setId(Object o) {
+    }
 }

@@ -9,14 +9,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pettyfer.caas.framework.biz.entity.BizApplicationDeployment;
 import com.github.pettyfer.caas.framework.biz.entity.BizApplicationDeploymentMount;
-import com.github.pettyfer.caas.framework.biz.entity.BizApplicationDeploymentNetwork;
+import com.github.pettyfer.caas.framework.biz.entity.BizServiceDiscovery;
 import com.github.pettyfer.caas.framework.biz.mapper.BizApplicationDeploymentMapper;
 import com.github.pettyfer.caas.framework.biz.service.IBizApplicationDeploymentMountService;
-import com.github.pettyfer.caas.framework.biz.service.IBizApplicationDeploymentNetworkService;
 import com.github.pettyfer.caas.framework.biz.service.IBizApplicationDeploymentService;
+import com.github.pettyfer.caas.framework.biz.service.IBizServiceDiscoveryService;
 import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentDetailView;
 import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentMountView;
-import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentNetworkView;
 import com.github.pettyfer.caas.utils.ConverterUtil;
 import com.github.pettyfer.caas.utils.SecurityUtil;
 import org.springframework.stereotype.Service;
@@ -38,13 +37,13 @@ import java.util.Optional;
 public class BizApplicationDeploymentServiceImpl extends ServiceImpl<BizApplicationDeploymentMapper, BizApplicationDeployment> implements IBizApplicationDeploymentService {
 
 
-    private final IBizApplicationDeploymentNetworkService bizApplicationDeploymentNetworkService;
-
     private final IBizApplicationDeploymentMountService bizApplicationDeploymentMountService;
 
-    public BizApplicationDeploymentServiceImpl(IBizApplicationDeploymentNetworkService bizApplicationDeploymentNetworkService, IBizApplicationDeploymentMountService bizApplicationDeploymentMountService) {
-        this.bizApplicationDeploymentNetworkService = bizApplicationDeploymentNetworkService;
+    private final IBizServiceDiscoveryService bizServiceDiscoveryService;
+
+    public BizApplicationDeploymentServiceImpl(IBizApplicationDeploymentMountService bizApplicationDeploymentMountService, IBizServiceDiscoveryService bizServiceDiscoveryService) {
         this.bizApplicationDeploymentMountService = bizApplicationDeploymentMountService;
+        this.bizServiceDiscoveryService = bizServiceDiscoveryService;
     }
 
     @Override
@@ -63,13 +62,17 @@ public class BizApplicationDeploymentServiceImpl extends ServiceImpl<BizApplicat
         Optional<ApplicationDeploymentDetailView> detailOptional = Optional.ofNullable(ConverterUtil.convert(applicationDeployment, new ApplicationDeploymentDetailView()));
         if (detailOptional.isPresent()) {
             ApplicationDeploymentDetailView detail = detailOptional.get();
-            Optional<List<BizApplicationDeploymentNetwork>> systemApplicationDeploymentNetworks = Optional.ofNullable(bizApplicationDeploymentNetworkService.list(
-                    Wrappers.<BizApplicationDeploymentNetwork>lambdaQuery().eq(BizApplicationDeploymentNetwork::getDeploymentId, id).eq(BizApplicationDeploymentNetwork::getDelFlag, 0)));
-            List<ApplicationDeploymentNetworkView> networks = ConverterUtil.convertList(BizApplicationDeploymentNetwork.class, ApplicationDeploymentNetworkView.class, systemApplicationDeploymentNetworks.orElseGet(ArrayList::new));
+            Optional<BizServiceDiscovery> bizNetworkOptional = Optional.ofNullable(bizServiceDiscoveryService.getOne(Wrappers.<BizServiceDiscovery>lambdaQuery().eq(BizServiceDiscovery::getDeploymentId, id).eq(BizServiceDiscovery::getDelFlag, 0)));
+            if(bizNetworkOptional.isPresent()) {
+                BizServiceDiscovery bizServiceDiscovery = bizNetworkOptional.get();
+                detail.setPorts(bizServiceDiscovery.getPorts());
+                detail.setNetwork(bizServiceDiscovery.getNetwork());
+                detail.setNetworkType(bizServiceDiscovery.getNetworkType());
+                detail.setExternalIp(bizServiceDiscovery.getExternalIp());
+            }
             Optional<List<BizApplicationDeploymentMount>> systemApplicationDeploymentMounts = Optional.ofNullable(bizApplicationDeploymentMountService.list(
                     Wrappers.<BizApplicationDeploymentMount>lambdaQuery().eq(BizApplicationDeploymentMount::getDeploymentId, id).eq(BizApplicationDeploymentMount::getDelFlag, 0)));
             List<ApplicationDeploymentMountView> mounts = ConverterUtil.convertList(BizApplicationDeploymentMount.class, ApplicationDeploymentMountView.class, systemApplicationDeploymentMounts.orElseGet(ArrayList::new));
-            detail.setNetworks(networks);
             detail.setMounts(mounts);
             return detail;
         } else {

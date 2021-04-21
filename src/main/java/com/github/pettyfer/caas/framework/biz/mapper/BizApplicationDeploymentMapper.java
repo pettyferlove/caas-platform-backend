@@ -1,7 +1,7 @@
 package com.github.pettyfer.caas.framework.biz.mapper;
 
-import com.github.pettyfer.caas.framework.biz.entity.BizApplicationDeployment;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.pettyfer.caas.framework.biz.entity.BizApplicationDeployment;
 
 /**
  * <p>
@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author Petty
- * @since 2020-07-28
+ * @since 2021-04-20
  */
 public interface BizApplicationDeploymentMapper extends BaseMapper<BizApplicationDeployment> {
 

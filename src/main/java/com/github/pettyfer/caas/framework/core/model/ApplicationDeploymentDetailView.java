@@ -115,7 +115,7 @@ public class ApplicationDeploymentDetailView implements Serializable {
     @ApiModelProperty("更新副本")
     private Integer updatedReplicas;
 
-    private List<ApplicationDeploymentNetworkView> networks;
+    private String ports;
 
     private List<ApplicationDeploymentMountView> mounts;
 

@@ -18,8 +18,8 @@ import java.io.Serializable;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@ApiModel(value = "应用部署Model", description = "")
-public class ApplicationDeploymentNetworkView implements Serializable {
+@ApiModel(value = "应用部署端口映射", description = "")
+public class ApplicationDeploymentPortView implements Serializable {
     private static final long serialVersionUID = 1355874754009669487L;
 
     @ApiModelProperty(value = "通讯协议")
@@ -30,8 +30,5 @@ public class ApplicationDeploymentNetworkView implements Serializable {
 
     @ApiModelProperty(value = "目标端口号")
     private Integer targetPort;
-
-    @ApiModelProperty(value = "环境信息")
-    private Integer envType;
 
 }

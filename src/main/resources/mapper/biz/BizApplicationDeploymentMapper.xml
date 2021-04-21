@@ -4,7 +4,12 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.biz.entity.BizApplicationDeployment">
-        <id column="id" property="id" />
+    <result column="id" property="id" />
+    <result column="del_flag" property="delFlag" />
+    <result column="creator" property="creator" />
+    <result column="create_time" property="createTime" />
+    <result column="modifier" property="modifier" />
+    <result column="modify_time" property="modifyTime" />
         <result column="name" property="name" />
         <result column="namespace_id" property="namespaceId" />
         <result column="description_content" property="descriptionContent" />
@@ -19,22 +24,21 @@
         <result column="max_surge" property="maxSurge" />
         <result column="max_unavaible" property="maxUnavaible" />
         <result column="revision_history_limit" property="revisionHistoryLimit" />
-        <result column="network" property="network" />
         <result column="node" property="node" />
-        <result column="external_ip" property="externalIp" />
         <result column="env_type" property="envType" />
-        <result column="del_flag" property="delFlag" />
-        <result column="creator" property="creator" />
-        <result column="create_time" property="createTime" />
-        <result column="modifier" property="modifier" />
-        <result column="modify_time" property="modifyTime" />
         <result column="group_id" property="groupId" />
         <result column="tenant_id" property="tenantId" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, name, namespace_id, description_content, auto_build_id, images_depository_id, image_name, image_tag, environment_variable, image_pull_strategy, instances_number, strategy_type, max_surge, max_unavaible, revision_history_limit, network, node, external_ip, env_type, del_flag, creator, create_time, modifier, modify_time, group_id, tenant_id
+        id,
+        del_flag,
+        creator,
+        create_time,
+        modifier,
+        modify_time,
+        name, namespace_id, description_content, auto_build_id, images_depository_id, image_name, image_tag, environment_variable, image_pull_strategy, instances_number, strategy_type, max_surge, max_unavaible, revision_history_limit, node, env_type, group_id, tenant_id
     </sql>
 
 </mapper>
