@@ -8,10 +8,10 @@ export PATH=$JAVA_HOME/bin:$PATH
 export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
 
 
-APP_NAME="kubernetes-caas"
-APP_VERSION="0.4.0-SNAPSHOT"
-JASYPT_PASSWORD="bali-auth-server"
-SERVER_PORT=9090
+APP_NAME="caas-platform"
+APP_VERSION="1.0.0-SNAPSHOT"
+JASYPT_PASSWORD="password"
+SERVER_PORT=8885
 PROFILE_NAME=prd
 JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Xmn128m -Xms512m -Xmx512m -Dfile.encoding=UTF-8 -Dloader.path=."
 

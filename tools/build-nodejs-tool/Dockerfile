@@ -7,6 +7,7 @@ RUN apk update &&\
     apk add --no-cache nodejs npm yarn
 
 RUN npm config set registry https://registry.npm.taobao.org/
+RUN npm config set cache "/usr/cache/nodejs"
 
 RUN mkdir -p /tool
 WORKDIR /tool
