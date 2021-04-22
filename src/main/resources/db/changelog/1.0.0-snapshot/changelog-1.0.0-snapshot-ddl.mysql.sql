@@ -103,3 +103,43 @@ alter table biz_service_discovery comment '服务发现';
 
 --changeset Petty:caas-1.0.0-snapshot-ddl-13
 alter table biz_service_discovery add namespace_id varchar(128) null after id;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-14
+create table biz_persistent_storage
+(
+    id                 varchar(128)                  not null
+        primary key,
+    namespace_id       varchar(128)                  null comment '应用所属命名空间ID',
+    name               varchar(255)                  null comment '持久化储存名称',
+    init_size          varchar(255)                  null comment '初始容量大小',
+    limit_size         varchar(255)                  null comment '最大容量大小',
+    unit               varchar(255)                  null comment '容量单位',
+    storage_class_name varchar(255)                  null comment '储存类名称',
+    access_mode        varchar(255)                  null comment '访问模式',
+    env_type           tinyint unsigned default '1'  null comment '环境类型',
+    del_flag           bit              default b'0' null comment '删除标记 0 未删除 1 删除',
+    creator            varchar(128)                  null comment '创建人',
+    create_time        datetime                      null comment '创建时间',
+    modifier           varchar(128)                  null comment '修改人',
+    modify_time        datetime                      null comment '修改时间',
+    group_id           varchar(128)                  null comment '项目组ID',
+    tenant_id          varchar(128)                  null comment '租户ID'
+)
+    comment '持久化储存';
+
+--rollback drop table biz_persistent_storage;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-15
+alter table biz_application_deployment_mount add persistent_storage_id varchar(128) null comment '持久化储存ID' after config_id;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-16
+create unique index application_deployment_unique_index on biz_application_deployment (namespace_id, name, del_flag);
+
+drop index id on biz_application_deployment;
+
+drop index name_del_flag_unique_index on biz_application_deployment;
+
+drop index id on biz_service_discovery;
+
+create unique index service_discovery_unique_index on biz_service_discovery (namespace_id, name, del_flag);
+

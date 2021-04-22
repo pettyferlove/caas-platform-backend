@@ -1,0 +1,42 @@
+## Deployment
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: mysql-server
+  namespace: caas
+  labels:
+    k8s-app: mysql-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: mysql-server
+  template:
+    metadata:
+      name: mysql-server
+      labels:
+        k8s-app: mysql-server
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0.18
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+          imagePullPolicy: Always
+          securityContext:
+            privileged: false
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/mysql
+              subPath: mysql/data
+            - name: conf
+              mountPath: /etc/mysql/conf.d
+      restartPolicy: Always
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mysql-persistent-volume-claim
+        - name: conf
+          configMap:
+            name: mysql-config

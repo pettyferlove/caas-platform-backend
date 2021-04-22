@@ -15,6 +15,10 @@ public interface INetworkService {
      */
     Service createOrUpdate(String namespace, Service service);
 
+    void update(String namespace, String name, Service service);
+
+    void create(String namespace, Service service);
+
     /**
      * 根据标签批量删除网络配置
      * @param namespace 命名空间

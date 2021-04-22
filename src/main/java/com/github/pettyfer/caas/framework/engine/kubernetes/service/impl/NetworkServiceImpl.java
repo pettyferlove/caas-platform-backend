@@ -3,8 +3,12 @@ package com.github.pettyfer.caas.framework.engine.kubernetes.service.impl;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.INetworkService;
 import com.github.pettyfer.caas.global.constants.KubernetesConstant;
 import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Pettyfer
@@ -22,6 +26,27 @@ public class NetworkServiceImpl implements INetworkService {
     @Override
     public Service createOrUpdate(String namespace, Service service) {
         return kubernetesClient.services().inNamespace(namespace).createOrReplace(service);
+    }
+
+    @Override
+    public void update(String namespace, String name, Service service) {
+        if("NodePort".equals(service.getSpec().getType())){
+            Optional<Service> optionalService = Optional.ofNullable(kubernetesClient.services().inNamespace(namespace).withName(name).get());
+            if(optionalService.isPresent()) {
+                List<ServicePort> oldPorts = optionalService.get().getSpec().getPorts();
+                List<ServicePort> ports = service.getSpec().getPorts();
+                for (ServicePort port: ports) {
+                    Optional<ServicePort> first = oldPorts.stream().filter(i -> i.getName().equals(port.getName())).findFirst();
+                    first.ifPresent(servicePort -> port.setNodePort(servicePort.getNodePort()));
+                }
+            }
+        }
+        kubernetesClient.services().inNamespace(namespace).withName(name).replace(service);
+    }
+
+    @Override
+    public void create(String namespace, Service service) {
+        kubernetesClient.services().inNamespace(namespace).create(service);
     }
 
     @Override

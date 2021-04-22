@@ -26,7 +26,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value="BizApplicationDeploymentMount对象", description="")
+@ApiModel(value="BizApplicationDeploymentVolume对象", description="")
 public class BizApplicationDeploymentMount extends BaseEntity<BizApplicationDeploymentMount> {
 
     private static final long serialVersionUID = 1L;
@@ -50,6 +50,9 @@ public class BizApplicationDeploymentMount extends BaseEntity<BizApplicationDepl
 
     @ApiModelProperty(value = "配置文件ID")
     private String configId;
+
+    @ApiModelProperty(value = "持久化存储ID")
+    private String persistentStorageId;
 
     @ApiModelProperty(value = "项目组ID")
     private String groupId;

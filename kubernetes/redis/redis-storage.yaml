@@ -1,0 +1,14 @@
+## PVC
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: redis-persistent-volume-claim
+  namespace: caas
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nfs-storage-class
+  volumeMode: Filesystem

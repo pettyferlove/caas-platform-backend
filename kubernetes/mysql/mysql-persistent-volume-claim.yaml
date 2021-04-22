@@ -1,0 +1,14 @@
+## PVC
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mysql-persistent-volume-claim
+  namespace: 1Gi
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: nfs-storage-class
+  volumeMode: Filesystem

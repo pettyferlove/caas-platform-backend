@@ -1,5 +1,6 @@
 package com.github.pettyfer.caas.framework.core.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -111,6 +112,9 @@ public class NamespaceCoreServiceImpl implements INamespaceCoreService {
 
     private Namespace buildNamespace(BizNamespace namespace) {
         Map<String, String> label = new HashMap<>();
+        if(ObjectUtil.isNull(namespace.getIstio())) {
+            namespace.setIstio(true);
+        }
         label.put("istio-injection", namespace.getIstio() ? "enable" : "disable");
         return new NamespaceBuilder()
                 .withApiVersion("v1")

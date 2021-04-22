@@ -32,6 +32,7 @@ public class BizConfigServiceImpl extends ServiceImpl<BizConfigMapper, BizConfig
     public IPage<ConfigListView> page(BizConfig bizConfig, Page<BizConfig> page) {
         LambdaQueryWrapper<BizConfig> queryWrapper = Wrappers.<BizConfig>lambdaQuery().orderByDesc(BizConfig::getCreateTime);
         queryWrapper.eq(BizConfig::getNamespaceId, bizConfig.getNamespaceId());
+        queryWrapper.eq(BizConfig::getDelFlag, 0);
         queryWrapper.likeRight(StrUtil.isNotEmpty(bizConfig.getConfigName()), BizConfig::getConfigName, bizConfig.getConfigName());
         return baseMapper.page(page, queryWrapper);
     }

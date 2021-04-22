@@ -37,4 +37,7 @@ public class ApplicationDeploymentMountView {
     @ApiModelProperty(value = "配置文件ID")
     private String configId;
 
+    @ApiModelProperty(value = "持久化存储ID")
+    private String persistentStorageId;
+
 }

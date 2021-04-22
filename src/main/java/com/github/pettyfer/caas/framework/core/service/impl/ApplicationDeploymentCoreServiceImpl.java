@@ -1,6 +1,5 @@
 package com.github.pettyfer.caas.framework.core.service.impl;
 
-import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -48,17 +47,20 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
 
     private final IBizConfigService bizConfigService;
 
+    private final IBizPersistentStorageService bizPersistentStorageService;
+
     private final IBizNamespaceService bizNamespaceService;
 
     private final IDeploymentService deploymentService;
 
     private final INetworkService networkService;
 
-    public ApplicationDeploymentCoreServiceImpl(IBizApplicationDeploymentService bizApplicationDeploymentService, IBizServiceDiscoveryService bizServiceDiscoveryService, IBizApplicationDeploymentMountService bizApplicationDeploymentVolumeService, IBizConfigService bizConfigService, IDeploymentService deploymentService, IBizNamespaceService bizNamespaceService, INetworkService networkService) {
+    public ApplicationDeploymentCoreServiceImpl(IBizApplicationDeploymentService bizApplicationDeploymentService, IBizServiceDiscoveryService bizServiceDiscoveryService, IBizApplicationDeploymentMountService bizApplicationDeploymentVolumeService, IBizConfigService bizConfigService, IBizPersistentStorageService bizPersistentStorageService, IDeploymentService deploymentService, IBizNamespaceService bizNamespaceService, INetworkService networkService) {
         this.bizApplicationDeploymentService = bizApplicationDeploymentService;
         this.bizServiceDiscoveryService = bizServiceDiscoveryService;
         this.bizApplicationDeploymentVolumeService = bizApplicationDeploymentVolumeService;
         this.bizConfigService = bizConfigService;
+        this.bizPersistentStorageService = bizPersistentStorageService;
         this.deploymentService = deploymentService;
         this.bizNamespaceService = bizNamespaceService;
         this.networkService = networkService;
@@ -84,16 +86,20 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                 bizServiceDiscoveryService.create(bizServiceDiscovery);
                 bizApplicationDeploymentVolumeService.batchInsert(deploymentId, deploymentDetail.getMounts());
 
-                try {
-                    Deployment deployment = buildDeployment(namespaceOptional.get(), deploymentDetail);
+                Deployment deployment = buildDeployment(namespaceOptional.get(), deploymentDetail);
+                Optional<Deployment> optionalDeployment = Optional.ofNullable(deploymentService.get(namespaceOptional.get().getName(), deploymentDetail.getName()));
+                if(optionalDeployment.isPresent()){
+                    deploymentService.update(namespaceOptional.get().getName(), deploymentDetail.getName(), deployment);
+                } else {
                     deploymentService.create(namespaceOptional.get().getName(), deployment);
-
-                    if (StrUtil.isNotEmpty(deploymentDetail.getNetwork()) && !"none".equals(deploymentDetail.getNetwork())) {
-                        networkService.createOrUpdate(namespaceOptional.get().getName(), buildService(deploymentDetail));
+                }
+                if (StrUtil.isNotEmpty(deploymentDetail.getNetwork()) && !"none".equals(deploymentDetail.getNetwork())) {
+                    Optional<io.fabric8.kubernetes.api.model.Service> serviceOptional = Optional.ofNullable(networkService.get(namespaceOptional.get().getName(), deploymentDetail.getName()));
+                    if(serviceOptional.isPresent()) {
+                        networkService.update(namespaceOptional.get().getName(), deploymentDetail.getName(), buildService(deploymentDetail));
+                    } else {
+                        networkService.create(namespaceOptional.get().getName(), buildService(deploymentDetail));
                     }
-                } catch (Exception ignored) {
-                    deploymentService.delete(namespaceOptional.get().getName(), deploymentDetail.getName());
-                    networkService.delete(namespaceOptional.get().getName(), deploymentDetail.getName());
                 }
 
                 return deploymentId;
@@ -132,16 +138,20 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                     bizApplicationDeploymentVolumeService.batchInsert(deploymentId, deploymentDetail.getMounts());
                 }
 
-                try {
-                    Deployment deployment = buildDeployment(namespaceOptional.get(), deploymentDetail);
-                    deploymentService.update(namespaceOptional.get().getName(), bizApplicationDeployment.getName(), deployment);
-
-                    if (StrUtil.isNotEmpty(deploymentDetail.getNetwork()) && !"none".equals(deploymentDetail.getNetwork())) {
-                        networkService.createOrUpdate(namespaceOptional.get().getName(), buildService(deploymentDetail));
+                Deployment deployment = buildDeployment(namespaceOptional.get(), deploymentDetail);
+                Optional<Deployment> optionalDeployment = Optional.ofNullable(deploymentService.get(namespaceOptional.get().getName(), deploymentDetail.getName()));
+                if(optionalDeployment.isPresent()){
+                    deploymentService.update(namespaceOptional.get().getName(), deploymentDetail.getName(), deployment);
+                } else {
+                    deploymentService.create(namespaceOptional.get().getName(), deployment);
+                }
+                if (StrUtil.isNotEmpty(deploymentDetail.getNetwork()) && !"none".equals(deploymentDetail.getNetwork())) {
+                    Optional<io.fabric8.kubernetes.api.model.Service> serviceOptional = Optional.ofNullable(networkService.get(namespaceOptional.get().getName(), deploymentDetail.getName()));
+                    if(serviceOptional.isPresent()) {
+                        networkService.update(namespaceOptional.get().getName(), deploymentDetail.getName(), buildService(deploymentDetail));
+                    } else {
+                        networkService.create(namespaceOptional.get().getName(), buildService(deploymentDetail));
                     }
-                } catch (Exception ignored) {
-                    deploymentService.delete(namespaceOptional.get().getName(), deploymentDetail.getName());
-                    networkService.delete(namespaceOptional.get().getName(), deploymentDetail.getName());
                 }
 
                 return update;
@@ -217,8 +227,6 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                 applicationDeploymentDetailView.setUnavailableReplicas(deployment.getStatus().getUnavailableReplicas());
                 applicationDeploymentDetailView.setUpdatedReplicas(deployment.getStatus().getUpdatedReplicas());
                 applicationDeploymentDetailView.setReplicas(deployment.getStatus().getReplicas());
-            } else {
-                throw new BaseRuntimeException("命名空间不存在该应用或应用部署失败");
             }
             return applicationDeploymentDetailView;
         } else {
@@ -241,11 +249,21 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                     detailView.setImageName(imageName);
                     detailView.setImageTag(tag);
 
-                    Deployment deployment = buildDeployment(namespace, detailView);
-                    deploymentService.update(namespace.getName(), applicationDeployment.getName(), deployment);
 
+                    Deployment deployment = buildDeployment(namespace, detailView);
+                    Optional<Deployment> optionalDeployment = Optional.ofNullable(deploymentService.get(namespace.getName(), detailView.getName()));
+                    if(optionalDeployment.isPresent()){
+                        deploymentService.update(namespace.getName(), detailView.getName(), deployment);
+                    } else {
+                        deploymentService.create(namespace.getName(), deployment);
+                    }
                     if (StrUtil.isNotEmpty(detailView.getNetwork()) && !"none".equals(detailView.getNetwork())) {
-                        networkService.createOrUpdate(namespace.getName(), buildService(detailView));
+                        Optional<io.fabric8.kubernetes.api.model.Service> serviceOptional = Optional.ofNullable(networkService.get(namespace.getName(), detailView.getName()));
+                        if(serviceOptional.isPresent()) {
+                            networkService.update(namespace.getName(), detailView.getName(), buildService(detailView));
+                        } else {
+                            networkService.create(namespace.getName(), buildService(detailView));
+                        }
                     }
 
                     applicationDeployment.setImageName(imageName);
@@ -270,7 +288,7 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
         List<ServicePort> servicePorts = new ArrayList<>();
         for (ApplicationDeploymentPortView n : ports) {
             ServicePort servicePort = new ServicePort();
-            servicePort.setName(deploymentDetail.getName() + "-http-" + RandomUtil.randomString(5));
+            servicePort.setName(deploymentDetail.getName() + "-http-" + n.getPort() +"-" + n.getTargetPort());
             servicePort.setAppProtocol(n.getProtocol());
             servicePort.setProtocol(n.getProtocol());
             servicePort.setPort(n.getPort());
@@ -364,10 +382,16 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                             .withType("DirectoryOrCreate")
                             .build());
                 } else if ("PersistentVolumeClaim".equals(i.getVolumeType())) {
-                    volumeBuilder.withPersistentVolumeClaim(new PersistentVolumeClaimVolumeSourceBuilder()
-                            .withClaimName(i.getVolumeName())
-                            .withReadOnly(false)
-                            .build());
+                    Optional<BizPersistentStorage> bizPersistentStorage = Optional.ofNullable(bizPersistentStorageService.get(i.getPersistentStorageId()));
+                    if(bizPersistentStorage.isPresent()) {
+                        BizPersistentStorage persistentStorage = bizPersistentStorage.get();
+                        volumeBuilder.withPersistentVolumeClaim(new PersistentVolumeClaimVolumeSourceBuilder()
+                                .withClaimName(persistentStorage.getName())
+                                .withReadOnly(false)
+                                .build());
+                    } else {
+                        throw new BaseRuntimeException("持久化存储配置不存在");
+                    }
                 }
                 volumes.add(volumeBuilder.build());
             }

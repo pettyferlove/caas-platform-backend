@@ -265,8 +265,12 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
             LambdaQueryWrapper<BizProjectBuildHistory> queryWrapper = Wrappers.<BizProjectBuildHistory>lambdaQuery();
             queryWrapper.eq(BizProjectBuildHistory::getJobId, jobId);
             BizProjectBuildHistory history = bizProjectBuildHistoryService.getOne(queryWrapper);
-            String[] image = history.getImageFullName().split(":");
-            publisher.push(history.getBuildId(), image[0], image[1]);
+            if(StrUtil.isNotEmpty(history.getImageFullName())){
+                String[] image = history.getImageFullName().split(":");
+                if(image.length==2){
+                    publisher.push(history.getBuildId(), image[0], image[1]);
+                }
+            }
         } else {
             // TODO 消息通知
         }
@@ -339,7 +343,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                         .withLabels(fetchBuildLabel(jobName, envType))
                         .endMetadata()
                         .withNewSpec()
-                        .withInitContainers(fetchInitContainer(env, 1, projectBuild.getNeedBuildImage(), projectBuild.getPersistentBuildFile(), projectBuild.getBuildTool()))
+                        .withInitContainers(fetchInitContainer(env, projectBuild.getNeedBuildProject(),1, projectBuild.getNeedBuildImage(), projectBuild.getPersistentBuildFile(), projectBuild.getBuildTool()))
                         .withContainers(fetchContainer(env))
                         .withVolumes(fetchVolume())
                         .withRestartPolicy("Never")
@@ -428,7 +432,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         return volumeMounts;
     }
 
-    private List<Container> fetchInitContainer(Map<String, String> env, Integer depositoryType, Integer needBuildImage, Integer needPersistent, String buildTool) {
+    private List<Container> fetchInitContainer(Map<String, String> env, Integer needBuild,  Integer depositoryType, Integer needBuildImage, Integer needPersistent, String buildTool) {
         List<Container> containers = new LinkedList<>();
         if (depositoryType == 2) {
             containers.add(new ContainerBuilder()
@@ -448,31 +452,31 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .build());
         }
 
-
-        switch (buildTool) {
-            case "maven":
-                containers.add(new ContainerBuilder()
-                        .withName("maven-build")
-                        .withImage(imageProperties.getImages().get("maven-build"))
-                        .withImagePullPolicy("Always")
-                        .withEnv(fetchEnv(env))
-                        .withVolumeMounts(fetchVolumeMount())
-                        .build());
-                break;
-            case "npm":
-            case "yarn":
-                containers.add(new ContainerBuilder()
-                        .withName("nodejs-build")
-                        .withImage(imageProperties.getImages().get("nodejs-build"))
-                        .withImagePullPolicy("Always")
-                        .withEnv(fetchEnv(env))
-                        .withVolumeMounts(fetchVolumeMount())
-                        .build());
-                break;
-            default:
-                throw new BaseRuntimeException("请指定构建工具");
+        if(needBuild == 1){
+            switch (buildTool) {
+                case "maven":
+                    containers.add(new ContainerBuilder()
+                            .withName("maven-build")
+                            .withImage(imageProperties.getImages().get("maven-build"))
+                            .withImagePullPolicy("Always")
+                            .withEnv(fetchEnv(env))
+                            .withVolumeMounts(fetchVolumeMount())
+                            .build());
+                    break;
+                case "npm":
+                case "yarn":
+                    containers.add(new ContainerBuilder()
+                            .withName("nodejs-build")
+                            .withImage(imageProperties.getImages().get("nodejs-build"))
+                            .withImagePullPolicy("Always")
+                            .withEnv(fetchEnv(env))
+                            .withVolumeMounts(fetchVolumeMount())
+                            .build());
+                    break;
+                default:
+                    throw new BaseRuntimeException("请指定构建工具");
+            }
         }
-
 
         if (needPersistent == 1) {
             containers.add(new ContainerBuilder()

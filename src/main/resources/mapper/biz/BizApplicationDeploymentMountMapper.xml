@@ -15,6 +15,7 @@
         <result column="volume_type" property="volumeType" />
         <result column="volume_path" property="volumePath" />
         <result column="config_id" property="configId" />
+        <result column="persistent_storage_id" property="persistentStorageId" />
         <result column="mount_name" property="mountName" />
         <result column="mount_path" property="mountPath" />
         <result column="group_id" property="groupId" />
@@ -29,7 +30,7 @@
         create_time,
         modifier,
         modify_time,
-        deployment_id, volume_name, volume_type, volume_path, config_id, mount_name, mount_path, group_id, tenant_id
+        deployment_id, volume_name, volume_type, volume_path, config_id, persistent_storage_id,  mount_name, mount_path, group_id, tenant_id
     </sql>
 
 </mapper>

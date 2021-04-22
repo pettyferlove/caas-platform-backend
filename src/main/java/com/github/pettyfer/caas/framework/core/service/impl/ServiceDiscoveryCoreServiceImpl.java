@@ -8,7 +8,9 @@ import com.github.pettyfer.caas.framework.biz.service.IBizNamespaceService;
 import com.github.pettyfer.caas.framework.biz.service.IBizServiceDiscoveryService;
 import com.github.pettyfer.caas.framework.core.model.ServiceDiscoveryListView;
 import com.github.pettyfer.caas.framework.core.service.IServiceDiscoveryCoreService;
+import com.github.pettyfer.caas.framework.engine.kubernetes.model.NodeDetailView;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.INetworkService;
+import com.github.pettyfer.caas.framework.engine.kubernetes.service.INodeService;
 import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
 import com.github.pettyfer.caas.utils.ConverterUtil;
 import io.fabric8.kubernetes.api.model.ServicePort;
@@ -33,10 +35,13 @@ public class ServiceDiscoveryCoreServiceImpl  implements IServiceDiscoveryCoreSe
 
     private final INetworkService networkService;
 
-    public ServiceDiscoveryCoreServiceImpl(IBizServiceDiscoveryService bizServiceDiscoveryService, IBizNamespaceService bizNamespaceService, INetworkService networkService) {
+    private final INodeService nodeService;
+
+    public ServiceDiscoveryCoreServiceImpl(IBizServiceDiscoveryService bizServiceDiscoveryService, IBizNamespaceService bizNamespaceService, INetworkService networkService, INodeService nodeService) {
         this.bizServiceDiscoveryService = bizServiceDiscoveryService;
         this.bizNamespaceService = bizNamespaceService;
         this.networkService = networkService;
+        this.nodeService = nodeService;
     }
 
     @Override
@@ -61,12 +66,17 @@ public class ServiceDiscoveryCoreServiceImpl  implements IServiceDiscoveryCoreSe
                     String namespace = service.getMetadata().getNamespace();
                     List<ServicePort> ports = service.getSpec().getPorts();
                     List<String> internalEndpoints = new LinkedList<>();
+                    List<String> externalEndpoints = new LinkedList<>();
                     for (ServicePort port: ports) {
+                        if("NodePort".equals(service.getSpec().getType())){
+                            List<NodeDetailView> list = nodeService.list();
+                            for (NodeDetailView node: list) {
+                                externalEndpoints.add(node.getIp() + ":" + port.getNodePort());
+                            }
+                        }
                         internalEndpoints.add(name + "." + namespace + ":" + port.getPort() + " " + port.getProtocol());
                     }
                     discoveryListView.setInternalEndpoints(String.join(",", internalEndpoints));
-
-                    List<String> externalEndpoints = new LinkedList<>();
                     List<String> externalIPs = service.getSpec().getExternalIPs();
                     for (String externalIP:externalIPs) {
                         for (ServicePort port: ports) {

@@ -32,4 +32,7 @@ public class ProjectBuildSelect implements Serializable {
 
     private String imagesDepositoryId;
 
+    @ApiModelProperty(value = "是否构建镜像")
+    private Integer needBuildImage;
+
 }
