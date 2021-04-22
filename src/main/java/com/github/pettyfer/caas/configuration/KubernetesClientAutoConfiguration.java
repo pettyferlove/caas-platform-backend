@@ -10,6 +10,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.FileCopyUtils;
 
 import java.nio.file.Paths;
 
@@ -33,8 +35,8 @@ public class KubernetesClientAutoConfiguration {
     @Profile("dev-windows")
     KubernetesClient kubernetesClientForWindows() {
         Config config = new ConfigBuilder()
-                .withMasterUrl(properties.getMasterUrl())
-                .withOauthToken(properties.getToken())
+                .withNewMasterUrl(properties.getMasterUrl())
+                .withNewOauthToken(properties.getToken())
                 .build();
         return new DefaultKubernetesClient(config);
     }
@@ -43,10 +45,11 @@ public class KubernetesClientAutoConfiguration {
     @SneakyThrows
     @Profile("dev-ubuntu")
     KubernetesClient kubernetesClientForUbuntu() {
+        ClassPathResource resource = new ClassPathResource(properties.getCert());
         Config config = new ConfigBuilder()
-                .withMasterUrl(properties.getMasterUrl())
-                .withOauthToken(properties.getToken())
-                .withCaCertFile(Paths.get(ClassLoader.getSystemResource(properties.getCert()).toURI()).toString())
+                .withNewMasterUrl(properties.getMasterUrl())
+                .withNewOauthToken(properties.getToken())
+                .withNewCaCertData(FileCopyUtils.copyToByteArray(resource.getInputStream()))
                 .build();
         return new DefaultKubernetesClient(config);
     }
@@ -55,10 +58,11 @@ public class KubernetesClientAutoConfiguration {
     @SneakyThrows
     @Profile("dev-centos")
     KubernetesClient kubernetesClientForCentos() {
+        ClassPathResource resource = new ClassPathResource(properties.getCert());
         Config config = new ConfigBuilder()
-                .withMasterUrl(properties.getMasterUrl())
-                .withOauthToken(properties.getToken())
-                .withCaCertFile(Paths.get(ClassLoader.getSystemResource(properties.getCert()).toURI()).toString())
+                .withNewMasterUrl(properties.getMasterUrl())
+                .withNewOauthToken(properties.getToken())
+                .withNewCaCertData(FileCopyUtils.copyToByteArray(resource.getInputStream()))
                 .build();
         return new DefaultKubernetesClient(config);
     }
