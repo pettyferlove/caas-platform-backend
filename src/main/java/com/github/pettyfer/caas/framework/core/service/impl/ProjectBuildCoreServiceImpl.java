@@ -49,8 +49,6 @@ import java.util.stream.Collectors;
 @Service
 public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
 
-    private final String HOOKS_ENDPOINT = "http://192.168.51.67:8885/api/v1/hooks/gitlab/";
-
     private final BuildImageProperties imageProperties;
 
     private final IBizGlobalConfigurationService bizGlobalConfigurationService;
@@ -175,8 +173,10 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
     @SneakyThrows
     public String createSourceProjectHook(String id, String sourceProjectId) {
         UserConfiguration userConfiguration = bizUserConfigurationService.loadConfig();
+        GlobalConfiguration globalConfiguration = bizGlobalConfigurationService.loadConfig();
         GitlabAPI connect = GitlabAPI.connect(userConfiguration.getGitlabHomePath(), userConfiguration.getGitlabApiToken());
-        String projectHookUrl = HOOKS_ENDPOINT + id;
+        String server = LoadBalanceUtil.chooseServer(globalConfiguration.getClusterServer());
+        String projectHookUrl = StrUtil.format("http://{}/api/v1/hooks/gitlab/", server);
         GitlabProject project = connect.getProject(sourceProjectId);
         List<GitlabProjectHook> projectHooks = connect.getProjectHooks(project);
         List<GitlabProjectHook> collect = projectHooks.stream().filter(i -> projectHookUrl.equals(i.getUrl())).collect(Collectors.toList());
@@ -261,13 +261,13 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         LambdaUpdateWrapper<BizProjectBuildHistory> updateWrapper = Wrappers.<BizProjectBuildHistory>lambdaUpdate();
         updateWrapper.set(BizProjectBuildHistory::getBuildStatus, status.getValue());
         updateWrapper.eq(BizProjectBuildHistory::getJobId, jobId);
-        if(bizProjectBuildHistoryService.update(updateWrapper)){
+        if (bizProjectBuildHistoryService.update(updateWrapper)) {
             LambdaQueryWrapper<BizProjectBuildHistory> queryWrapper = Wrappers.<BizProjectBuildHistory>lambdaQuery();
             queryWrapper.eq(BizProjectBuildHistory::getJobId, jobId);
             BizProjectBuildHistory history = bizProjectBuildHistoryService.getOne(queryWrapper);
-            if(StrUtil.isNotEmpty(history.getImageFullName())){
+            if (StrUtil.isNotEmpty(history.getImageFullName())) {
                 String[] image = history.getImageFullName().split(":");
-                if(image.length==2){
+                if (image.length == 2) {
                     publisher.push(history.getBuildId(), image[0], image[1]);
                 }
             }
@@ -343,7 +343,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                         .withLabels(fetchBuildLabel(jobName, envType))
                         .endMetadata()
                         .withNewSpec()
-                        .withInitContainers(fetchInitContainer(env, projectBuild.getNeedBuildProject(),1, projectBuild.getNeedBuildImage(), projectBuild.getPersistentBuildFile(), projectBuild.getBuildTool()))
+                        .withInitContainers(fetchInitContainer(env, projectBuild.getNeedBuildProject(), 1, projectBuild.getNeedBuildImage(), projectBuild.getPersistentBuildFile(), projectBuild.getBuildTool()))
                         .withContainers(fetchContainer(env))
                         .withVolumes(fetchVolume())
                         .withRestartPolicy("Never")
@@ -432,7 +432,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         return volumeMounts;
     }
 
-    private List<Container> fetchInitContainer(Map<String, String> env, Integer needBuild,  Integer depositoryType, Integer needBuildImage, Integer needPersistent, String buildTool) {
+    private List<Container> fetchInitContainer(Map<String, String> env, Integer needBuild, Integer depositoryType, Integer needBuildImage, Integer needPersistent, String buildTool) {
         List<Container> containers = new LinkedList<>();
         if (depositoryType == 2) {
             containers.add(new ContainerBuilder()
@@ -452,7 +452,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .build());
         }
 
-        if(needBuild == 1){
+        if (needBuild == 1) {
             switch (buildTool) {
                 case "maven":
                     containers.add(new ContainerBuilder()
