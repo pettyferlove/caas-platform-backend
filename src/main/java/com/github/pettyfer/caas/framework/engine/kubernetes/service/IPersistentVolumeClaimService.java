@@ -11,4 +11,6 @@ public interface IPersistentVolumeClaimService {
 
     Boolean update(String namespace, String name, PersistentVolumeClaim persistentVolumeClaim);
 
+    Boolean delete(String namespace, String name);
+
 }

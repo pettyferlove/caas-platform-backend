@@ -30,4 +30,10 @@ public class PersistentVolumeClaimServiceImpl implements IPersistentVolumeClaimS
         kubernetesClient.persistentVolumeClaims().inNamespace(namespace).create(persistentVolumeClaim);
         return true;
     }
+
+    @Override
+    public Boolean delete(String namespace, String name) {
+        return kubernetesClient.persistentVolumeClaims().inNamespace(namespace).withName(name).delete();
+    }
+
 }

@@ -31,9 +31,9 @@ public class PersistentStorageApi {
         return new R<IPage<PersistentStorageListView>>(persistentStorageCoreService.page(namespaceId, persistentStorage, page));
     }
 
-    @GetMapping("/{namespaceId}/{id}")
-    public R<BizPersistentStorage> get(@PathVariable String namespaceId ,@PathVariable String id) {
-        return new R<BizPersistentStorage>(persistentStorageCoreService.get(namespaceId, id));
+    @GetMapping("/{id}")
+    public R<BizPersistentStorage> get(@PathVariable String id) {
+        return new R<BizPersistentStorage>(persistentStorageCoreService.get(id));
     }
 
     @PutMapping
@@ -49,6 +49,11 @@ public class PersistentStorageApi {
     @GetMapping("select/{namespaceId}")
     public R<List<PersistentStorageSelectView>> configSelect(@PathVariable String namespaceId) {
         return new R<List<PersistentStorageSelectView>>(persistentStorageCoreService.select(namespaceId));
+    }
+
+    @DeleteMapping("/{id}")
+    public R<Boolean> delete(@PathVariable String id) {
+        return new R<Boolean>(persistentStorageCoreService.delete(id));
     }
 
 }

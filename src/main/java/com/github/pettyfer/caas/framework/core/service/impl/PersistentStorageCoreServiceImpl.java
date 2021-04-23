@@ -69,12 +69,16 @@ public class PersistentStorageCoreServiceImpl implements IPersistentStorageCoreS
     }
 
     @Override
-    public BizPersistentStorage get(String namespaceId, String id) {
-        Optional<BizNamespace> namespaceOptional = Optional.ofNullable(bizNamespaceService.get(namespaceId));
-        if (namespaceOptional.isPresent()) {
-            return bizPersistentStorageService.get(id);
+    public BizPersistentStorage get(String id) {
+        Optional<BizPersistentStorage> persistentStorageOptional = Optional.ofNullable(bizPersistentStorageService.get(id));
+        if (persistentStorageOptional.isPresent()) {
+            Optional<BizNamespace> namespaceOptional = Optional.ofNullable(bizNamespaceService.get(persistentStorageOptional.get().getNamespaceId()));
+            if(!namespaceOptional.isPresent()){
+                throw new BaseRuntimeException("命名空间不存在");
+            }
+            return persistentStorageOptional.get();
         } else {
-            throw new BaseRuntimeException("命名空间不存在");
+            throw new BaseRuntimeException("存储配置不存在");
         }
     }
 
@@ -118,6 +122,22 @@ public class PersistentStorageCoreServiceImpl implements IPersistentStorageCoreS
         } else {
             throw new BaseRuntimeException("命名空间不存在");
         }
+    }
+
+    @Override
+    public Boolean delete(String id) {
+        Optional<BizPersistentStorage> persistentStorageOptional = Optional.ofNullable(bizPersistentStorageService.get(id));
+        if (persistentStorageOptional.isPresent()) {
+            Optional<BizNamespace> bizNamespaceOptional = Optional.ofNullable(bizNamespaceService.get(persistentStorageOptional.get().getNamespaceId()));
+            if (bizNamespaceOptional.isPresent()) {
+                persistentVolumeClaimService.delete(bizNamespaceOptional.get().getName(), persistentStorageOptional.get().getName());
+            } else {
+                throw new BaseRuntimeException("命名空间不存在");
+            }
+        } else {
+            throw new BaseRuntimeException("存储配置不存在");
+        }
+        return bizPersistentStorageService.delete(id);
     }
 
 

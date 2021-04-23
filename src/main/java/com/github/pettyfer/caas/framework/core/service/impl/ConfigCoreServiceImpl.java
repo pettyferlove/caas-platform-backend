@@ -89,7 +89,6 @@ public class ConfigCoreServiceImpl implements IConfigCoreService {
             Optional<BizNamespace> bizNamespaceOptional = Optional.ofNullable(bizNamespaceService.get(optionalBizConfig.get().getNamespaceId()));
             if (bizNamespaceOptional.isPresent()) {
                 configMapService.delete(bizNamespaceOptional.get().getName(), optionalBizConfig.get().getConfigName());
-                bizConfigService.delete(optionalBizConfig.get().getId());
             } else {
                 throw new BaseRuntimeException("命名空间不存在");
             }

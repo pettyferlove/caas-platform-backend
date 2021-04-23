@@ -15,11 +15,13 @@ public interface IPersistentStorageCoreService {
 
     IPage<PersistentStorageListView> page(String namespaceId, BizPersistentStorage persistentStorage, Page<BizPersistentStorage> page);
 
-    BizPersistentStorage get(String namespaceId, String id);
+    BizPersistentStorage get(String id);
 
     Boolean update(BizPersistentStorage persistentStorage);
 
     String create(BizPersistentStorage persistentStorage);
 
     List<PersistentStorageSelectView> select(String namespaceId);
+
+    Boolean delete(String id);
 }
