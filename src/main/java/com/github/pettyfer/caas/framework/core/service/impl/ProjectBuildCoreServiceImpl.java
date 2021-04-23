@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.google.common.base.Preconditions;
 import com.github.pettyfer.caas.framework.biz.entity.BizNamespace;
 import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuild;
 import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuildHistory;
@@ -30,6 +29,7 @@ import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
 import com.github.pettyfer.caas.global.properties.BuildImageProperties;
 import com.github.pettyfer.caas.utils.LoadBalanceUtil;
 import com.github.pettyfer.caas.utils.URLResolutionUtil;
+import com.google.common.base.Preconditions;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.batch.Job;
 import io.fabric8.kubernetes.api.model.batch.JobBuilder;
@@ -277,7 +277,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
             queryWrapper.eq(BizProjectBuildHistory::getJobId, jobId);
             BizProjectBuildHistory history = bizProjectBuildHistoryService.getOne(queryWrapper);
             BizProjectBuild projectBuild = bizProjectBuildService.get(history.getBuildId());
-            if(status==BuildStatus.Success) {
+            if (status == BuildStatus.Success) {
                 buildMessage.setType("success");
                 buildMessage.setContent(projectBuild.getProjectName() + "自动构建成功");
             } else {
