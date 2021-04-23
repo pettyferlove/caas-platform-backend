@@ -70,9 +70,9 @@ public class ProjectBuildApi {
         return new R<>(projectBuildCoreService.delete(id));
     }
 
-    @GetMapping("/select")
-    public R<List<ProjectBuildSelect>> select(Integer envType) {
-        return new R<>(bizProjectBuildService.select(envType));
+    @GetMapping("/select/{namespaceId}")
+    public R<List<ProjectBuildSelect>> select(Integer envType, @PathVariable String namespaceId) {
+        return new R<>(bizProjectBuildService.select(envType, namespaceId));
     }
 
 

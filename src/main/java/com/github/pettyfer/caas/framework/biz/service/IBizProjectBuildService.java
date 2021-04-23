@@ -65,7 +65,7 @@ public interface IBizProjectBuildService extends IService<BizProjectBuild> {
      *
      * @return 集合
      */
-    List<ProjectBuildSelect> select(Integer envType);
+    List<ProjectBuildSelect> select(Integer envType, String namespaceId);
 
     /**
      * 更新自动构建触发状态
