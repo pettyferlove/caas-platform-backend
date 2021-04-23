@@ -64,7 +64,7 @@ spring:
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*Mapper.xml
   #实体扫描，多个package用逗号或者分号分隔
-  typeAliasesPackage: com.github.pettyfer.caas.framework.biz
+  typeAliasesPackage: com.github.pettyfer.caas.framework.biz,com.github.pettyfer.caas.framework.system
   global-config:
     banner: false
     db-config:

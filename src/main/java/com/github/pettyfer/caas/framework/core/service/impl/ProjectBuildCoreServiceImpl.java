@@ -20,6 +20,8 @@ import com.github.pettyfer.caas.framework.core.model.*;
 import com.github.pettyfer.caas.framework.core.service.IProjectBuildCoreService;
 import com.github.pettyfer.caas.framework.engine.docker.register.service.IHarborService;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.IJobService;
+import com.github.pettyfer.caas.framework.system.entity.SystemMessage;
+import com.github.pettyfer.caas.framework.system.event.publisher.MessageEventPublisher;
 import com.github.pettyfer.caas.global.constants.BuildStatus;
 import com.github.pettyfer.caas.global.constants.EnvConstant;
 import com.github.pettyfer.caas.global.constants.GlobalConstant;
@@ -39,6 +41,7 @@ import org.gitlab.api.models.GitlabProjectHook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -71,7 +74,9 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
 
     private final BuildEventPublisher publisher;
 
-    public ProjectBuildCoreServiceImpl(BuildImageProperties imageProperties, IBizGlobalConfigurationService bizGlobalConfigurationService, IBizUserConfigurationService bizUserConfigurationService, IBizProjectBuildService bizProjectBuildService, IBizProjectBuildHistoryService bizProjectBuildHistoryService, IHarborService harborService, IBizImagesDepositoryService bizImagesDepositoryService, IBizUserConfigurationService userConfigurationService, IBizNamespaceService bizNamespaceService, IJobService jobService, BuildEventPublisher publisher) {
+    private final MessageEventPublisher messagePublisher;
+
+    public ProjectBuildCoreServiceImpl(BuildImageProperties imageProperties, IBizGlobalConfigurationService bizGlobalConfigurationService, IBizUserConfigurationService bizUserConfigurationService, IBizProjectBuildService bizProjectBuildService, IBizProjectBuildHistoryService bizProjectBuildHistoryService, IHarborService harborService, IBizImagesDepositoryService bizImagesDepositoryService, IBizUserConfigurationService userConfigurationService, IBizNamespaceService bizNamespaceService, IJobService jobService, BuildEventPublisher publisher, MessageEventPublisher messagePublisher) {
         this.imageProperties = imageProperties;
         this.bizGlobalConfigurationService = bizGlobalConfigurationService;
         this.bizUserConfigurationService = bizUserConfigurationService;
@@ -83,6 +88,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         this.bizNamespaceService = bizNamespaceService;
         this.jobService = jobService;
         this.publisher = publisher;
+        this.messagePublisher = messagePublisher;
     }
 
 
@@ -258,6 +264,11 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
 
     @Override
     public void updateStatus(String jobId, BuildStatus status) {
+        SystemMessage buildMessage = new SystemMessage();
+        buildMessage.setBusinessName("build");
+        buildMessage.setMessage("构建通知");
+        buildMessage.setDeliver("system");
+        buildMessage.setTime(LocalDateTime.now());
         LambdaUpdateWrapper<BizProjectBuildHistory> updateWrapper = Wrappers.<BizProjectBuildHistory>lambdaUpdate();
         updateWrapper.set(BizProjectBuildHistory::getBuildStatus, status.getValue());
         updateWrapper.eq(BizProjectBuildHistory::getJobId, jobId);
@@ -265,14 +276,22 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
             LambdaQueryWrapper<BizProjectBuildHistory> queryWrapper = Wrappers.<BizProjectBuildHistory>lambdaQuery();
             queryWrapper.eq(BizProjectBuildHistory::getJobId, jobId);
             BizProjectBuildHistory history = bizProjectBuildHistoryService.getOne(queryWrapper);
+            BizProjectBuild projectBuild = bizProjectBuildService.get(history.getBuildId());
+            if(status==BuildStatus.Success) {
+                buildMessage.setType("success");
+                buildMessage.setContent(projectBuild.getProjectName() + "自动构建成功");
+            } else {
+                buildMessage.setType("error");
+                buildMessage.setContent(projectBuild.getProjectName() + "自动构建失败，请检查日志");
+            }
+            buildMessage.setReceiver(projectBuild.getCreator());
             if (StrUtil.isNotEmpty(history.getImageFullName())) {
                 String[] image = history.getImageFullName().split(":");
                 if (image.length == 2) {
                     publisher.push(history.getBuildId(), image[0], image[1]);
                 }
             }
-        } else {
-            // TODO 消息通知
+            messagePublisher.push(buildMessage);
         }
     }
 

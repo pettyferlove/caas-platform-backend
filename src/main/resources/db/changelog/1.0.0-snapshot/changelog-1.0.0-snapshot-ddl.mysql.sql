@@ -143,3 +143,31 @@ drop index id on biz_service_discovery;
 
 create unique index service_discovery_unique_index on biz_service_discovery (namespace_id, name, del_flag);
 
+--changeset Petty:caas-1.0.0-snapshot-ddl-17
+create table system_message
+(
+    id                    varchar(128)                 not null comment '数据唯一标识符'
+        primary key,
+    message               varchar(255)                 not null comment '消息',
+    content               varchar(1000)                null comment '具体内容',
+    time                  datetime                     null comment '消息产生时间',
+    type                  varchar(128)                 null comment '消息类型 success、error',
+    business_name         varchar(128)                 null comment '业务名称',
+    business_id           varchar(400)                 null comment '业务ID',
+    business_page_address varchar(128)                 null comment '该业务对应的页面地址（对应前端路径）',
+    edit_page_address     varchar(128)                 null comment '编辑地址（对应前端路径）',
+    view_page_address     varchar(128)                 null comment '查看地址（对应前端路径）',
+    receiver              varchar(128)                 not null comment '接收人USER_ID',
+    deliver               varchar(128)                 not null comment '发送人USER_ID，如果是系统消息则为system',
+    state                 tinyint default 0            not null comment '状态 1已读 0未读 默认为0',
+    del_flag              bit     default b'0'         null comment '删除标记 0 未删除 1 删除',
+    creator               varchar(128) charset utf8mb4 null comment '创建人',
+    create_time           datetime                     null comment '创建时间',
+    modifier              varchar(128) charset utf8mb4 null comment '修改人',
+    modify_time           datetime                     null comment '修改时间',
+    group_id              varchar(128) charset utf8mb4 null comment '项目组ID',
+    tenant_id             varchar(128) charset utf8mb4 null comment '租户ID'
+)
+    comment '系统消息' collate = utf8mb4_general_ci;
+
+--rollback drop table system_message;
