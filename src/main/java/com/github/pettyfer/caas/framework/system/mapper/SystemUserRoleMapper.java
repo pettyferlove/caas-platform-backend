@@ -1,7 +1,7 @@
 package com.github.pettyfer.caas.framework.system.mapper;
 
-import com.github.pettyfer.caas.framework.system.entity.SystemUserRole;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.pettyfer.caas.framework.system.entity.SystemUserRole;
 
 /**
  * <p>

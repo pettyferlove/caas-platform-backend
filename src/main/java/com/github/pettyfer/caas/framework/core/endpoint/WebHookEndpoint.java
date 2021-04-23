@@ -1,11 +1,11 @@
 package com.github.pettyfer.caas.framework.core.endpoint;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.pettyfer.caas.global.constants.BuildStatus;
 import com.github.pettyfer.caas.framework.core.event.GitlabPushDetails;
 import com.github.pettyfer.caas.framework.core.event.publisher.GitlabPushEventPublisher;
 import com.github.pettyfer.caas.framework.core.event.publisher.ProjectBuildEventPublisher;
 import com.github.pettyfer.caas.framework.core.event.publisher.SqlBuildEventPublisher;
+import com.github.pettyfer.caas.global.constants.BuildStatus;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;

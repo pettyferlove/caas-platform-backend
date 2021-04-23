@@ -20,7 +20,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value="附件结果", description="附件上传结果VO")
+@ApiModel(value = "附件结果", description = "附件上传结果VO")
 public class UploadResult implements Serializable {
     private static final long serialVersionUID = 6121441712776319710L;
 

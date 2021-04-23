@@ -1,7 +1,7 @@
 package com.github.pettyfer.caas.framework.core.event.listener;
 
-import com.github.pettyfer.caas.framework.core.service.ISqlBuildCoreService;
 import com.github.pettyfer.caas.framework.core.event.SqlBuildEvent;
+import com.github.pettyfer.caas.framework.core.service.ISqlBuildCoreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;

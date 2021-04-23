@@ -1,7 +1,7 @@
 package com.github.pettyfer.caas.framework.biz.mapper;
 
-import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuildHistory;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuildHistory;
 import com.github.pettyfer.caas.framework.core.model.ProjectBuildHistorySelectView;
 
 import java.util.List;

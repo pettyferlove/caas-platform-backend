@@ -1,9 +1,5 @@
 package com.github.pettyfer.caas.configuration;
 
-import com.nimbusds.jose.JWSAlgorithm;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.KeyUse;
-import com.nimbusds.jose.jwk.RSAKey;
 import com.github.pettyfer.caas.global.factory.ITokenGranterFactory;
 import com.github.pettyfer.caas.global.factory.impl.TokenGranterFactoryImpl;
 import com.github.pettyfer.caas.global.filter.BaseClientCredentialsTokenEndpointFilter;
@@ -13,6 +9,10 @@ import com.github.pettyfer.caas.global.provider.token.BaseAccessTokenConverter;
 import com.github.pettyfer.caas.global.service.OAuth2ClientDetailsService;
 import com.github.pettyfer.caas.global.service.OAuth2UserDetailsService;
 import com.github.pettyfer.caas.utils.KeyUtil;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.KeyUse;
+import com.nimbusds.jose.jwk.RSAKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;

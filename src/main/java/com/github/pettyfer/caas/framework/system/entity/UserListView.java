@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value="UserListView对象", description="VIEW")
+@ApiModel(value = "UserListView对象", description = "VIEW")
 public class UserListView extends Model<UserListView> {
 
     private static final long serialVersionUID = 1L;

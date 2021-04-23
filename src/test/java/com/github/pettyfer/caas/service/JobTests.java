@@ -92,7 +92,6 @@ public class JobTests {
                 .build());
 
 
-
         volumes.add(new VolumeBuilder()
                 .withName("work-dir")
                 .withEmptyDir(new EmptyDirVolumeSource())
@@ -184,7 +183,7 @@ public class JobTests {
     public void fetchLog() {
         Pod pod = kubernetesClient.pods().inNamespace("auto1").withLabel("job-name", "test-build-0a235fad-e14a-4cb7-a52a-eb52a780bc52").list().getItems().get(0);
         List<Container> containerList = pod.getSpec().getInitContainers();
-        for (Container c:containerList) {
+        for (Container c : containerList) {
             String log = kubernetesClient.pods().inNamespace("auto1").withName(pod.getMetadata().getName()).inContainer(c.getName()).tailingLines(2000).getLog();
             System.out.println(log);
         }

@@ -1,9 +1,9 @@
 package com.github.pettyfer.caas.framework.core.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.pettyfer.caas.framework.biz.entity.BizNamespace;
 import com.github.pettyfer.caas.framework.engine.kubernetes.model.NamespaceDetailView;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import java.util.List;
 

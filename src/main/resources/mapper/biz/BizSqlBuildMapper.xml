@@ -4,29 +4,29 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.biz.entity.BizSqlBuild">
-    <result column="id" property="id" />
-    <result column="del_flag" property="delFlag" />
-    <result column="creator" property="creator" />
-    <result column="create_time" property="createTime" />
-    <result column="modifier" property="modifier" />
-    <result column="modify_time" property="modifyTime" />
-        <result column="namespace_id" property="namespaceId" />
-        <result column="project_name" property="projectName" />
-        <result column="describe_info" property="describeInfo" />
-        <result column="depository_type" property="depositoryType" />
-        <result column="remote_path" property="remotePath" />
-        <result column="remote_branch" property="remoteBranch" />
-        <result column="env" property="env" />
-        <result column="username" property="username" />
-        <result column="password" property="password" />
-        <result column="config" property="config" />
-        <result column="sql_from" property="sqlFrom" />
-        <result column="sql_to" property="sqlTo" />
-        <result column="env_type" property="envType" />
-        <result column="auth_type" property="authType" />
-        <result column="full" property="full" />
-        <result column="group_id" property="groupId" />
-        <result column="tenant_id" property="tenantId" />
+        <result column="id" property="id"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="creator" property="creator"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modifier" property="modifier"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="namespace_id" property="namespaceId"/>
+        <result column="project_name" property="projectName"/>
+        <result column="describe_info" property="describeInfo"/>
+        <result column="depository_type" property="depositoryType"/>
+        <result column="remote_path" property="remotePath"/>
+        <result column="remote_branch" property="remoteBranch"/>
+        <result column="env" property="env"/>
+        <result column="username" property="username"/>
+        <result column="password" property="password"/>
+        <result column="config" property="config"/>
+        <result column="sql_from" property="sqlFrom"/>
+        <result column="sql_to" property="sqlTo"/>
+        <result column="env_type" property="envType"/>
+        <result column="auth_type" property="authType"/>
+        <result column="full" property="full"/>
+        <result column="group_id" property="groupId"/>
+        <result column="tenant_id" property="tenantId"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -42,11 +42,15 @@
     </sql>
     <select id="page" resultType="com.github.pettyfer.caas.framework.core.model.SqlBuildListView">
         select
-            <include refid="Base_Column_List"></include>,
-            (select h.id from biz_sql_build_history h where t.id = h.build_id and h.del_flag = 0 order by create_time desc limit 1) history_id,
-            (select h.job_id from biz_sql_build_history h where t.id = h.build_id and h.del_flag = 0 order by create_time desc limit 1) job,
-            (select h.build_status from biz_sql_build_history h where t.id = h.build_id and h.del_flag = 0 order by create_time desc limit 1) last_state,
-            (select h.create_time from biz_sql_build_history h where t.id = h.build_id and h.del_flag = 0 order by create_time desc limit 1) last_build_time
+        <include refid="Base_Column_List"></include>,
+        (select h.id from biz_sql_build_history h where t.id = h.build_id and h.del_flag = 0 order by create_time desc
+        limit 1) history_id,
+        (select h.job_id from biz_sql_build_history h where t.id = h.build_id and h.del_flag = 0 order by create_time
+        desc limit 1) job,
+        (select h.build_status from biz_sql_build_history h where t.id = h.build_id and h.del_flag = 0 order by
+        create_time desc limit 1) last_state,
+        (select h.create_time from biz_sql_build_history h where t.id = h.build_id and h.del_flag = 0 order by
+        create_time desc limit 1) last_build_time
         from biz_sql_build t
         ${ew.customSqlSegment}
     </select>

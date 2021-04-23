@@ -4,26 +4,26 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.system.entity.SystemMessage">
-    <result column="id" property="id" />
-    <result column="del_flag" property="delFlag" />
-    <result column="creator" property="creator" />
-    <result column="create_time" property="createTime" />
-    <result column="modifier" property="modifier" />
-    <result column="modify_time" property="modifyTime" />
-        <result column="message" property="message" />
-        <result column="content" property="content" />
-        <result column="time" property="time" />
-        <result column="type" property="type" />
-        <result column="business_name" property="businessName" />
-        <result column="business_id" property="businessId" />
-        <result column="business_page_address" property="businessPageAddress" />
-        <result column="edit_page_address" property="editPageAddress" />
-        <result column="view_page_address" property="viewPageAddress" />
-        <result column="receiver" property="receiver" />
-        <result column="deliver" property="deliver" />
-        <result column="state" property="state" />
-        <result column="group_id" property="groupId" />
-        <result column="tenant_id" property="tenantId" />
+        <result column="id" property="id"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="creator" property="creator"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modifier" property="modifier"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="message" property="message"/>
+        <result column="content" property="content"/>
+        <result column="time" property="time"/>
+        <result column="type" property="type"/>
+        <result column="business_name" property="businessName"/>
+        <result column="business_id" property="businessId"/>
+        <result column="business_page_address" property="businessPageAddress"/>
+        <result column="edit_page_address" property="editPageAddress"/>
+        <result column="view_page_address" property="viewPageAddress"/>
+        <result column="receiver" property="receiver"/>
+        <result column="deliver" property="deliver"/>
+        <result column="state" property="state"/>
+        <result column="group_id" property="groupId"/>
+        <result column="tenant_id" property="tenantId"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->

@@ -15,6 +15,7 @@ import java.util.List;
 
 /**
  * Search
+ *
  * @author Petty
  */
 @Data

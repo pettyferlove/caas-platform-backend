@@ -22,7 +22,7 @@ public interface IBizImagesDepositoryService extends IService<BizImagesDepositor
      * List查找
      *
      * @param bizImagesDepository 查询参数对象
-     * @param page                   Page分页对象
+     * @param page                Page分页对象
      * @return IPage 返回结果
      */
     IPage<BizImagesDepository> page(BizImagesDepository bizImagesDepository, Page<BizImagesDepository> page);
@@ -53,7 +53,8 @@ public interface IBizImagesDepositoryService extends IService<BizImagesDepositor
 
     /**
      * 创建镜像仓库与当前用户的映射
-     * @param projectId projectId
+     *
+     * @param projectId   projectId
      * @param projectName projectName
      */
     void create(String projectId, String projectName);
@@ -68,6 +69,7 @@ public interface IBizImagesDepositoryService extends IService<BizImagesDepositor
 
     /**
      * 获取镜像仓库列表
+     *
      * @return 集合
      */
     List<ImagesDepositorySelect> select();

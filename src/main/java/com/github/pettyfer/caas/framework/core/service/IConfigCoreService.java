@@ -15,8 +15,9 @@ public interface IConfigCoreService {
 
     /**
      * 分页查询配置文件
+     *
      * @param config 查询参数
-     * @param page 分页参数
+     * @param page   分页参数
      * @return 查询结果
      */
     IPage<ConfigListView> page(BizConfig config, Page<BizConfig> page);
@@ -24,13 +25,15 @@ public interface IConfigCoreService {
 
     /**
      * 获取配置文件详情
+     *
      * @param id 配置ID
      * @return 配置信息
      */
     BizConfig get(String id);
 
     /**
-     *  更新配置文件
+     * 更新配置文件
+     *
      * @param bizConfig 配置信息
      * @return 更新结果
      */
@@ -38,6 +41,7 @@ public interface IConfigCoreService {
 
     /**
      * 添加配置文件
+     *
      * @param bizConfig 配置信息
      * @return 配置ID
      */
@@ -45,6 +49,7 @@ public interface IConfigCoreService {
 
     /**
      * 删除配置文件
+     *
      * @param id 配置ID
      * @return 删除结果
      */

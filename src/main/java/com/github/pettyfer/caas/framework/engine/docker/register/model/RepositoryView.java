@@ -8,6 +8,7 @@ import java.io.Serializable;
 
 /**
  * SearchRepository
+ *
  * @author Petty
  */
 @Data
@@ -18,21 +19,21 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RepositoryView implements Serializable {
-  private static final long serialVersionUID = 1732428920064309110L;
+    private static final long serialVersionUID = 1732428920064309110L;
 
-  private String repositoryName;
+    private String repositoryName;
 
-  private String projectName;
+    private String projectName;
 
-  private Boolean projectPublic;
+    private Boolean projectPublic;
 
-  private Integer tagsCount;
+    private Integer tagsCount;
 
-  private Integer projectId;
+    private Integer projectId;
 
-  private Integer pullCount;
+    private Integer pullCount;
 
-  private String pullUrl;
+    private String pullUrl;
 
 }
 

@@ -26,22 +26,22 @@ import java.security.interfaces.RSAPublicKey;
  * @author Petty
  */
 public class KeyUtil {
-	public static final String KEY_STORE_FILE = "caas-server.keystore";
-	public static final String KEY_STORE_PASSWORD = "caas-auth";
-	public static final String KEY_ALIAS = "oauth2-caas-key";
-	public static final KeyStoreKeyFactory KEY_STORE_KEY_FACTORY = new KeyStoreKeyFactory(
-			new ClassPathResource(KEY_STORE_FILE), KEY_STORE_PASSWORD.toCharArray());
-	public static final String VERIFIER_KEY_ID = new String("caas-server-key");
+    public static final String KEY_STORE_FILE = "caas-server.keystore";
+    public static final String KEY_STORE_PASSWORD = "caas-auth";
+    public static final String KEY_ALIAS = "oauth2-caas-key";
+    public static final KeyStoreKeyFactory KEY_STORE_KEY_FACTORY = new KeyStoreKeyFactory(
+            new ClassPathResource(KEY_STORE_FILE), KEY_STORE_PASSWORD.toCharArray());
+    public static final String VERIFIER_KEY_ID = new String("caas-server-key");
 
-	public static RSAPublicKey getVerifierKey() {
-		return (RSAPublicKey) getKeyPair().getPublic();
-	}
+    public static RSAPublicKey getVerifierKey() {
+        return (RSAPublicKey) getKeyPair().getPublic();
+    }
 
-	public static RSAPrivateKey getSignerKey() {
-		return (RSAPrivateKey) getKeyPair().getPrivate();
-	}
+    public static RSAPrivateKey getSignerKey() {
+        return (RSAPrivateKey) getKeyPair().getPrivate();
+    }
 
-	private static KeyPair getKeyPair() {
-		return KEY_STORE_KEY_FACTORY.getKeyPair(KEY_ALIAS);
-	}
+    private static KeyPair getKeyPair() {
+        return KEY_STORE_KEY_FACTORY.getKeyPair(KEY_ALIAS);
+    }
 }

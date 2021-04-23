@@ -58,7 +58,7 @@ public class BizImagesDepositoryServiceImpl extends ServiceImpl<BizImagesDeposit
     @Override
     public void create(String projectId, String projectName) {
         Optional<BizImagesDepository> systemImagesDepositoryOptional = Optional.ofNullable(this.getOne(Wrappers.<BizImagesDepository>lambdaQuery().eq(BizImagesDepository::getProjectId, projectId)));
-        if(!systemImagesDepositoryOptional.isPresent()){
+        if (!systemImagesDepositoryOptional.isPresent()) {
             BizImagesDepository create = new BizImagesDepository();
             create.setProjectId(projectId);
             create.setProjectName(projectName);

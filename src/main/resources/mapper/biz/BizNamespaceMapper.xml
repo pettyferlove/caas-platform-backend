@@ -4,18 +4,18 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.biz.entity.BizNamespace">
-        <id column="id" property="id" />
-        <result column="name" property="name" />
-        <result column="istio" property="istio" />
-        <result column="description" property="description" />
-        <result column="del_flag" property="delFlag" />
-        <result column="creator" property="creator" />
-        <result column="create_time" property="createTime" />
-        <result column="modifier" property="modifier" />
-        <result column="modify_time" property="modifyTime" />
-        <result column="group_id" property="groupId" />
-        <result column="tenant_id" property="tenantId" />
-        <result column="registry_secret_name" property="registrySecretName" />
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="istio" property="istio"/>
+        <result column="description" property="description"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="creator" property="creator"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modifier" property="modifier"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="group_id" property="groupId"/>
+        <result column="tenant_id" property="tenantId"/>
+        <result column="registry_secret_name" property="registrySecretName"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->

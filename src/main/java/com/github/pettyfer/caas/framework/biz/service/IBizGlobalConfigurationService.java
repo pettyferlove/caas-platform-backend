@@ -38,12 +38,14 @@ public interface IBizGlobalConfigurationService extends IService<BizGlobalConfig
 
     /**
      * 加载系统配置
+     *
      * @return GlobalConfiguration
      */
     GlobalConfiguration loadConfig();
 
     /**
      * 检测系统全局配置是否完善
+     *
      * @return Boolean
      */
     Boolean checkConfiguration();

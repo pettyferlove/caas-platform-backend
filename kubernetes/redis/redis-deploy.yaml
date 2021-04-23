@@ -65,7 +65,7 @@ spec:
               subPath: redis
               mountPath: /data
             - name: config
-              mountPath:  /usr/local/etc/redis/redis.conf
+              mountPath: /usr/local/etc/redis/redis.conf
               subPath: redis.conf
       volumes:
         - name: data

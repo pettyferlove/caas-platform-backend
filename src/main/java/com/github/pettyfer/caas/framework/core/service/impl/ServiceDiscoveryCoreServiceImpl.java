@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class ServiceDiscoveryCoreServiceImpl  implements IServiceDiscoveryCoreService {
+public class ServiceDiscoveryCoreServiceImpl implements IServiceDiscoveryCoreService {
 
     private final IBizServiceDiscoveryService bizServiceDiscoveryService;
 
@@ -59,7 +59,7 @@ public class ServiceDiscoveryCoreServiceImpl  implements IServiceDiscoveryCoreSe
                 ServiceDiscoveryListView discoveryListView = new ServiceDiscoveryListView();
                 ConverterUtil.convert(i, discoveryListView);
                 Optional<io.fabric8.kubernetes.api.model.Service> serviceOptional = Optional.ofNullable(networkService.get(namespaceOptional.get().getName(), i.getName()));
-                if(serviceOptional.isPresent()) {
+                if (serviceOptional.isPresent()) {
                     io.fabric8.kubernetes.api.model.Service service = serviceOptional.get();
                     discoveryListView.setClusterIp(service.getSpec().getClusterIP());
                     String name = service.getMetadata().getName();
@@ -67,10 +67,10 @@ public class ServiceDiscoveryCoreServiceImpl  implements IServiceDiscoveryCoreSe
                     List<ServicePort> ports = service.getSpec().getPorts();
                     List<String> internalEndpoints = new LinkedList<>();
                     List<String> externalEndpoints = new LinkedList<>();
-                    for (ServicePort port: ports) {
-                        if("NodePort".equals(service.getSpec().getType())){
+                    for (ServicePort port : ports) {
+                        if ("NodePort".equals(service.getSpec().getType())) {
                             List<NodeDetailView> list = nodeService.list();
-                            for (NodeDetailView node: list) {
+                            for (NodeDetailView node : list) {
                                 externalEndpoints.add(node.getIp() + ":" + port.getNodePort());
                             }
                         }
@@ -78,8 +78,8 @@ public class ServiceDiscoveryCoreServiceImpl  implements IServiceDiscoveryCoreSe
                     }
                     discoveryListView.setInternalEndpoints(String.join(",", internalEndpoints));
                     List<String> externalIPs = service.getSpec().getExternalIPs();
-                    for (String externalIP:externalIPs) {
-                        for (ServicePort port: ports) {
+                    for (String externalIP : externalIPs) {
+                        for (ServicePort port : ports) {
                             externalEndpoints.add(externalIP + ":" + port.getPort());
                         }
                     }

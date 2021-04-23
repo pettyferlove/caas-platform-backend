@@ -1,7 +1,5 @@
 package com.github.pettyfer.caas.framework.engine.docker.register.model;
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,8 +8,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * ProjectMetadata
+ *
  * @author Pettyfer
  */
 @Data
@@ -20,25 +21,25 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ProjectMetadata  implements Serializable {
-  private static final long serialVersionUID = 7872053442880557112L;
-  
-  @JsonProperty("enable_content_trust")
-  private String enableContentTrust;
+public class ProjectMetadata implements Serializable {
+    private static final long serialVersionUID = 7872053442880557112L;
 
-  @JsonProperty("auto_scan")
-  private String autoScan;
+    @JsonProperty("enable_content_trust")
+    private String enableContentTrust;
 
-  @JsonProperty("severity")
-  private String severity;
+    @JsonProperty("auto_scan")
+    private String autoScan;
 
-  @JsonProperty("reuse_sys_cve_whitelist")
-  private String reuseSysCveWhitelist;
+    @JsonProperty("severity")
+    private String severity;
 
-  @JsonProperty("public")
-  private String _public;
+    @JsonProperty("reuse_sys_cve_whitelist")
+    private String reuseSysCveWhitelist;
 
-  @JsonProperty("prevent_vul")
-  private String preventVul;
+    @JsonProperty("public")
+    private String _public;
+
+    @JsonProperty("prevent_vul")
+    private String preventVul;
 }
 

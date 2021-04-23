@@ -14,7 +14,7 @@ import java.io.Serializable;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author Petty
@@ -26,7 +26,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value="BizGlobalConfiguration对象", description="")
+@ApiModel(value = "BizGlobalConfiguration对象", description = "")
 public class BizGlobalConfiguration extends BaseEntity<BizGlobalConfiguration> {
 
     private static final long serialVersionUID = 1L;

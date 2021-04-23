@@ -4,21 +4,21 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.biz.entity.BizConfig">
-    <result column="id" property="id" />
-    <result column="del_flag" property="delFlag" />
-    <result column="creator" property="creator" />
-    <result column="create_time" property="createTime" />
-    <result column="modifier" property="modifier" />
-    <result column="modify_time" property="modifyTime" />
-        <result column="namespace_id" property="namespaceId" />
-        <result column="config_name" property="configName" />
-        <result column="description" property="description" />
-        <result column="file_name" property="fileName" />
-        <result column="config_type" property="configType" />
-        <result column="content" property="content" />
-        <result column="env_type" property="envType" />
-        <result column="group_id" property="groupId" />
-        <result column="tenant_id" property="tenantId" />
+        <result column="id" property="id"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="creator" property="creator"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modifier" property="modifier"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="namespace_id" property="namespaceId"/>
+        <result column="config_name" property="configName"/>
+        <result column="description" property="description"/>
+        <result column="file_name" property="fileName"/>
+        <result column="config_type" property="configType"/>
+        <result column="content" property="content"/>
+        <result column="env_type" property="envType"/>
+        <result column="group_id" property="groupId"/>
+        <result column="tenant_id" property="tenantId"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -32,8 +32,9 @@
         namespace_id, config_name, description, file_name, config_type, content, env_type, group_id, tenant_id
     </sql>
     <select id="page" resultType="com.github.pettyfer.caas.framework.core.model.ConfigListView">
-        select id, config_name, 'description', file_name, config_type, env_type, create_time from biz_config t
-        ${ew.customSqlSegment}
+        select id, config_name, 'description', file_name, config_type, env_type, create_time
+        from biz_config t
+            ${ew.customSqlSegment}
     </select>
 
 </mapper>

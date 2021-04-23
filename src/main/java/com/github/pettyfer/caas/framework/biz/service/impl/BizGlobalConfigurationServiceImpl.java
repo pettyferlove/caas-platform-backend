@@ -4,7 +4,6 @@ import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.google.common.base.Preconditions;
 import com.github.pettyfer.caas.framework.biz.entity.BizGlobalConfiguration;
 import com.github.pettyfer.caas.framework.biz.mapper.BizGlobalConfigurationMapper;
 import com.github.pettyfer.caas.framework.biz.service.IBizGlobalConfigurationService;
@@ -12,6 +11,7 @@ import com.github.pettyfer.caas.framework.core.model.GlobalConfiguration;
 import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
 import com.github.pettyfer.caas.utils.ConverterUtil;
 import com.github.pettyfer.caas.utils.SecurityUtil;
+import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

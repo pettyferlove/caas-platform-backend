@@ -4,23 +4,23 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.biz.entity.BizServiceDiscovery">
-    <result column="id" property="id" />
-    <result column="del_flag" property="delFlag" />
-    <result column="creator" property="creator" />
-    <result column="create_time" property="createTime" />
-    <result column="modifier" property="modifier" />
-    <result column="modify_time" property="modifyTime" />
-        <result column="namespace_id" property="namespaceId" />
-        <result column="deployment_id" property="deploymentId" />
-        <result column="name" property="name" />
-        <result column="network" property="network" />
-        <result column="match_label" property="matchLabel" />
-        <result column="network_type" property="networkType" />
-        <result column="external_ip" property="externalIp" />
-        <result column="ports" property="ports" />
-        <result column="env_type" property="envType" />
-        <result column="group_id" property="groupId" />
-        <result column="tenant_id" property="tenantId" />
+        <result column="id" property="id"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="creator" property="creator"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modifier" property="modifier"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="namespace_id" property="namespaceId"/>
+        <result column="deployment_id" property="deploymentId"/>
+        <result column="name" property="name"/>
+        <result column="network" property="network"/>
+        <result column="match_label" property="matchLabel"/>
+        <result column="network_type" property="networkType"/>
+        <result column="external_ip" property="externalIp"/>
+        <result column="ports" property="ports"/>
+        <result column="env_type" property="envType"/>
+        <result column="group_id" property="groupId"/>
+        <result column="tenant_id" property="tenantId"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->

@@ -1,7 +1,7 @@
 package com.github.pettyfer.caas.framework.core.event.listener;
 
-import com.github.pettyfer.caas.framework.core.service.IProjectBuildCoreService;
 import com.github.pettyfer.caas.framework.core.event.GitlabPushEvent;
+import com.github.pettyfer.caas.framework.core.service.IProjectBuildCoreService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 

@@ -58,7 +58,7 @@ public class UserApi {
     }
 
     @GetMapping("/check/config")
-    public R<Boolean> checkConfig(){
+    public R<Boolean> checkConfig() {
         return new R<Boolean>(systemUserService.checkConfig());
     }
 

@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 /**
  * IP解析工具类
+ *
  * @author Pettyfer
  */
 public class URLResolutionUtil {
@@ -17,7 +18,7 @@ public class URLResolutionUtil {
     public static String ip(String uri) {
         String result = "";
         Matcher ipMatcher = IP_PATTERN.matcher(uri);
-        while(ipMatcher.find()) {
+        while (ipMatcher.find()) {
             result = ipMatcher.group(1);
         }
         return result;
@@ -26,11 +27,11 @@ public class URLResolutionUtil {
     public static String port(String uri) {
         String result = "";
         Matcher portMatcher = PORT_PATTERN.matcher(uri);
-        while(portMatcher.find()) {
+        while (portMatcher.find()) {
             result = portMatcher.group(1);
         }
-        if(StrUtil.isEmpty(result)){
-            if(uri.contains("https")){
+        if (StrUtil.isEmpty(result)) {
+            if (uri.contains("https")) {
                 result = "443";
             } else {
                 result = "80";

@@ -4,12 +4,12 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.system.entity.UserListView">
-        <result column="id" property="id" />
-        <result column="login_name" property="loginName" />
-        <result column="user_name" property="userName" />
-        <result column="user_avatar" property="userAvatar" />
-        <result column="roles" property="roles" />
-        <result column="create_time" property="createTime" />
+        <result column="id" property="id"/>
+        <result column="login_name" property="loginName"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_avatar" property="userAvatar"/>
+        <result column="roles" property="roles"/>
+        <result column="create_time" property="createTime"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->

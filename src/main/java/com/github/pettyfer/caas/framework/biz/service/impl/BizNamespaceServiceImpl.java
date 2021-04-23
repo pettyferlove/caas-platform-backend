@@ -67,7 +67,7 @@ public class BizNamespaceServiceImpl extends ServiceImpl<BizNamespaceMapper, Biz
         queryWrapper.eq(BizNamespace::getCreator, SecurityUtil.getUser().getId());
         queryWrapper.eq(BizNamespace::getDelFlag, 0);
         int count = this.count(queryWrapper);
-        if(count<1){
+        if (count < 1) {
             throw new BaseRuntimeException("用户未配置命名空间");
         }
         return true;

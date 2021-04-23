@@ -5,6 +5,7 @@ import org.springframework.security.oauth2.provider.token.store.redis.StandardSt
 
 /**
  * Token储存自定义序列化
+ *
  * @author Petty
  */
 public class JdkSerializationStrategy extends StandardStringSerializationStrategy {

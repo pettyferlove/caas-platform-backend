@@ -4,18 +4,18 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.biz.entity.BizGlobalConfiguration">
-        <result column="id" property="id" />
-        <result column="del_flag" property="delFlag" />
-        <result column="creator" property="creator" />
-        <result column="create_time" property="createTime" />
-        <result column="modifier" property="modifier" />
-        <result column="modify_time" property="modifyTime" />
-        <result column="docker_registry_path" property="dockerRegistryPath" />
-        <result column="docker_registry_username" property="dockerRegistryUsername" />
-        <result column="docker_registry_password" property="dockerRegistryPassword" />
-        <result column="cluster_server" property="clusterServer" />
-        <result column="group_id" property="groupId" />
-        <result column="tenant_id" property="tenantId" />
+        <result column="id" property="id"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="creator" property="creator"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modifier" property="modifier"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="docker_registry_path" property="dockerRegistryPath"/>
+        <result column="docker_registry_username" property="dockerRegistryUsername"/>
+        <result column="docker_registry_password" property="dockerRegistryPassword"/>
+        <result column="cluster_server" property="clusterServer"/>
+        <result column="group_id" property="groupId"/>
+        <result column="tenant_id" property="tenantId"/>
     </resultMap>
 
     <sql id="Base_Column_List">

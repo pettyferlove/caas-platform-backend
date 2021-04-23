@@ -51,7 +51,7 @@ public class SecretServiceImpl implements ISecretService {
         auths.put(new URL(globalConfiguration.getDockerRegistryPath()).getHost(), server);
         json.put("auths", auths);
         String encode = Base64.encode(json.toJSONString());
-        Map<String, String> data  = new HashMap<>();
+        Map<String, String> data = new HashMap<>();
         data.put(".dockerconfigjson", encode);
         String name = "registry-secret-" + RandomUtil.randomString(5);
         Secret secret = new SecretBuilder()

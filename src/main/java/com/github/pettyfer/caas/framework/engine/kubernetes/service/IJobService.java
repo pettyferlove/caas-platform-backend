@@ -1,10 +1,7 @@
 package com.github.pettyfer.caas.framework.engine.kubernetes.service;
 
-import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.batch.Job;
-
-import java.util.List;
 
 /**
  * @author Pettyfer

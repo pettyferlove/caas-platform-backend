@@ -19,7 +19,8 @@ public interface BizProjectBuildMapper extends BaseMapper<BizProjectBuild> {
 
     /**
      * 获取自动构建列表
-     * @param page 分页查询参数
+     *
+     * @param page         分页查询参数
      * @param queryWrapper 查询条件包装器
      * @return 分页查询结果
      */

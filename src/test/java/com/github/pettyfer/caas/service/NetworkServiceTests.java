@@ -20,7 +20,7 @@ public class NetworkServiceTests {
     private INetworkService networkService;
 
     @Test
-    public void createService(){
+    public void createService() {
         ServicePort servicePort = new ServicePort();
         servicePort.setName("auto-build-examples" + "-http");
         servicePort.setAppProtocol("TCP");

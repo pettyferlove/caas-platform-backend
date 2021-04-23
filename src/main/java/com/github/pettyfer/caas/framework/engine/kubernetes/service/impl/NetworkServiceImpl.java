@@ -30,12 +30,12 @@ public class NetworkServiceImpl implements INetworkService {
 
     @Override
     public void update(String namespace, String name, Service service) {
-        if("NodePort".equals(service.getSpec().getType())){
+        if ("NodePort".equals(service.getSpec().getType())) {
             Optional<Service> optionalService = Optional.ofNullable(kubernetesClient.services().inNamespace(namespace).withName(name).get());
-            if(optionalService.isPresent()) {
+            if (optionalService.isPresent()) {
                 List<ServicePort> oldPorts = optionalService.get().getSpec().getPorts();
                 List<ServicePort> ports = service.getSpec().getPorts();
-                for (ServicePort port: ports) {
+                for (ServicePort port : ports) {
                     Optional<ServicePort> first = oldPorts.stream().filter(i -> i.getName().equals(port.getName())).findFirst();
                     first.ifPresent(servicePort -> port.setNodePort(servicePort.getNodePort()));
                 }

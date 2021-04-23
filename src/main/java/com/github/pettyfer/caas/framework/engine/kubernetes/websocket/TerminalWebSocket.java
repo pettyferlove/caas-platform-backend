@@ -5,11 +5,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pettyfer.caas.framework.biz.entity.BizNamespace;
 import com.github.pettyfer.caas.framework.biz.service.IBizNamespaceService;
-import com.github.pettyfer.caas.global.constants.ApiConstant;
-import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
 import com.github.pettyfer.caas.framework.engine.kubernetes.session.TerminalSession;
 import com.github.pettyfer.caas.framework.engine.kubernetes.utils.BlockingInputStreamPumper;
 import com.github.pettyfer.caas.framework.engine.kubernetes.utils.SessionStorage;
+import com.github.pettyfer.caas.global.constants.ApiConstant;
+import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.Callback;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -61,7 +61,7 @@ public class TerminalWebSocket {
     public void onOpen(Session session, @PathParam("namespaceId") String namespaceId, @PathParam("name") String name) {
         try {
             Optional<BizNamespace> namespaceOptional = Optional.ofNullable(bizNamespaceService.get(namespaceId));
-            if(namespaceOptional.isPresent()){
+            if (namespaceOptional.isPresent()) {
                 PodResource<Pod> podResource = kubernetesClient.pods().inNamespace(namespaceOptional.get().getName().trim()).withName(name.trim());
                 String[] validShells = new String[]{"bash", "sh", "powershell", "cmd"};
                 String shell = "";

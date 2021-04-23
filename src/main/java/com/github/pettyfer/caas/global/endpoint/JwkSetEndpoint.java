@@ -36,6 +36,7 @@ public class JwkSetEndpoint {
 
     /**
      * 验证JWT密钥集
+     *
      * @return Map
      */
     @GetMapping(value = "/.well-known/jwks.json", produces = "application/json; charset=UTF-8")

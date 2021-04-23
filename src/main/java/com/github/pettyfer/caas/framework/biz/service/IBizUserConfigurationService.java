@@ -40,12 +40,14 @@ public interface IBizUserConfigurationService extends IService<BizUserConfigurat
 
     /**
      * 加载当前用户配置
+     *
      * @return UserConfiguration
      */
     UserConfiguration loadConfig();
 
     /**
      * 根据具体用户ID加载相应配置
+     *
      * @param userId 用户ID
      * @return UserConfiguration
      */
@@ -53,6 +55,7 @@ public interface IBizUserConfigurationService extends IService<BizUserConfigurat
 
     /**
      * 检测用户配置是否完善
+     *
      * @return Boolean
      */
     Boolean checkConfiguration();

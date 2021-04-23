@@ -1,17 +1,20 @@
 package com.github.pettyfer.caas.framework.system.entity;
 
-import com.github.pettyfer.caas.global.entity.BaseEntity;
-
-import java.io.Serializable;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.github.pettyfer.caas.global.entity.BaseEntity;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author Petty
@@ -23,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value="SystemAttachmentInfo对象", description="")
+@ApiModel(value = "SystemAttachmentInfo对象", description = "")
 public class SystemAttachmentInfo extends BaseEntity<SystemAttachmentInfo> {
 
     private static final long serialVersionUID = 1L;

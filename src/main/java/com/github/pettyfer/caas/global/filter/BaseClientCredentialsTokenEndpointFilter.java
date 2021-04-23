@@ -7,6 +7,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 
 /**
  * 自定义客户端认证（用于支持表单提交方式）
+ *
  * @author Pettyfer
  */
 public class BaseClientCredentialsTokenEndpointFilter extends ClientCredentialsTokenEndpointFilter {

@@ -36,7 +36,7 @@ public class SecretsServiceTests {
         server.put("auth", Base64.encode("admin:Admin@123456"));
         auths.put("192.168.13.61", server);
         s.put("auths", auths);
-        Map<String, String> data  = new HashMap<>();
+        Map<String, String> data = new HashMap<>();
         data.put(".dockerconfigjson", Base64.encode(s.toJSONString()));
         Secret secret = new SecretBuilder()
                 .withNewMetadata()

@@ -14,6 +14,7 @@ import java.util.List;
 
 /**
  * A specified chart entry
+ *
  * @author Petty
  */
 @Data

@@ -1,7 +1,7 @@
 package com.github.pettyfer.caas.framework.resource.controller;
 
-import com.github.pettyfer.caas.global.model.UserDetails;
 import com.github.pettyfer.caas.global.constants.ApiConstant;
+import com.github.pettyfer.caas.global.model.UserDetails;
 import com.github.pettyfer.caas.global.userdetails.BaseUserDetails;
 import com.github.pettyfer.caas.utils.SecurityUtil;
 import io.swagger.annotations.Api;

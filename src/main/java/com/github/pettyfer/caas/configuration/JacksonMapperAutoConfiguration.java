@@ -39,7 +39,7 @@ public class JacksonMapperAutoConfiguration {
     public Formatter<LocalDateTime> localDateTimeFormatter() {
         return new Formatter<LocalDateTime>() {
             @Override
-            public LocalDateTime parse(String text, Locale locale)  {
+            public LocalDateTime parse(String text, Locale locale) {
                 return LocalDateTime.parse(text, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             }
 
@@ -55,7 +55,7 @@ public class JacksonMapperAutoConfiguration {
     public Formatter<LocalDate> localDateFormatter() {
         return new Formatter<LocalDate>() {
             @Override
-            public LocalDate parse(String text, Locale locale)  {
+            public LocalDate parse(String text, Locale locale) {
                 return LocalDate.parse(text, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             }
 

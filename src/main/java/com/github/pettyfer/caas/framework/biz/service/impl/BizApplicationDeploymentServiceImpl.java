@@ -63,7 +63,7 @@ public class BizApplicationDeploymentServiceImpl extends ServiceImpl<BizApplicat
         if (detailOptional.isPresent()) {
             ApplicationDeploymentDetailView detail = detailOptional.get();
             Optional<BizServiceDiscovery> bizNetworkOptional = Optional.ofNullable(bizServiceDiscoveryService.getOne(Wrappers.<BizServiceDiscovery>lambdaQuery().eq(BizServiceDiscovery::getDeploymentId, id).eq(BizServiceDiscovery::getDelFlag, 0)));
-            if(bizNetworkOptional.isPresent()) {
+            if (bizNetworkOptional.isPresent()) {
                 BizServiceDiscovery bizServiceDiscovery = bizNetworkOptional.get();
                 detail.setPorts(bizServiceDiscovery.getPorts());
                 detail.setNetwork(bizServiceDiscovery.getNetwork());

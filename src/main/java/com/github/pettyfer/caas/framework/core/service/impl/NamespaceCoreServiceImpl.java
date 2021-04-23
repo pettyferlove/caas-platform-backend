@@ -112,7 +112,7 @@ public class NamespaceCoreServiceImpl implements INamespaceCoreService {
 
     private Namespace buildNamespace(BizNamespace namespace) {
         Map<String, String> label = new HashMap<>();
-        if(ObjectUtil.isNull(namespace.getIstio())) {
+        if (ObjectUtil.isNull(namespace.getIstio())) {
             namespace.setIstio(true);
         }
         label.put("istio-injection", namespace.getIstio() ? "enable" : "disable");

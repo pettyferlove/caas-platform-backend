@@ -13,6 +13,7 @@ public interface IStorageClassService {
 
     /**
      * 获取集群储存类资源列表
+     *
      * @return 集合
      */
     List<StorageClassView> list();

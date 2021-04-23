@@ -14,7 +14,7 @@ import java.io.Serializable;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author Petty
@@ -26,7 +26,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value="BizApplicationDeploymentVolume对象", description="")
+@ApiModel(value = "BizApplicationDeploymentVolume对象", description = "")
 public class BizApplicationDeploymentMount extends BaseEntity<BizApplicationDeploymentMount> {
 
     private static final long serialVersionUID = 1L;

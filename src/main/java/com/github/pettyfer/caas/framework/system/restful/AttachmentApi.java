@@ -1,8 +1,8 @@
 package com.github.pettyfer.caas.framework.system.restful;
 
-import com.github.pettyfer.caas.framework.system.service.IAttachmentOperaService;
 import com.github.pettyfer.caas.framework.system.model.Upload;
 import com.github.pettyfer.caas.framework.system.model.UploadResult;
+import com.github.pettyfer.caas.framework.system.service.IAttachmentOperaService;
 import com.github.pettyfer.caas.global.constants.ApiConstant;
 import com.github.pettyfer.caas.global.model.R;
 import com.github.pettyfer.caas.utils.SecurityUtil;

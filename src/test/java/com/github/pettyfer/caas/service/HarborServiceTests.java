@@ -17,14 +17,14 @@ public class HarborServiceTests {
     private IHarborService harborService;
 
     @Test
-    public void checkProjectTest(){
+    public void checkProjectTest() {
         harborService.checkProject("demo");
     }
 
     @Test
-    public void queryRepositoryTest(){
+    public void queryRepositoryTest() {
         List<RepositoryView> repositoryViews = harborService.queryRepository("14", null);
-        for (RepositoryView repositoryView:repositoryViews) {
+        for (RepositoryView repositoryView : repositoryViews) {
             System.out.println(repositoryView);
         }
     }

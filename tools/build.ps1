@@ -1,7 +1,7 @@
-$prefix="192.168.0.4/tools"
-$version="1.0.0"
-$jdk_version="oracle-jdk-8_281"
-$jre_version="oracle-jre-8_281"
+$prefix = "192.168.0.4/tools"
+$version = "1.0.0"
+$jdk_version = "oracle-jdk-8_281"
+$jre_version = "oracle-jre-8_281"
 # 基础镜像
 Write-Output "Begin building the base tool image,version:$version"
 Set-Location "alpine-base"

@@ -52,7 +52,7 @@ public class BaseUserDetails implements UserDetails {
         for (String role : roles) {
             if (StrUtil.isNotEmpty(role)) {
                 String r = role.toUpperCase();
-                if(!r.contains(SecurityConstant.ROLE_PREFIX)){
+                if (!r.contains(SecurityConstant.ROLE_PREFIX)) {
                     authoritySet.add(new SimpleGrantedAuthority(SecurityConstant.ROLE_PREFIX + r));
                 } else {
                     authoritySet.add(new SimpleGrantedAuthority(r));

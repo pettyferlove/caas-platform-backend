@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 
 /**
  * Mybatis相关资源生成器
+ *
  * @author Petty
  */
 public class MybatisGenerator {

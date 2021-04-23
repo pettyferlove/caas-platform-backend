@@ -1,11 +1,11 @@
 package com.github.pettyfer.caas.framework.engine.gitlab.restful;
 
-import com.github.pettyfer.caas.global.constants.ApiConstant;
-import com.github.pettyfer.caas.global.model.R;
 import com.github.pettyfer.caas.framework.engine.gitlab.model.GitlabBranchView;
 import com.github.pettyfer.caas.framework.engine.gitlab.model.GitlabProjectView;
 import com.github.pettyfer.caas.framework.engine.gitlab.model.GitlabTagView;
 import com.github.pettyfer.caas.framework.engine.gitlab.service.IGitlabService;
+import com.github.pettyfer.caas.global.constants.ApiConstant;
+import com.github.pettyfer.caas.global.model.R;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -57,7 +57,6 @@ public class GitlabApi {
     public R<List<GitlabTagView>> projectTags(@PathVariable String projectId) {
         return new R<>(gitlabService.queryProjectsTags(projectId));
     }
-
 
 
 }

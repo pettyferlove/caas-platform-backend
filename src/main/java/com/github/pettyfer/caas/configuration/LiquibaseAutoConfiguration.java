@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 
 /**
  * Liquibase配置
+ *
  * @author Petty
  */
 @Configuration

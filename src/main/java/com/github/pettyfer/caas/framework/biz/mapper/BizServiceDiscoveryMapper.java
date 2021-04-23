@@ -5,7 +5,7 @@ import com.github.pettyfer.caas.framework.biz.entity.BizServiceDiscovery;
 
 /**
  * <p>
- *  Mapper 接口
+ * Mapper 接口
  * </p>
  *
  * @author Petty

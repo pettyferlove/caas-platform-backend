@@ -167,7 +167,7 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
         try {
             this.checkConfig();
         } catch (Exception e) {
-            if(SecurityUtil.getRoles().contains("ADMIN")){
+            if (SecurityUtil.getRoles().contains("ADMIN")) {
                 globalConfigurationService.create(initConfig.getGlobalConfiguration());
             }
             userConfigurationService.create(initConfig.getUserConfiguration());

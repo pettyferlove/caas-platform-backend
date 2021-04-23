@@ -4,18 +4,18 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.system.entity.SystemOauthClientDetails">
-    <result column="id" property="id" />
-        <result column="client_id" property="clientId" />
-        <result column="resource_ids" property="resourceIds" />
-        <result column="client_secret" property="clientSecret" />
-        <result column="scope" property="scope" />
-        <result column="authorized_grant_types" property="authorizedGrantTypes" />
-        <result column="web_server_redirect_uri" property="webServerRedirectUri" />
-        <result column="authorities" property="authorities" />
-        <result column="access_token_validity" property="accessTokenValidity" />
-        <result column="refresh_token_validity" property="refreshTokenValidity" />
-        <result column="additional_information" property="additionalInformation" />
-        <result column="auto_approve" property="autoApprove" />
+        <result column="id" property="id"/>
+        <result column="client_id" property="clientId"/>
+        <result column="resource_ids" property="resourceIds"/>
+        <result column="client_secret" property="clientSecret"/>
+        <result column="scope" property="scope"/>
+        <result column="authorized_grant_types" property="authorizedGrantTypes"/>
+        <result column="web_server_redirect_uri" property="webServerRedirectUri"/>
+        <result column="authorities" property="authorities"/>
+        <result column="access_token_validity" property="accessTokenValidity"/>
+        <result column="refresh_token_validity" property="refreshTokenValidity"/>
+        <result column="additional_information" property="additionalInformation"/>
+        <result column="auto_approve" property="autoApprove"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->

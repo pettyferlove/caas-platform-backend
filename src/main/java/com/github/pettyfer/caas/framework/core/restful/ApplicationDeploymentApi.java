@@ -2,11 +2,11 @@ package com.github.pettyfer.caas.framework.core.restful;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentDetailView;
+import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentListView;
 import com.github.pettyfer.caas.framework.core.service.IApplicationDeploymentCoreService;
 import com.github.pettyfer.caas.global.constants.ApiConstant;
 import com.github.pettyfer.caas.global.model.R;
-import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentListView;
-import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentDetailView;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -33,17 +33,17 @@ public class ApplicationDeploymentApi {
     }
 
     @PostMapping("{namespaceId}")
-    public R<String> create(@PathVariable String namespaceId, @RequestBody ApplicationDeploymentDetailView deploymentDetail){
+    public R<String> create(@PathVariable String namespaceId, @RequestBody ApplicationDeploymentDetailView deploymentDetail) {
         return new R<>(applicationDeploymentCoreService.create(namespaceId, deploymentDetail));
     }
 
     @PutMapping("{namespaceId}")
-    public R<Boolean> update(@PathVariable String namespaceId, @RequestBody ApplicationDeploymentDetailView deploymentDetail){
+    public R<Boolean> update(@PathVariable String namespaceId, @RequestBody ApplicationDeploymentDetailView deploymentDetail) {
         return new R<>(applicationDeploymentCoreService.update(namespaceId, deploymentDetail));
     }
 
     @DeleteMapping("{namespaceId}/{id}")
-    public R<Object> delete(@PathVariable String namespaceId ,@PathVariable String id){
+    public R<Object> delete(@PathVariable String namespaceId, @PathVariable String id) {
         applicationDeploymentCoreService.delete(namespaceId, id);
         return new R<>();
     }

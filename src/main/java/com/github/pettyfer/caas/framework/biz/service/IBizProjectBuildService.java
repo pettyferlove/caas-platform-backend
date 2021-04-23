@@ -2,8 +2,8 @@ package com.github.pettyfer.caas.framework.biz.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuild;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuild;
 import com.github.pettyfer.caas.framework.core.model.ProjectBuildListView;
 import com.github.pettyfer.caas.framework.core.model.ProjectBuildSelect;
 
@@ -23,7 +23,7 @@ public interface IBizProjectBuildService extends IService<BizProjectBuild> {
      * List查找
      *
      * @param bizProjectBuild 查询参数对象
-     * @param page     Page分页对象
+     * @param page            Page分页对象
      * @return IPage 返回结果
      */
     IPage<ProjectBuildListView> page(BizProjectBuild bizProjectBuild, Page<BizProjectBuild> page);
@@ -36,13 +36,13 @@ public interface IBizProjectBuildService extends IService<BizProjectBuild> {
      */
     BizProjectBuild get(String id);
 
-     /**
-      * 通过Id删除信息
-      *
-      * @param id 业务主键
-      * @return Boolean
-      */
-     Boolean delete(String id);
+    /**
+     * 通过Id删除信息
+     *
+     * @param id 业务主键
+     * @return Boolean
+     */
+    Boolean delete(String id);
 
     /**
      * 创建数据
@@ -62,13 +62,15 @@ public interface IBizProjectBuildService extends IService<BizProjectBuild> {
 
     /**
      * 获取自动构建下拉框数据
+     *
      * @return 集合
      */
     List<ProjectBuildSelect> select(Integer envType);
 
     /**
      * 更新自动构建触发状态
-     * @param id ID
+     *
+     * @param id     ID
      * @param status 当前状态
      * @return Boolean
      */

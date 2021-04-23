@@ -5,11 +5,11 @@ import com.github.pettyfer.caas.framework.biz.entity.BizApplicationDeployment;
 import com.github.pettyfer.caas.framework.biz.entity.BizNamespace;
 import com.github.pettyfer.caas.framework.biz.service.IBizApplicationDeploymentService;
 import com.github.pettyfer.caas.framework.biz.service.IBizNamespaceService;
+import com.github.pettyfer.caas.framework.core.service.IPodCoreService;
 import com.github.pettyfer.caas.framework.engine.kubernetes.model.ListQueryParams;
 import com.github.pettyfer.caas.framework.engine.kubernetes.model.PodPageView;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.IPodService;
 import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
-import com.github.pettyfer.caas.framework.core.service.IPodCoreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

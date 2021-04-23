@@ -15,12 +15,14 @@ public interface INamespaceService {
 
     /**
      * 列出所有的Namespace
+     *
      * @return Page
      */
     List<NamespacePageView> listAll();
 
     /**
      * 列出当前用户（Kubernetes用户）下的所有的Namespace
+     *
      * @param params ListQueryParams
      * @return Page
      */
@@ -28,6 +30,7 @@ public interface INamespaceService {
 
     /**
      * 创建Namespace
+     *
      * @param namespace 名称
      * @return Boolean
      */
@@ -35,14 +38,16 @@ public interface INamespaceService {
 
     /**
      * 更新命名空间信息
+     *
      * @param namespaceName namespaceName
-     * @param namespace Namespace
+     * @param namespace     Namespace
      * @return Boolean
      */
     Boolean update(String namespaceName, Namespace namespace);
 
     /**
      * 删除Namespace
+     *
      * @param namespace 名称
      * @return Boolean
      */
@@ -50,6 +55,7 @@ public interface INamespaceService {
 
     /**
      * 获取Namespace详情
+     *
      * @param namespace 名称
      * @return NamespaceDetailView
      */

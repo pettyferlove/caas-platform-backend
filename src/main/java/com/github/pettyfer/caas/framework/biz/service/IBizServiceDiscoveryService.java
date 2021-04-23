@@ -18,9 +18,9 @@ public interface IBizServiceDiscoveryService extends IService<BizServiceDiscover
     /**
      * List查找
      *
-     * @param namespaceId 命名空间ID
+     * @param namespaceId         命名空间ID
      * @param bizServiceDiscovery 查询参数对象
-     * @param page       Page分页对象
+     * @param page                Page分页对象
      * @return IPage 返回结果
      */
     IPage<BizServiceDiscovery> page(String namespaceId, BizServiceDiscovery bizServiceDiscovery, Page<BizServiceDiscovery> page);

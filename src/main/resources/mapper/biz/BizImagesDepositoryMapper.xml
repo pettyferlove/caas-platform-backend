@@ -4,16 +4,16 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.biz.entity.BizImagesDepository">
-        <id column="id" property="id" />
-        <result column="project_id" property="projectId" />
-        <result column="project_name" property="projectName" />
-        <result column="del_flag" property="delFlag" />
-        <result column="creator" property="creator" />
-        <result column="create_time" property="createTime" />
-        <result column="modifier" property="modifier" />
-        <result column="modify_time" property="modifyTime" />
-        <result column="group_id" property="groupId" />
-        <result column="tenant_id" property="tenantId" />
+        <id column="id" property="id"/>
+        <result column="project_id" property="projectId"/>
+        <result column="project_name" property="projectName"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="creator" property="creator"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modifier" property="modifier"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="group_id" property="groupId"/>
+        <result column="tenant_id" property="tenantId"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->

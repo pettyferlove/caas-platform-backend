@@ -27,7 +27,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value="SystemUser对象", description="用户信息")
+@ApiModel(value = "SystemUser对象", description = "用户信息")
 public class SystemUser extends BaseEntity<SystemUser> {
 
     private static final long serialVersionUID = 1L;

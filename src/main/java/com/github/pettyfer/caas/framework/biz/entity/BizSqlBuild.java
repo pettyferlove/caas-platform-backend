@@ -29,7 +29,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value="BizSqlBuild对象", description="SQL构建")
+@ApiModel(value = "BizSqlBuild对象", description = "SQL构建")
 public class BizSqlBuild extends BaseEntity<BizSqlBuild> {
 
     private static final long serialVersionUID = 1L;

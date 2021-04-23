@@ -4,22 +4,22 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.biz.entity.BizPersistentStorage">
-    <result column="id" property="id" />
-    <result column="del_flag" property="delFlag" />
-    <result column="creator" property="creator" />
-    <result column="create_time" property="createTime" />
-    <result column="modifier" property="modifier" />
-    <result column="modify_time" property="modifyTime" />
-        <result column="namespace_id" property="namespaceId" />
-        <result column="name" property="name" />
-        <result column="init_size" property="initSize" />
-        <result column="limit_size" property="limitSize" />
-        <result column="unit" property="unit" />
-        <result column="storage_class_name" property="storageClassName" />
-        <result column="access_mode" property="accessMode" />
-        <result column="env_type" property="envType" />
-        <result column="group_id" property="groupId" />
-        <result column="tenant_id" property="tenantId" />
+        <result column="id" property="id"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="creator" property="creator"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modifier" property="modifier"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="namespace_id" property="namespaceId"/>
+        <result column="name" property="name"/>
+        <result column="init_size" property="initSize"/>
+        <result column="limit_size" property="limitSize"/>
+        <result column="unit" property="unit"/>
+        <result column="storage_class_name" property="storageClassName"/>
+        <result column="access_mode" property="accessMode"/>
+        <result column="env_type" property="envType"/>
+        <result column="group_id" property="groupId"/>
+        <result column="tenant_id" property="tenantId"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->

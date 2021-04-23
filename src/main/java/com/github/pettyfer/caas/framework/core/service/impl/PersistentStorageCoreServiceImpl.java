@@ -73,7 +73,7 @@ public class PersistentStorageCoreServiceImpl implements IPersistentStorageCoreS
         Optional<BizPersistentStorage> persistentStorageOptional = Optional.ofNullable(bizPersistentStorageService.get(id));
         if (persistentStorageOptional.isPresent()) {
             Optional<BizNamespace> namespaceOptional = Optional.ofNullable(bizNamespaceService.get(persistentStorageOptional.get().getNamespaceId()));
-            if(!namespaceOptional.isPresent()){
+            if (!namespaceOptional.isPresent()) {
                 throw new BaseRuntimeException("命名空间不存在");
             }
             return persistentStorageOptional.get();

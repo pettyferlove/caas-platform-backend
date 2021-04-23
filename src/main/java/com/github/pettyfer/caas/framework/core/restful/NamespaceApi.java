@@ -7,7 +7,6 @@ import com.github.pettyfer.caas.framework.core.service.INamespaceCoreService;
 import com.github.pettyfer.caas.framework.engine.kubernetes.model.NamespaceDetailView;
 import com.github.pettyfer.caas.global.constants.ApiConstant;
 import com.github.pettyfer.caas.global.model.R;
-import com.github.pettyfer.caas.global.model.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;

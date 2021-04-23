@@ -1,7 +1,7 @@
 package com.github.pettyfer.caas.framework.core.event.publisher;
 
-import com.github.pettyfer.caas.global.constants.BuildStatus;
 import com.github.pettyfer.caas.framework.core.event.ProjectBuildEvent;
+import com.github.pettyfer.caas.global.constants.BuildStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;

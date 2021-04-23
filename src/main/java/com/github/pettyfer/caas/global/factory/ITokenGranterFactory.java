@@ -13,6 +13,7 @@ public interface ITokenGranterFactory extends ApplicationContextAware, Initializ
 
     /**
      * 获取TokenGranter列表
+     *
      * @return List
      */
     List<TokenGranter> getGranters();

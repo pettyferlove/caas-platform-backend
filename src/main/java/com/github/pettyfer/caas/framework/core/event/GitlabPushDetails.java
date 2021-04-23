@@ -66,7 +66,7 @@ public class GitlabPushDetails implements Serializable {
     @AllArgsConstructor
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = false)
-    static class CommitInfo implements Serializable{
+    static class CommitInfo implements Serializable {
         private static final long serialVersionUID = 7837566542351749379L;
 
         private String id;

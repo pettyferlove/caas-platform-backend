@@ -27,7 +27,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value="BizPersistentStorage对象", description="持久化储存")
+@ApiModel(value = "BizPersistentStorage对象", description = "持久化储存")
 public class BizPersistentStorage extends BaseEntity<BizPersistentStorage> {
 
     private static final long serialVersionUID = 1L;

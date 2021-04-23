@@ -1,13 +1,16 @@
 package com.github.pettyfer.caas.framework.system.entity;
 
-import com.github.pettyfer.caas.global.entity.BaseEntity;
-
-import java.io.Serializable;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-import lombok.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.github.pettyfer.caas.global.entity.BaseEntity;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -23,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value="SystemRole对象", description="用户角色")
+@ApiModel(value = "SystemRole对象", description = "用户角色")
 public class SystemRole extends BaseEntity<SystemRole> {
 
     private static final long serialVersionUID = 1L;

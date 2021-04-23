@@ -47,13 +47,13 @@ public class StorageClassServiceImpl implements IStorageClassService {
                 .skip((params.getCurrentPage() - 1) * params.getPageSize())
                 .limit(params.getPageSize())
                 .map(i -> {
-            StorageClassView storageClassView = new StorageClassView();
-            storageClassView.setName(i.getMetadata().getName());
-            storageClassView.setProvisioner(i.getProvisioner());
-            storageClassView.setReclaimPolicy(i.getReclaimPolicy());
-            storageClassView.setCreationTimestamp(LocalDateTime.parse(i.getMetadata().getCreationTimestamp(), DateTimeFormatter.ISO_DATE_TIME));
-            return storageClassView;
-        }).collect(Collectors.toList());
+                    StorageClassView storageClassView = new StorageClassView();
+                    storageClassView.setName(i.getMetadata().getName());
+                    storageClassView.setProvisioner(i.getProvisioner());
+                    storageClassView.setReclaimPolicy(i.getReclaimPolicy());
+                    storageClassView.setCreationTimestamp(LocalDateTime.parse(i.getMetadata().getCreationTimestamp(), DateTimeFormatter.ISO_DATE_TIME));
+                    return storageClassView;
+                }).collect(Collectors.toList());
         Page<StorageClassView> page = new Page<>();
         page.setRecords(storageClassViews);
         page.setCurrent(params.getCurrentPage());

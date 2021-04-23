@@ -26,7 +26,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value="BizProjectBuildHistory对象", description="项目构建历史记录")
+@ApiModel(value = "BizProjectBuildHistory对象", description = "项目构建历史记录")
 public class BizProjectBuildHistory extends BaseEntity<BizProjectBuildHistory> {
 
     private static final long serialVersionUID = 1L;

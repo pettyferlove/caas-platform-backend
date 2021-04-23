@@ -22,7 +22,7 @@ public interface IBizApplicationDeploymentMountService extends IService<BizAppli
      * List查找
      *
      * @param bizApplicationDeploymentMount 查询参数对象
-     * @param page                           Page分页对象
+     * @param page                          Page分页对象
      * @return IPage 返回结果
      */
     IPage<BizApplicationDeploymentMount> page(BizApplicationDeploymentMount bizApplicationDeploymentMount, Page<BizApplicationDeploymentMount> page);
@@ -61,7 +61,8 @@ public interface IBizApplicationDeploymentMountService extends IService<BizAppli
 
     /**
      * 批量插入储存挂载配置
-     * @param deploymentId 应用ID
+     *
+     * @param deploymentId      应用ID
      * @param deploymentVolumes 挂载配置
      */
     void batchInsert(String deploymentId, List<ApplicationDeploymentMountView> deploymentMounts);

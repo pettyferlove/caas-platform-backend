@@ -15,7 +15,7 @@ public class RSAUtils {
     @Test
     @SneakyThrows
     public void mavenPackageTest() {
-        Map<String,String> keys = new HashMap<>();
+        Map<String, String> keys = new HashMap<>();
         int type = KeyPair.RSA;
         JSch jsch = new JSch();
         try {

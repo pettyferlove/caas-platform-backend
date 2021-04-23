@@ -20,7 +20,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@ApiModel(value="全局配置Model", description="")
+@ApiModel(value = "全局配置Model", description = "")
 public class GlobalConfiguration implements Serializable {
 
     private static final long serialVersionUID = 1L;

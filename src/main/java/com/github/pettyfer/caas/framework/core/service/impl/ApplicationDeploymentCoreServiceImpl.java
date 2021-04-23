@@ -88,14 +88,14 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
 
                 Deployment deployment = buildDeployment(namespaceOptional.get(), deploymentDetail);
                 Optional<Deployment> optionalDeployment = Optional.ofNullable(deploymentService.get(namespaceOptional.get().getName(), deploymentDetail.getName()));
-                if(optionalDeployment.isPresent()){
+                if (optionalDeployment.isPresent()) {
                     deploymentService.update(namespaceOptional.get().getName(), deploymentDetail.getName(), deployment);
                 } else {
                     deploymentService.create(namespaceOptional.get().getName(), deployment);
                 }
                 if (StrUtil.isNotEmpty(deploymentDetail.getNetwork()) && !"none".equals(deploymentDetail.getNetwork())) {
                     Optional<io.fabric8.kubernetes.api.model.Service> serviceOptional = Optional.ofNullable(networkService.get(namespaceOptional.get().getName(), deploymentDetail.getName()));
-                    if(serviceOptional.isPresent()) {
+                    if (serviceOptional.isPresent()) {
                         networkService.update(namespaceOptional.get().getName(), deploymentDetail.getName(), buildService(deploymentDetail));
                     } else {
                         networkService.create(namespaceOptional.get().getName(), buildService(deploymentDetail));
@@ -140,14 +140,14 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
 
                 Deployment deployment = buildDeployment(namespaceOptional.get(), deploymentDetail);
                 Optional<Deployment> optionalDeployment = Optional.ofNullable(deploymentService.get(namespaceOptional.get().getName(), deploymentDetail.getName()));
-                if(optionalDeployment.isPresent()){
+                if (optionalDeployment.isPresent()) {
                     deploymentService.update(namespaceOptional.get().getName(), deploymentDetail.getName(), deployment);
                 } else {
                     deploymentService.create(namespaceOptional.get().getName(), deployment);
                 }
                 if (StrUtil.isNotEmpty(deploymentDetail.getNetwork()) && !"none".equals(deploymentDetail.getNetwork())) {
                     Optional<io.fabric8.kubernetes.api.model.Service> serviceOptional = Optional.ofNullable(networkService.get(namespaceOptional.get().getName(), deploymentDetail.getName()));
-                    if(serviceOptional.isPresent()) {
+                    if (serviceOptional.isPresent()) {
                         networkService.update(namespaceOptional.get().getName(), deploymentDetail.getName(), buildService(deploymentDetail));
                     } else {
                         networkService.create(namespaceOptional.get().getName(), buildService(deploymentDetail));
@@ -252,14 +252,14 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
 
                     Deployment deployment = buildDeployment(namespace, detailView);
                     Optional<Deployment> optionalDeployment = Optional.ofNullable(deploymentService.get(namespace.getName(), detailView.getName()));
-                    if(optionalDeployment.isPresent()){
+                    if (optionalDeployment.isPresent()) {
                         deploymentService.update(namespace.getName(), detailView.getName(), deployment);
                     } else {
                         deploymentService.create(namespace.getName(), deployment);
                     }
                     if (StrUtil.isNotEmpty(detailView.getNetwork()) && !"none".equals(detailView.getNetwork())) {
                         Optional<io.fabric8.kubernetes.api.model.Service> serviceOptional = Optional.ofNullable(networkService.get(namespace.getName(), detailView.getName()));
-                        if(serviceOptional.isPresent()) {
+                        if (serviceOptional.isPresent()) {
                             networkService.update(namespace.getName(), detailView.getName(), buildService(detailView));
                         } else {
                             networkService.create(namespace.getName(), buildService(detailView));
@@ -288,7 +288,7 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
         List<ServicePort> servicePorts = new ArrayList<>();
         for (ApplicationDeploymentPortView n : ports) {
             ServicePort servicePort = new ServicePort();
-            servicePort.setName(deploymentDetail.getName() + "-http-" + n.getPort() +"-" + n.getTargetPort());
+            servicePort.setName(deploymentDetail.getName() + "-http-" + n.getPort() + "-" + n.getTargetPort());
             servicePort.setAppProtocol(n.getProtocol());
             servicePort.setProtocol(n.getProtocol());
             servicePort.setPort(n.getPort());
@@ -383,7 +383,7 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                             .build());
                 } else if ("PersistentVolumeClaim".equals(i.getVolumeType())) {
                     Optional<BizPersistentStorage> bizPersistentStorage = Optional.ofNullable(bizPersistentStorageService.get(i.getPersistentStorageId()));
-                    if(bizPersistentStorage.isPresent()) {
+                    if (bizPersistentStorage.isPresent()) {
                         BizPersistentStorage persistentStorage = bizPersistentStorage.get();
                         volumeBuilder.withPersistentVolumeClaim(new PersistentVolumeClaimVolumeSourceBuilder()
                                 .withClaimName(persistentStorage.getName())

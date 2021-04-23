@@ -18,6 +18,7 @@ public interface ISystemMessageService extends IService<SystemMessage> {
 
     /**
      * List查找
+     *
      * @param userId userId
      * @return List 返回结果
      */
@@ -35,7 +36,7 @@ public interface ISystemMessageService extends IService<SystemMessage> {
      * 变更状态为已读
      *
      * @param userId userId
-     * @param id 消息ID
+     * @param id     消息ID
      * @return Boolean
      */
     Boolean read(String userId, String id);

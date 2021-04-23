@@ -18,7 +18,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@ApiModel(value="用户配置Model", description="")
+@ApiModel(value = "用户配置Model", description = "")
 public class UserConfiguration implements Serializable {
     private static final long serialVersionUID = -2858002591496343832L;
 

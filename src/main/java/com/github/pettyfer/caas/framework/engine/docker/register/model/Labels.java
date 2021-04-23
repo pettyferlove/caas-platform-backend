@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 /**
  * A list of label
+ *
  * @author Petty
  */
 public class Labels extends ArrayList<Label> implements Serializable {

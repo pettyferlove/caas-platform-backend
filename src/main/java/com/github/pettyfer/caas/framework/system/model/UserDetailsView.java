@@ -23,7 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value="用户信息", description="用户信息")
+@ApiModel(value = "用户信息", description = "用户信息")
 public class UserDetailsView implements Serializable {
 
     private static final long serialVersionUID = 1L;

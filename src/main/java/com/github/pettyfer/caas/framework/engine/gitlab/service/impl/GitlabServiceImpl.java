@@ -1,12 +1,12 @@
 package com.github.pettyfer.caas.framework.engine.gitlab.service.impl;
 
 import com.github.pettyfer.caas.framework.biz.service.IBizUserConfigurationService;
-import com.google.common.base.Preconditions;
 import com.github.pettyfer.caas.framework.core.model.UserConfiguration;
 import com.github.pettyfer.caas.framework.engine.gitlab.model.GitlabBranchView;
 import com.github.pettyfer.caas.framework.engine.gitlab.model.GitlabProjectView;
 import com.github.pettyfer.caas.framework.engine.gitlab.model.GitlabTagView;
 import com.github.pettyfer.caas.framework.engine.gitlab.service.IGitlabService;
+import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.models.GitlabBranch;

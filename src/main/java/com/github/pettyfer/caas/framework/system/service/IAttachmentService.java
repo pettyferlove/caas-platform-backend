@@ -1,7 +1,6 @@
 package com.github.pettyfer.caas.framework.system.service;
 
 
-
 import com.github.pettyfer.caas.framework.system.model.FileProcessResult;
 import com.github.pettyfer.caas.framework.system.model.Upload;
 import com.github.pettyfer.caas.global.constants.FileType;
@@ -19,7 +18,7 @@ public interface IAttachmentService {
     /**
      * 文件上传
      *
-     * @param fileId    文件ID
+     * @param fileId   文件ID
      * @param file     文件对象
      * @param upload   上传文件基本信息
      * @param fileType 文件类型

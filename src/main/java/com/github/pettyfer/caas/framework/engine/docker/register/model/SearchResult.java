@@ -12,6 +12,7 @@ import java.io.Serializable;
 
 /**
  * The chart search result item
+ *
  * @author Petty
  */
 @Data

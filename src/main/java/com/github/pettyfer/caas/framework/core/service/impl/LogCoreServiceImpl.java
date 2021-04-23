@@ -2,9 +2,9 @@ package com.github.pettyfer.caas.framework.core.service.impl;
 
 import com.github.pettyfer.caas.framework.biz.entity.BizNamespace;
 import com.github.pettyfer.caas.framework.biz.service.IBizNamespaceService;
+import com.github.pettyfer.caas.framework.core.service.ILogCoreService;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.IJobService;
 import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
-import com.github.pettyfer.caas.framework.core.service.ILogCoreService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

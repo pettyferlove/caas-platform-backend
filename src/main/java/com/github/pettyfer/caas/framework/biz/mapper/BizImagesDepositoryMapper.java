@@ -1,11 +1,11 @@
 package com.github.pettyfer.caas.framework.biz.mapper;
 
-import com.github.pettyfer.caas.framework.biz.entity.BizImagesDepository;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.pettyfer.caas.framework.biz.entity.BizImagesDepository;
 
 /**
  * <p>
- *  Mapper 接口
+ * Mapper 接口
  * </p>
  *
  * @author Petty

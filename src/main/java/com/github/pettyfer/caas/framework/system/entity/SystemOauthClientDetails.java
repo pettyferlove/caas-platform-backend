@@ -1,12 +1,15 @@
 package com.github.pettyfer.caas.framework.system.entity;
 
-import com.github.pettyfer.caas.global.entity.BaseEntity;
-
-import java.io.Serializable;
-import io.swagger.annotations.ApiModel;
-import lombok.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.github.pettyfer.caas.global.entity.BaseEntity;
+import io.swagger.annotations.ApiModel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -22,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value="SystemOauthClientDetails对象", description="终端信息表")
+@ApiModel(value = "SystemOauthClientDetails对象", description = "终端信息表")
 public class SystemOauthClientDetails extends BaseEntity<SystemOauthClientDetails> {
 
     private static final long serialVersionUID = 1L;

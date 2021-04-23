@@ -1,4 +1,5 @@
 # 介绍
+
 介绍
 Liquibase是一个用于数据库重构和迁移的开源工具，通过日志文件的形式记录数据库的变更，然后执行日志文件中的修改，将数据库更新或回滚到一致的状态。它的目标是提供一种数据库类型无关的解决方案，通过执行schema类型的文件来达到迁移。其有点主要有以下：
 
@@ -8,20 +9,20 @@ Liquibase是一个用于数据库重构和迁移的开源工具，通过日志�
 * 支持多种运行方式，如命令行、Spring集成、Maven插件、Gradle插件等。
 
 # 配置文件
-db/liquibase.properties 数据库连接参数
-db/db.changelog-master.yml Liquibase配置文件入口
+
+db/liquibase.properties 数据库连接参数 db/db.changelog-master.yml Liquibase配置文件入口
+
 ``` 
 // 可增加新的include
   - include:
       file: db/changelog/1.0.0/db.changelog-1.0.0.yml
 ```
 
-/db/changelog/日期/***.mysql.sql 需要执行的sql
-/db/changelog/日期/changelogdb.changelog-日期.yml 该目录下所有sql的总集，会被db.changelog-master.yml引用
-
-
+/db/changelog/日期/***.mysql.sql 需要执行的sql 
+/db/changelog/日期/changelogdb.changelog-日期.yml该目录下所有sql的总集，会被db.changelog-master.yml引用
 
 # SQL文件编写示例
+
 ``` 
 --liquibase formatted sql
 
@@ -30,16 +31,18 @@ CREATE TABLE biz_news_info (id VARCHAR(128) NOT NULL, title VARCHAR(128) NOT NUL
 ALTER TABLE biz_news_info COMMENT = '资讯信息表';
 
 ```
+
 * --liquibase formatted sql 标记为liquibase检查标记，有该标记的liquibase会进行版本对比，如果数据库还未更新，这执行对应sql
 
 * --changeset Petty:1590579738857-1 ChangeSet编写人，以及ChangeSet Id，ChangeSet Id会作为liquibase，liquibase会根据该值判断是否执行
 
-
 # 约定（强制）
+
 1. 项目采用Liquibase进行数据库操作管理，但不限制本地测试数据。仅要求必要的操作记录到日志文件。
 2. ddl语句必须在dml语句之前执行，可通过文件引入顺序来决定执行顺序
 
 # Maven插件命令
+
 ```
 // 逆向初始化SQL语句（生成DDL语句）
 $ mvn liquibase:generateChangeLog

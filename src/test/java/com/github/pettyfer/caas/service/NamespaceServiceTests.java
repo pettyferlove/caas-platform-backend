@@ -19,7 +19,7 @@ public class NamespaceServiceTests {
     @Test
     public void testContent() {
         List<Namespace> items = kubernetesClient.namespaces().list().getItems();
-        for (Namespace namespace: items) {
+        for (Namespace namespace : items) {
             System.out.println(namespace);
         }
     }
