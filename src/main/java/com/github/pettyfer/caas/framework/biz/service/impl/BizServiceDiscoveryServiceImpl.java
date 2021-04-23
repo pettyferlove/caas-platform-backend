@@ -32,6 +32,7 @@ public class BizServiceDiscoveryServiceImpl extends ServiceImpl<BizServiceDiscov
     public IPage<BizServiceDiscovery> page(String namespaceId, BizServiceDiscovery bizServiceDiscovery, Page<BizServiceDiscovery> page) {
         LambdaQueryWrapper<BizServiceDiscovery> queryWrapper = Wrappers.<BizServiceDiscovery>lambdaQuery()
                 .eq(BizServiceDiscovery::getNamespaceId, namespaceId)
+                .ne(BizServiceDiscovery::getNetwork, "none")
                 .likeRight(StrUtil.isNotEmpty(bizServiceDiscovery.getName()), BizServiceDiscovery::getName, bizServiceDiscovery.getName())
                 .eq(ObjectUtil.isNotNull(bizServiceDiscovery.getEnvType()), BizServiceDiscovery::getEnvType, bizServiceDiscovery.getEnvType())
                 .orderByDesc(BizServiceDiscovery::getCreateTime);

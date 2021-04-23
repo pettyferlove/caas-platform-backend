@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -124,7 +125,9 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                 ConverterUtil.convert(deploymentDetail, bizApplicationDeployment);
                 Boolean update = bizApplicationDeploymentService.update(namespaceId, bizApplicationDeployment);
                 if (update) {
-                    bizServiceDiscoveryService.remove(Wrappers.<BizServiceDiscovery>lambdaQuery().eq(BizServiceDiscovery::getDeploymentId, deploymentId));
+
+
+                    int count = bizServiceDiscoveryService.count(Wrappers.<BizServiceDiscovery>lambdaQuery().eq(BizServiceDiscovery::getDeploymentId, deploymentId).eq(BizServiceDiscovery::getDelFlag, 0));
                     BizServiceDiscovery bizServiceDiscovery = new BizServiceDiscovery();
                     ConverterUtil.convert(deploymentDetail, bizServiceDiscovery);
                     bizServiceDiscovery.setId(null);
@@ -132,7 +135,14 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                     bizServiceDiscovery.setDeploymentId(deploymentId);
                     bizServiceDiscovery.setName(deploymentDetail.getName());
                     bizServiceDiscovery.setMatchLabel(JSON.toJSONString(fetchMatchLabel(deploymentDetail.getName(), EnvConstant.transform(deploymentDetail.getEnvType()))));
-                    bizServiceDiscoveryService.create(bizServiceDiscovery);
+                    if (count > 0) {
+                        LambdaUpdateWrapper<BizServiceDiscovery> updateWrapper = Wrappers.<BizServiceDiscovery>lambdaUpdate();
+                        updateWrapper.eq(BizServiceDiscovery::getDeploymentId, deploymentId);
+                        updateWrapper.eq(BizServiceDiscovery::getDelFlag, 0);
+                        bizServiceDiscoveryService.update(bizServiceDiscovery, updateWrapper);
+                    } else {
+                        bizServiceDiscoveryService.create(bizServiceDiscovery);
+                    }
 
                     bizApplicationDeploymentVolumeService.remove(Wrappers.<BizApplicationDeploymentMount>lambdaQuery().eq(BizApplicationDeploymentMount::getDeploymentId, deploymentId));
                     bizApplicationDeploymentVolumeService.batchInsert(deploymentId, deploymentDetail.getMounts());
@@ -145,13 +155,16 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                 } else {
                     deploymentService.create(namespaceOptional.get().getName(), deployment);
                 }
-                if (StrUtil.isNotEmpty(deploymentDetail.getNetwork()) && !"none".equals(deploymentDetail.getNetwork())) {
-                    Optional<io.fabric8.kubernetes.api.model.Service> serviceOptional = Optional.ofNullable(networkService.get(namespaceOptional.get().getName(), deploymentDetail.getName()));
-                    if (serviceOptional.isPresent()) {
+
+                Optional<io.fabric8.kubernetes.api.model.Service> serviceOptional = Optional.ofNullable(networkService.get(namespaceOptional.get().getName(), deploymentDetail.getName()));
+                if (serviceOptional.isPresent()) {
+                    if (StrUtil.isNotEmpty(deploymentDetail.getNetwork()) && !"none".equals(deploymentDetail.getNetwork())) {
                         networkService.update(namespaceOptional.get().getName(), deploymentDetail.getName(), buildService(deploymentDetail));
                     } else {
-                        networkService.create(namespaceOptional.get().getName(), buildService(deploymentDetail));
+                        networkService.delete(namespaceOptional.get().getName(), deploymentDetail.getName());
                     }
+                } else {
+                    networkService.create(namespaceOptional.get().getName(), buildService(deploymentDetail));
                 }
 
                 return update;
@@ -257,14 +270,20 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                     } else {
                         deploymentService.create(namespace.getName(), deployment);
                     }
-                    if (StrUtil.isNotEmpty(detailView.getNetwork()) && !"none".equals(detailView.getNetwork())) {
-                        Optional<io.fabric8.kubernetes.api.model.Service> serviceOptional = Optional.ofNullable(networkService.get(namespace.getName(), detailView.getName()));
-                        if (serviceOptional.isPresent()) {
+
+                    Optional<io.fabric8.kubernetes.api.model.Service> serviceOptional = Optional.ofNullable(networkService.get(namespace.getName(), detailView.getName()));
+                    if (serviceOptional.isPresent()) {
+                        if (StrUtil.isNotEmpty(detailView.getNetwork()) && !"none".equals(detailView.getNetwork())) {
                             networkService.update(namespace.getName(), detailView.getName(), buildService(detailView));
                         } else {
+                            networkService.delete(namespace.getName(), detailView.getName());
+                        }
+                    } else {
+                        if (StrUtil.isNotEmpty(detailView.getNetwork()) && !"none".equals(detailView.getNetwork())) {
                             networkService.create(namespace.getName(), buildService(detailView));
                         }
                     }
+
 
                     applicationDeployment.setImageName(imageName);
                     applicationDeployment.setImageTag(tag);

@@ -2,8 +2,10 @@ package com.github.pettyfer.caas.global.constants;
 
 public enum RunStatus {
     Preparing("preparing", "准备中"),
-    Fail("fail", "运行错误"),
+    Error("error", "运行错误"),
     Stopped("stopped", "已停止"),
+    Stopping("stopping", "停止中"),
+    Updating("updating", "更新中"),
     Running("running", "运行中");
 
 
