@@ -1,4 +1,4 @@
-$prefix = "192.168.0.4/tools"
+$prefix = "pettyfer"
 $version = "1.0.0"
 $jdk_version = "oracle-jdk-8_281"
 $jre_version = "oracle-jre-8_281"
