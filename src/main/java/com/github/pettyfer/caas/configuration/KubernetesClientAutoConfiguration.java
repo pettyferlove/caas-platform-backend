@@ -10,8 +10,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.util.FileCopyUtils;
 
 /**
  * Kubernetes Client实例自动化配置
@@ -43,11 +41,10 @@ public class KubernetesClientAutoConfiguration {
     @SneakyThrows
     @Profile("dev-ubuntu")
     KubernetesClient kubernetesClientForUbuntu() {
-        ClassPathResource resource = new ClassPathResource(properties.getCert());
         Config config = new ConfigBuilder()
                 .withNewMasterUrl(properties.getMasterUrl())
                 .withNewOauthToken(properties.getToken())
-                .withNewCaCertData(FileCopyUtils.copyToByteArray(resource.getInputStream()))
+                .withNewCaCertData(properties.getCertData())
                 .build();
         return new DefaultKubernetesClient(config);
     }
@@ -56,11 +53,10 @@ public class KubernetesClientAutoConfiguration {
     @SneakyThrows
     @Profile("dev-centos")
     KubernetesClient kubernetesClientForCentos() {
-        ClassPathResource resource = new ClassPathResource(properties.getCert());
         Config config = new ConfigBuilder()
                 .withNewMasterUrl(properties.getMasterUrl())
                 .withNewOauthToken(properties.getToken())
-                .withNewCaCertData(FileCopyUtils.copyToByteArray(resource.getInputStream()))
+                .withNewCaCertData(properties.getCertData())
                 .build();
         return new DefaultKubernetesClient(config);
     }

@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
 public class KubernetesClientProperties {
 
     /**
-     * 主节点Api Proxy地址
+     * 主节点地址
      */
     @Value("${kubernetes.client.master-url:http://127.0.0.1:8001}")
     private String masterUrl;
@@ -28,9 +28,9 @@ public class KubernetesClientProperties {
      */
     private String token;
 
-    /*
-     * Kubernetes CA证书，非Https访问可为空
-     * */
-    private String cert;
+    /**
+     * CA证书（Base64）
+     */
+    private String certData;
 
 }
