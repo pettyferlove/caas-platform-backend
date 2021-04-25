@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.base.Preconditions;
 import com.github.pettyfer.caas.framework.biz.entity.BizNamespace;
 import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuild;
 import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuildHistory;
@@ -29,7 +30,6 @@ import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
 import com.github.pettyfer.caas.global.properties.BuildImageProperties;
 import com.github.pettyfer.caas.utils.LoadBalanceUtil;
 import com.github.pettyfer.caas.utils.URLResolutionUtil;
-import com.google.common.base.Preconditions;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.batch.Job;
 import io.fabric8.kubernetes.api.model.batch.JobBuilder;
@@ -350,6 +350,23 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
 
 
                 String envType = EnvConstant.transform(projectBuild.getEnvType());
+                String cacheHostDir = "";
+                String cacheDir = "";
+                switch (projectBuild.getBuildTool()) {
+                    case "maven":
+                        cacheHostDir = "/usr/build/cache/" + namespace.getName() + "/maven";
+                        cacheDir = "/usr/cache/maven";
+                        break;
+                    case "npm":
+                    case "yarn":
+                        cacheHostDir = "/usr/build/cache/" + namespace.getName() + "/nodejs";
+                        cacheDir = "/usr/cache/nodejs";
+                        break;
+                    default:
+                        throw new BaseRuntimeException("请指定构建工具");
+                }
+                List<VolumeMount> volumeMounts = fetchVolumeMount(cacheDir);
+                List<Volume> volumes = fetchVolume(cacheHostDir);
 
                 Job job = new JobBuilder()
                         .withNewMetadata()
@@ -362,9 +379,9 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                         .withLabels(fetchBuildLabel(jobName, envType))
                         .endMetadata()
                         .withNewSpec()
-                        .withInitContainers(fetchInitContainer(env, projectBuild.getNeedBuildProject(), 1, projectBuild.getNeedBuildImage(), projectBuild.getPersistentBuildFile(), projectBuild.getBuildTool()))
+                        .withInitContainers(fetchInitContainer(env, projectBuild.getNeedBuildProject(), 1, projectBuild.getNeedBuildImage(), projectBuild.getPersistentBuildFile(), projectBuild.getBuildTool(), volumeMounts))
                         .withContainers(fetchContainer(env))
-                        .withVolumes(fetchVolume())
+                        .withVolumes(volumes)
                         .withRestartPolicy("Never")
                         .addNewImagePullSecret(namespace.getRegistrySecretName())
                         .endSpec()
@@ -412,7 +429,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         return list;
     }
 
-    private List<Volume> fetchVolume() {
+    private List<Volume> fetchVolume(String cacheHostDir) {
         List<Volume> volumes = new ArrayList<>();
         volumes.add(new VolumeBuilder()
                 .withName("work-dir")
@@ -421,7 +438,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         volumes.add(new VolumeBuilder()
                 .withName("cache-dir")
                 .withHostPath(new HostPathVolumeSourceBuilder()
-                        .withPath("/usr/build/cache/maven")
+                        .withPath(cacheHostDir)
                         .withType("DirectoryOrCreate")
                         .build())
                 .build());
@@ -434,7 +451,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         return volumes;
     }
 
-    private List<VolumeMount> fetchVolumeMount() {
+    private List<VolumeMount> fetchVolumeMount(String cacheDir) {
         List<VolumeMount> volumeMounts = new ArrayList<>();
         volumeMounts.add(new VolumeMountBuilder()
                 .withName("work-dir")
@@ -442,7 +459,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 .build());
         volumeMounts.add(new VolumeMountBuilder()
                 .withName("cache-dir")
-                .withMountPath("/usr/cache/maven")
+                .withMountPath(cacheDir)
                 .build());
         volumeMounts.add(new VolumeMountBuilder()
                 .withName("docker-dir")
@@ -451,7 +468,8 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         return volumeMounts;
     }
 
-    private List<Container> fetchInitContainer(Map<String, String> env, Integer needBuild, Integer depositoryType, Integer needBuildImage, Integer needPersistent, String buildTool) {
+    private List<Container> fetchInitContainer(Map<String, String> env, Integer needBuild, Integer depositoryType, Integer needBuildImage, Integer needPersistent, String buildTool, List<VolumeMount> volumeMounts) {
+        
         List<Container> containers = new LinkedList<>();
         if (depositoryType == 2) {
             containers.add(new ContainerBuilder()
@@ -459,7 +477,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .withImage(imageProperties.getImages().get("svn-pull"))
                     .withImagePullPolicy("Always")
                     .withEnv(fetchEnv(env))
-                    .withVolumeMounts(fetchVolumeMount())
+                    .withVolumeMounts(volumeMounts)
                     .build());
         } else {
             containers.add(new ContainerBuilder()
@@ -467,7 +485,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .withImage(imageProperties.getImages().get("git-pull"))
                     .withImagePullPolicy("Always")
                     .withEnv(fetchEnv(env))
-                    .withVolumeMounts(fetchVolumeMount())
+                    .withVolumeMounts(volumeMounts)
                     .build());
         }
 
@@ -479,7 +497,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                             .withImage(imageProperties.getImages().get("maven-build"))
                             .withImagePullPolicy("Always")
                             .withEnv(fetchEnv(env))
-                            .withVolumeMounts(fetchVolumeMount())
+                            .withVolumeMounts(volumeMounts)
                             .build());
                     break;
                 case "npm":
@@ -489,7 +507,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                             .withImage(imageProperties.getImages().get("nodejs-build"))
                             .withImagePullPolicy("Always")
                             .withEnv(fetchEnv(env))
-                            .withVolumeMounts(fetchVolumeMount())
+                            .withVolumeMounts(volumeMounts)
                             .build());
                     break;
                 default:
@@ -503,7 +521,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .withImage(imageProperties.getImages().get("persistence"))
                     .withImagePullPolicy("Always")
                     .withEnv(fetchEnv(env))
-                    .withVolumeMounts(fetchVolumeMount())
+                    .withVolumeMounts(volumeMounts)
                     .build());
         }
 
@@ -513,7 +531,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .withImage(imageProperties.getImages().get("docker-build"))
                     .withImagePullPolicy("Always")
                     .withEnv(fetchEnv(env))
-                    .withVolumeMounts(fetchVolumeMount())
+                    .withVolumeMounts(volumeMounts)
                     .build());
         }
 
@@ -527,7 +545,6 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 .withImage(imageProperties.getImages().get("notification"))
                 .withImagePullPolicy("Always")
                 .withEnv(fetchEnv(env))
-                .withVolumeMounts(fetchVolumeMount())
                 .build());
         return containers;
     }

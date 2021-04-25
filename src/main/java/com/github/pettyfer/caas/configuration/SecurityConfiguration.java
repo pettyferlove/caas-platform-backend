@@ -53,7 +53,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity webSecurity) {
-        webSecurity.ignoring().antMatchers("/webjars/**", "/images/**", "/static/**", "/favicon**", "/error");
+        webSecurity.ignoring().antMatchers("/webjars/**", "/images/**", "/static/**", "/favicon**", "/error", "/actuator/**", "/actuator");
     }
 
     @Override
