@@ -1,4 +1,4 @@
-FROM pettyfer/apline-tool-base:oracle-jre-8_281
+FROM pettyfer/alpine-base:1.0.0
 LABEL maintainer="Alex Pettyfer <pettyferlove@live.cn>"
 LABEL description="自动化工具-Hook通知镜像"
 

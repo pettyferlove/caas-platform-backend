@@ -1,4 +1,4 @@
-FROM pettyfer/apline-tool-base:oracle-jre-8_281
+FROM pettyfer/alpine-tool-base:oracle-jdk-8_281
 LABEL maintainer="Alex Pettyfer <pettyferlove@live.cn>"
 LABEL description="自动化工具-SQL构建镜像"
 
