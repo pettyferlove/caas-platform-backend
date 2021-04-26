@@ -171,3 +171,72 @@ create table system_message
     comment '系统消息' collate = utf8mb4_general_ci;
 
 --rollback drop table system_message;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-18
+alter table biz_project_build add parent_id varchar(128) null comment '父项目ID' after id;
+
+--rollback alter table biz_project_build drop column parent_id;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-19
+alter table biz_project_build change project_id remote_project_id varchar(128) null comment '远程仓库项目ID';
+
+--rollback alter table biz_project_build change gitlab_project_id project_id varchar(128) null comment 'Gitlab项目ID';
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-20
+alter table biz_project_build add depository_type tinyint unsigned default 1 null comment '仓库类型' after project_name;
+
+--rollback alter table biz_project_build drop column depository_type;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-21
+alter table biz_project_build change clone_url remote_path varchar(500) not null comment 'Clone地址';
+
+--rollback alter table biz_project_build change remote_path clone_url varchar(500) not null comment 'Clone地址';
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-22
+alter table biz_project_build change branch remote_branch varchar(64) default 'master' not null comment '源码拉取分支' after remote_path;
+
+--rollback alter table biz_project_build change remote_branch branch varchar(64) default 'master' not null comment '源码拉取分支' after remote_path;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-23
+alter table biz_project_build add remote_owner varchar(128) null comment '远程仓库地址空间' after remote_branch;
+
+--rollback alter table biz_project_build drop column remote_owner;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-24
+alter table biz_project_build add remote_repo varchar(255) null comment '仓库路径（相对路径）' after remote_owner;
+
+--rollback alter table biz_project_build drop column remote_repo;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-25
+alter table biz_project_build add pre_shell_script text null comment '前置脚本' after build_params;
+
+--rollback alter table biz_project_build drop column pre_shell_script;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-26
+alter table biz_project_build add post_shell_script text null comment '后置脚本' after pre_shell_script;
+
+--rollback alter table biz_project_build drop column post_shell_script;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-27
+alter table biz_project_build add run_pre_shell_script bit default false null  comment '是否执行前置脚本' after post_shell_script;
+
+--rollback alter table biz_project_build drop column run_pre_shell_script;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-28
+alter table biz_project_build add run_post_shell_script bit default false null  comment '是否执行后置脚本' after run_pre_shell_script;
+
+--rollback alter table biz_project_build drop column run_post_shell_script;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-29
+alter table biz_project_build modify depository_type varchar(128) default 'gitlab_v4' null comment '仓库类型';
+
+--rollback alter table biz_project_build modify depository_type tinyint unsigned default 1 null comment '仓库类型';
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-30
+alter table biz_project_build modify remote_project_id varchar(128) null comment '远程仓库项目ID' after depository_type;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-31
+alter table biz_user_configuration add subversion_username varchar(400) null comment 'SVN用户名' after private_key;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-32
+alter table biz_user_configuration add subversion_password varchar(400) null comment 'SVN密码' after subversion_username;

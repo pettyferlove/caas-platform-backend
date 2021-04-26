@@ -43,9 +43,6 @@ public class ProjectBuildListView implements Serializable {
     @ApiModelProperty(value = "源码仓库项目名称")
     private String sourceProjectName;
 
-    @ApiModelProperty(value = "源码仓库Web访问地址")
-    private String sourceProjectWebUrl;
-
     @ApiModelProperty(value = "是否打开自动构建")
     private Integer openAutoBuild;
 

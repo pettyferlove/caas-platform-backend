@@ -10,7 +10,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 
 /**
@@ -19,7 +18,7 @@ import java.io.Serializable;
  * </p>
  *
  * @author Petty
- * @since 2021-04-12
+ * @since 2021-04-26
  */
 @Data
 @NoArgsConstructor
@@ -27,24 +26,37 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value = "BizProjectBuild对象", description = "项目构建配置")
+@ApiModel(value="BizProjectBuild对象", description="项目构建配置")
 public class BizProjectBuild extends BaseEntity<BizProjectBuild> {
 
     private static final long serialVersionUID = 1L;
 
+    @ApiModelProperty(value = "父项目ID")
+    private String parentId;
+
     @ApiModelProperty(value = "命名空间ID")
-    @NotEmpty(message = "必须指定命名空间")
     private String namespaceId;
 
-    @ApiModelProperty(value = "项目ID")
-    private String projectId;
-
     @ApiModelProperty(value = "项目名称")
-    @NotEmpty(message = "项目名称不能为空")
     private String projectName;
 
+    @ApiModelProperty(value = "仓库类型")
+    private String depositoryType;
+
+    @ApiModelProperty(value = "远程仓库项目ID")
+    private String remoteProjectId;
+
     @ApiModelProperty(value = "Clone地址")
-    private String cloneUrl;
+    private String remotePath;
+
+    @ApiModelProperty(value = "源码拉取分支")
+    private String remoteBranch;
+
+    @ApiModelProperty(value = "远程仓库地址空间")
+    private String remoteOwner;
+
+    @ApiModelProperty(value = "仓库路径（相对路径）")
+    private String remoteRepo;
 
     @ApiModelProperty(value = "是否打开自动构建")
     private Integer openAutoBuild;
@@ -60,6 +72,18 @@ public class BizProjectBuild extends BaseEntity<BizProjectBuild> {
 
     @ApiModelProperty(value = "构建参数")
     private String buildParams;
+
+    @ApiModelProperty(value = "前置脚本")
+    private String preShellScript;
+
+    @ApiModelProperty(value = "后置脚本")
+    private String postShellScript;
+
+    @ApiModelProperty(value = "是否执行前置脚本")
+    private Boolean runPreShellScript;
+
+    @ApiModelProperty(value = "是否执行后置脚本")
+    private Boolean runPostShellScript;
 
     @ApiModelProperty(value = "是否构建镜像")
     private Integer needBuildImage;
@@ -84,9 +108,6 @@ public class BizProjectBuild extends BaseEntity<BizProjectBuild> {
 
     @ApiModelProperty(value = "触发条件")
     private String triggerMethod;
-
-    @ApiModelProperty(value = "源码拉取分支")
-    private String branch;
 
     @ApiModelProperty(value = "镜像仓库别名")
     private String imagesDepositoryAlias;

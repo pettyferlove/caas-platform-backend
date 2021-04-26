@@ -1,6 +1,6 @@
 spring:
   application:
-    name: kubernetes-caas
+    name: caas-platform
     group: caas
   profiles:
     active: dev-ubuntu

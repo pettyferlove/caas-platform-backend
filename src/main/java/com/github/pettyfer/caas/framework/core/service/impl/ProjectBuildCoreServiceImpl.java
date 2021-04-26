@@ -22,10 +22,7 @@ import com.github.pettyfer.caas.framework.engine.docker.register.service.IHarbor
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.IJobService;
 import com.github.pettyfer.caas.framework.system.entity.SystemMessage;
 import com.github.pettyfer.caas.framework.system.event.publisher.MessageEventPublisher;
-import com.github.pettyfer.caas.global.constants.BuildStatus;
-import com.github.pettyfer.caas.global.constants.EnvConstant;
-import com.github.pettyfer.caas.global.constants.GlobalConstant;
-import com.github.pettyfer.caas.global.constants.KubernetesConstant;
+import com.github.pettyfer.caas.global.constants.*;
 import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
 import com.github.pettyfer.caas.global.properties.BuildImageProperties;
 import com.github.pettyfer.caas.utils.LoadBalanceUtil;
@@ -132,10 +129,14 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
             String id = IdWorker.getIdStr();
             projectBuild.setId(id);
             projectBuild.setImagesDepositoryAlias(namespaceOptional.get().getName());
-            if (StrUtil.isNotEmpty(projectBuild.getProjectId())) {
-                String sourceProjectHookId = this.createSourceProjectHook(id, projectBuild.getProjectId());
-                projectBuild.setProjectHookId(sourceProjectHookId);
+            if (DepositoryType.GitLabV4.getValue().equals(projectBuild.getDepositoryType())) {
+                if (StrUtil.isNotEmpty(projectBuild.getRemoteProjectId())) {
+                    String sourceProjectHookId = this.createSourceProjectHook(id, projectBuild.getRemoteProjectId());
+                    projectBuild.setProjectHookId(sourceProjectHookId);
+                }
             }
+
+            // 创建镜像仓库别名
             String projectId = harborService.createProject(projectBuild.getImagesDepositoryAlias());
             bizImagesDepositoryService.create(projectId, projectBuild.getImagesDepositoryAlias());
             projectBuild.setImagesDepositoryId(projectId);
@@ -150,7 +151,11 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
     @Transactional(rollbackFor = Throwable.class)
     public Boolean delete(String id) {
         BizProjectBuild bizProjectBuild = bizProjectBuildService.getById(id);
-        this.removeSourceProjectHook(bizProjectBuild.getProjectId(), bizProjectBuild.getProjectHookId());
+        if (DepositoryType.GitLabV4.getValue().equals(bizProjectBuild.getDepositoryType())) {
+            if (StrUtil.isNotEmpty(bizProjectBuild.getRemoteProjectId())) {
+                this.removeSourceProjectHook(bizProjectBuild.getRemoteProjectId(), bizProjectBuild.getProjectHookId());
+            }
+        }
         return bizProjectBuildService.delete(id);
     }
 
@@ -169,7 +174,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         Optional<BizProjectBuild> projectBuildOptional = Optional.ofNullable(bizProjectBuildService.getOne(queryWrapper));
         if (projectBuildOptional.isPresent()) {
             BizProjectBuild bizProjectBuild = projectBuildOptional.get();
-            if (pushDetails.getRef().contains(bizProjectBuild.getBranch())) {
+            if (pushDetails.getRef().contains(bizProjectBuild.getRemoteBranch())) {
                 startBuild(id);
             }
         }
@@ -309,13 +314,13 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 env.put("PRIVATE_KEY", userConfiguration.getPrivateKey().replaceAll("\n", "\\\\n"));
                 env.put("GIT_ROOT", "gitlab.ggjs.sinobest.cn");
                 env.put("BUILD_CODE_PATH", GlobalConstant.BUILD_CODE_PATH);
-                env.put("REMOTE_PATH", projectBuild.getCloneUrl());
-                env.put("REMOTE_BRANCH", projectBuild.getBranch());
+                env.put("REMOTE_PATH", projectBuild.getRemotePath());
+                env.put("REMOTE_BRANCH", projectBuild.getRemoteBranch());
                 env.put("PROJECT_NAME", projectBuild.getProjectName());
                 env.put("BUILD_TARGET_PATH", projectBuild.getBuildTargetPath());
                 env.put("BUILD_TARGET_NAME", projectBuild.getBuildTargetName());
-                /*env.put("USERNAME", sqlBuild.getUsername());
-                env.put("PASSWORD", sqlBuild.getPassword());*/
+                env.put("USERNAME", userConfiguration.getSubversionUsername());
+                env.put("PASSWORD", userConfiguration.getSubversionPassword());
                 env.put("JOB_NAME", jobName);
                 env.put("FILE_ID", jobName);
                 env.put("USER_ID", projectBuild.getCreator());
@@ -350,23 +355,8 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
 
 
                 String envType = EnvConstant.transform(projectBuild.getEnvType());
-                String cacheHostDir = "";
-                String cacheDir = "";
-                switch (projectBuild.getBuildTool()) {
-                    case "maven":
-                        cacheHostDir = "/usr/build/cache/" + namespace.getName() + "/maven";
-                        cacheDir = "/usr/cache/maven";
-                        break;
-                    case "npm":
-                    case "yarn":
-                        cacheHostDir = "/usr/build/cache/" + namespace.getName() + "/nodejs";
-                        cacheDir = "/usr/cache/nodejs";
-                        break;
-                    default:
-                        throw new BaseRuntimeException("请指定构建工具");
-                }
-                List<VolumeMount> volumeMounts = fetchVolumeMount(cacheDir);
-                List<Volume> volumes = fetchVolume(cacheHostDir);
+                List<VolumeMount> volumeMounts = fetchVolumeMount(projectBuild.getNeedBuildProject()==1, projectBuild.getBuildTool(), namespace.getName());
+                List<Volume> volumes = fetchVolume(projectBuild.getNeedBuildProject()==1, projectBuild.getBuildTool(), namespace.getName());
 
                 Job job = new JobBuilder()
                         .withNewMetadata()
@@ -379,7 +369,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                         .withLabels(fetchBuildLabel(jobName, envType))
                         .endMetadata()
                         .withNewSpec()
-                        .withInitContainers(fetchInitContainer(env, projectBuild.getNeedBuildProject(), 1, projectBuild.getNeedBuildImage(), projectBuild.getPersistentBuildFile(), projectBuild.getBuildTool(), volumeMounts))
+                        .withInitContainers(fetchInitContainer(env, projectBuild.getNeedBuildProject(), projectBuild.getDepositoryType(), projectBuild.getNeedBuildImage(), projectBuild.getPersistentBuildFile(), projectBuild.getBuildTool(), volumeMounts))
                         .withContainers(fetchContainer(env))
                         .withVolumes(volumes)
                         .withRestartPolicy("Never")
@@ -429,19 +419,33 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         return list;
     }
 
-    private List<Volume> fetchVolume(String cacheHostDir) {
+    private List<Volume> fetchVolume(Boolean needBuild, String buildTool, String name) {
         List<Volume> volumes = new ArrayList<>();
         volumes.add(new VolumeBuilder()
                 .withName("work-dir")
                 .withEmptyDir(new EmptyDirVolumeSource())
                 .build());
-        volumes.add(new VolumeBuilder()
-                .withName("cache-dir")
-                .withHostPath(new HostPathVolumeSourceBuilder()
-                        .withPath(cacheHostDir)
-                        .withType("DirectoryOrCreate")
-                        .build())
-                .build());
+        if(needBuild) {
+            String cacheHostDir = "";
+            switch (buildTool) {
+                case "maven":
+                    cacheHostDir = "/usr/build/cache/" + name + "/maven";
+                    break;
+                case "npm":
+                case "yarn":
+                    cacheHostDir = "/usr/build/cache/" + name + "/nodejs";
+                    break;
+                default:
+                    throw new BaseRuntimeException("请指定构建工具");
+            }
+            volumes.add(new VolumeBuilder()
+                    .withName("cache-dir")
+                    .withHostPath(new HostPathVolumeSourceBuilder()
+                            .withPath(cacheHostDir)
+                            .withType("DirectoryOrCreate")
+                            .build())
+                    .build());
+        }
         volumes.add(new VolumeBuilder()
                 .withName("docker-dir")
                 .withHostPath(new HostPathVolumeSourceBuilder()
@@ -451,16 +455,30 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         return volumes;
     }
 
-    private List<VolumeMount> fetchVolumeMount(String cacheDir) {
+    private List<VolumeMount> fetchVolumeMount(Boolean needBuild, String buildTool, String name) {
         List<VolumeMount> volumeMounts = new ArrayList<>();
         volumeMounts.add(new VolumeMountBuilder()
                 .withName("work-dir")
                 .withMountPath(GlobalConstant.BUILD_CODE_PATH)
                 .build());
-        volumeMounts.add(new VolumeMountBuilder()
-                .withName("cache-dir")
-                .withMountPath(cacheDir)
-                .build());
+        if(needBuild) {
+            String cacheDir = "";
+            switch (buildTool) {
+                case "maven":
+                    cacheDir = "/usr/cache/maven";
+                    break;
+                case "npm":
+                case "yarn":
+                    cacheDir = "/usr/cache/nodejs";
+                    break;
+                default:
+                    throw new BaseRuntimeException("请指定构建工具");
+            }
+            volumeMounts.add(new VolumeMountBuilder()
+                    .withName("cache-dir")
+                    .withMountPath(cacheDir)
+                    .build());
+        }
         volumeMounts.add(new VolumeMountBuilder()
                 .withName("docker-dir")
                 .withMountPath("/var/run/docker.sock")
@@ -468,10 +486,10 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         return volumeMounts;
     }
 
-    private List<Container> fetchInitContainer(Map<String, String> env, Integer needBuild, Integer depositoryType, Integer needBuildImage, Integer needPersistent, String buildTool, List<VolumeMount> volumeMounts) {
-        
+    private List<Container> fetchInitContainer(Map<String, String> env, Integer needBuild, String depositoryType, Integer needBuildImage, Integer needPersistent, String buildTool, List<VolumeMount> volumeMounts) {
+
         List<Container> containers = new LinkedList<>();
-        if (depositoryType == 2) {
+        if (DepositoryType.Subversion.getValue().equals(depositoryType)) {
             containers.add(new ContainerBuilder()
                     .withName("svn-pull")
                     .withImage(imageProperties.getImages().get("svn-pull"))
@@ -479,7 +497,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .withEnv(fetchEnv(env))
                     .withVolumeMounts(volumeMounts)
                     .build());
-        } else {
+        } else if(DepositoryType.GitLabV4.getValue().equals(depositoryType)) {
             containers.add(new ContainerBuilder()
                     .withName("git-pull")
                     .withImage(imageProperties.getImages().get("git-pull"))
@@ -487,6 +505,8 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .withEnv(fetchEnv(env))
                     .withVolumeMounts(volumeMounts)
                     .build());
+        } else {
+            throw new BaseRuntimeException("不支持的仓库类型");
         }
 
         if (needBuild == 1) {

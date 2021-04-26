@@ -18,7 +18,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@ApiModel(value = "用户配置Model", description = "")
+@ApiModel(value="用户配置Model", description="")
 public class UserConfiguration implements Serializable {
     private static final long serialVersionUID = -2858002591496343832L;
 
@@ -30,5 +30,11 @@ public class UserConfiguration implements Serializable {
 
     @ApiModelProperty(value = "RSA私钥")
     private String privateKey;
+
+    @ApiModelProperty(value = "SVN用户名")
+    private String subversionUsername;
+
+    @ApiModelProperty(value = "SVN密码")
+    private String subversionPassword;
 
 }

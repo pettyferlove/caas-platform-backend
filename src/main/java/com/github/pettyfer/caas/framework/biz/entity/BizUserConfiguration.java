@@ -26,7 +26,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value = "BizUserConfiguration对象", description = "用户个人配置")
+@ApiModel(value="BizUserConfiguration对象", description="用户个人配置")
 public class BizUserConfiguration extends BaseEntity<BizUserConfiguration> {
 
     private static final long serialVersionUID = 1L;
@@ -39,6 +39,12 @@ public class BizUserConfiguration extends BaseEntity<BizUserConfiguration> {
 
     @ApiModelProperty(value = "RSA私钥")
     private String privateKey;
+
+    @ApiModelProperty(value = "SVN用户名")
+    private String subversionUsername;
+
+    @ApiModelProperty(value = "SVN密码")
+    private String subversionPassword;
 
     @ApiModelProperty(value = "项目组ID")
     private String groupId;
