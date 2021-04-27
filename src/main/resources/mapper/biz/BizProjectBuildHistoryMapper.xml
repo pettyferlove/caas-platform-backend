@@ -4,19 +4,19 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.biz.entity.BizProjectBuildHistory">
-        <result column="id" property="id"/>
-        <result column="del_flag" property="delFlag"/>
-        <result column="creator" property="creator"/>
-        <result column="create_time" property="createTime"/>
-        <result column="modifier" property="modifier"/>
-        <result column="modify_time" property="modifyTime"/>
-        <result column="job_id" property="jobId"/>
-        <result column="build_id" property="buildId"/>
-        <result column="image_full_name" property="imageFullName"/>
-        <result column="file_id" property="fileId"/>
-        <result column="build_status" property="buildStatus"/>
-        <result column="group_id" property="groupId"/>
-        <result column="tenant_id" property="tenantId"/>
+    <result column="id" property="id" />
+    <result column="del_flag" property="delFlag" />
+    <result column="creator" property="creator" />
+    <result column="create_time" property="createTime" />
+    <result column="modifier" property="modifier" />
+    <result column="modify_time" property="modifyTime" />
+        <result column="job_id" property="jobId" />
+        <result column="build_id" property="buildId" />
+        <result column="image_full_name" property="imageFullName" />
+        <result column="file_id" property="fileId" />
+        <result column="build_status" property="buildStatus" />
+        <result column="group_id" property="groupId" />
+        <result column="tenant_id" property="tenantId" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -31,10 +31,14 @@
     </sql>
     <select id="historySelect"
             resultType="com.github.pettyfer.caas.framework.core.model.ProjectBuildHistorySelectView">
-        select h.file_id, h.build_status, h.create_time
+        select h.file_id, h.build_status, h.create_time from biz_project_build_history h where h.build_id = #{id} order by create_time desc limit 5
+    </select>
+
+    <select id="queryLastBuild" resultType="com.github.pettyfer.caas.framework.biz.entity.BizProjectBuildHistory">
+        select
+        <include refid="Base_Column_List"></include>
         from biz_project_build_history h
-        where h.build_id = #{id}
-        order by create_time desc limit 5
+        where h.build_id = #{id} and h.build_status = 'success' order by create_time desc limit 1
     </select>
 
 </mapper>

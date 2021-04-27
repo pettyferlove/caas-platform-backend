@@ -61,4 +61,5 @@ public interface IBizProjectBuildHistoryService extends IService<BizProjectBuild
 
     List<ProjectBuildHistorySelectView> historySelect(String id);
 
+    BizProjectBuildHistory queryLastBuild(String id);
 }

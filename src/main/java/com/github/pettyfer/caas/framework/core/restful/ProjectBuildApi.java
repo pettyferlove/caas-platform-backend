@@ -71,8 +71,8 @@ public class ProjectBuildApi {
     }
 
     @GetMapping("/select/{namespaceId}")
-    public R<List<ProjectBuildSelect>> select(Integer envType, @PathVariable String namespaceId) {
-        return new R<>(bizProjectBuildService.select(envType, namespaceId));
+    public R<List<ProjectBuildSelect>> select(Integer envType, String currentId, @PathVariable String namespaceId) {
+        return new R<>(bizProjectBuildService.select(envType, currentId, namespaceId));
     }
 
 

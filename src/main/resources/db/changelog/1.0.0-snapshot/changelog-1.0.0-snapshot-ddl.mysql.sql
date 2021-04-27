@@ -240,3 +240,6 @@ alter table biz_user_configuration add subversion_username varchar(400) null com
 
 --changeset Petty:caas-1.0.0-snapshot-ddl-32
 alter table biz_user_configuration add subversion_password varchar(400) null comment 'SVN密码' after subversion_username;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-33
+alter table biz_project_build add link_project bit default false null comment '是否需要关联其他项目' after parent_id;

@@ -75,6 +75,14 @@ docker push "$prefix/build-persistence-tool:$version"
 Set-Location "../"
 Write-Output "The persistence tool image has been built"
 
+# Shell工具镜像
+Write-Output "Begin building the shell tool image,version:$version"
+Set-Location "build-shell-tool"
+docker build -t "$prefix/build-shell-tool:$version" .
+docker push "$prefix/build-shell-tool:$version"
+Set-Location "../"
+Write-Output "The shell tool image has been built"
+
 # SQL工具镜像
 Write-Output "Begin building the sql tool image,version:$version"
 Set-Location "build-sql-tool"

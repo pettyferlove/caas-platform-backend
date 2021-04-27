@@ -35,14 +35,14 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                         "/register/**",
                         ApiConstant.API_V1_PREFIX + "/hooks/**",
                         ApiConstant.API_V1_PREFIX + "/sockjs/**",
-                        ApiConstant.API_V1_PREFIX + "/build/file/upload")
+                        ApiConstant.API_V1_PREFIX + "/build/file/**")
                 .and()
                 .authorizeRequests()
                 // 对确定的匹配规则进行验证处理，如果匹配规则未添加则只对下面的url进行验证，其他路径全部放行
                 .mvcMatchers("/register/**",
                         ApiConstant.API_V1_PREFIX + "/hooks/**",
                         ApiConstant.API_V1_PREFIX + "/sockjs/**",
-                        ApiConstant.API_V1_PREFIX + "/build/file/upload").permitAll()
+                        ApiConstant.API_V1_PREFIX + "/build/file/**").permitAll()
                 .mvcMatchers(ApiConstant.API_MATCH_PREFIX, "/resource/**").authenticated();
 
     }

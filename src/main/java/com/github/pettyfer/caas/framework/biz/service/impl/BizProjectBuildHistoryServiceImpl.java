@@ -70,4 +70,9 @@ public class BizProjectBuildHistoryServiceImpl extends ServiceImpl<BizProjectBui
         return baseMapper.historySelect(id);
     }
 
+    @Override
+    public BizProjectBuildHistory queryLastBuild(String id) {
+        return baseMapper.queryLastBuild(id);
+    }
+
 }

@@ -34,6 +34,9 @@ public class BizProjectBuild extends BaseEntity<BizProjectBuild> {
     @ApiModelProperty(value = "父项目ID")
     private String parentId;
 
+    @ApiModelProperty(value = "是否需要关联其他项目")
+    private Boolean linkProject;
+
     @ApiModelProperty(value = "命名空间ID")
     private String namespaceId;
 

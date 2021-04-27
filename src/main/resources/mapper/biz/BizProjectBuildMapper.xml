@@ -11,6 +11,7 @@
         <result column="modifier" property="modifier" />
         <result column="modify_time" property="modifyTime" />
         <result column="parent_id" property="parentId" />
+        <result column="link_project" property="linkProject" />
         <result column="namespace_id" property="namespaceId" />
         <result column="project_name" property="projectName" />
         <result column="depository_type" property="depositoryType" />
@@ -54,7 +55,7 @@
         create_time,
         modifier,
         modify_time,
-        parent_id, namespace_id, project_name, depository_type, remote_project_id, remote_path, remote_branch, remote_owner, remote_repo, open_auto_build, need_build_project, build_tool, build_command, build_params, pre_shell_script, post_shell_script, run_pre_shell_script, run_post_shell_script, need_build_image, build_target_path, build_target_name, dockerfile_already_exists, dockerfile_path, dockerfile_content, project_hook_id, trigger_method, images_depository_alias, source_project_name, source_project_web_url, images_depository_id, persistent_build_file, env_type, group_id, tenant_id
+        parent_id, link_project, namespace_id, project_name, depository_type, remote_project_id, remote_path, remote_branch, remote_owner, remote_repo, open_auto_build, need_build_project, build_tool, build_command, build_params, pre_shell_script, post_shell_script, run_pre_shell_script, run_post_shell_script, need_build_image, build_target_path, build_target_name, dockerfile_already_exists, dockerfile_path, dockerfile_content, project_hook_id, trigger_method, images_depository_alias, source_project_name, source_project_web_url, images_depository_id, persistent_build_file, env_type, group_id, tenant_id
     </sql>
     <select id="queryProjectBuildList" resultType="com.github.pettyfer.caas.framework.core.model.ProjectBuildListView">
         select

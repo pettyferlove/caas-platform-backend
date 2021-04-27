@@ -283,6 +283,14 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
             BizProjectBuildHistory history = bizProjectBuildHistoryService.getOne(queryWrapper);
             BizProjectBuild projectBuild = bizProjectBuildService.get(history.getBuildId());
             if (status == BuildStatus.Success) {
+                LambdaQueryWrapper<BizProjectBuild> parentQuery = Wrappers.<BizProjectBuild>lambdaQuery();
+                parentQuery.eq(BizProjectBuild::getParentId, projectBuild.getId());
+                parentQuery.eq(BizProjectBuild::getDelFlag, 0);
+                parentQuery.eq(BizProjectBuild::getOpenAutoBuild, 1);
+                List<BizProjectBuild> projectBuilds = bizProjectBuildService.list(parentQuery);
+                for (BizProjectBuild build:projectBuilds) {
+                    this.startBuild(build.getId());
+                }
                 buildMessage.setType("success");
                 buildMessage.setContent(projectBuild.getProjectName() + "自动构建成功");
             } else {
@@ -326,6 +334,13 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 env.put("USER_ID", projectBuild.getCreator());
                 env.put("NOTIFICATION_FLAG", "project");
                 env.put("REMOTE_SERVER", LoadBalanceUtil.chooseServer(globalConfiguration.getClusterServer()));
+                if(projectBuild.getLinkProject()){
+                    BizProjectBuild parentProject = bizProjectBuildService.get(projectBuild.getParentId());
+                    Optional<BizProjectBuildHistory> historyOptional = Optional.ofNullable(bizProjectBuildHistoryService.queryLastBuild(parentProject.getId()));
+                    historyOptional.ifPresent(bizProjectBuildHistory -> env.put("PARENT_PROJECT_LAST_BUILD_FILE", bizProjectBuildHistory.getFileId()));
+                }
+                env.put("PRE_SHELL_SCRIPT", projectBuild.getPreShellScript());
+                env.put("POST_SHELL_SCRIPT", projectBuild.getPostShellScript());
 
                 StringBuilder imageName = new StringBuilder();
                 String tagName = String.valueOf(System.currentTimeMillis());
@@ -363,13 +378,15 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                         .withName(jobName)
                         .endMetadata()
                         .withNewSpec()
+                        .withActiveDeadlineSeconds(1800L)
+                        .withTtlSecondsAfterFinished(2592000)
                         .withBackoffLimit(0)
                         .withNewTemplate()
                         .withNewMetadata()
                         .withLabels(fetchBuildLabel(jobName, envType))
                         .endMetadata()
                         .withNewSpec()
-                        .withInitContainers(fetchInitContainer(env, projectBuild.getNeedBuildProject(), projectBuild.getDepositoryType(), projectBuild.getNeedBuildImage(), projectBuild.getPersistentBuildFile(), projectBuild.getBuildTool(), volumeMounts))
+                        .withInitContainers(fetchInitContainer(env, volumeMounts, projectBuild))
                         .withContainers(fetchContainer(env))
                         .withVolumes(volumes)
                         .withRestartPolicy("Never")
@@ -486,10 +503,13 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         return volumeMounts;
     }
 
-    private List<Container> fetchInitContainer(Map<String, String> env, Integer needBuild, String depositoryType, Integer needBuildImage, Integer needPersistent, String buildTool, List<VolumeMount> volumeMounts) {
+    private List<Container> fetchInitContainer(Map<String,
+            String> env
+            , List<VolumeMount> volumeMounts
+            , BizProjectBuild projectBuild) {
 
         List<Container> containers = new LinkedList<>();
-        if (DepositoryType.Subversion.getValue().equals(depositoryType)) {
+        if (DepositoryType.Subversion.getValue().equals(projectBuild.getDepositoryType())) {
             containers.add(new ContainerBuilder()
                     .withName("svn-pull")
                     .withImage(imageProperties.getImages().get("svn-pull"))
@@ -497,7 +517,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .withEnv(fetchEnv(env))
                     .withVolumeMounts(volumeMounts)
                     .build());
-        } else if(DepositoryType.GitLabV4.getValue().equals(depositoryType)) {
+        } else if(DepositoryType.GitLabV4.getValue().equals(projectBuild.getDepositoryType())) {
             containers.add(new ContainerBuilder()
                     .withName("git-pull")
                     .withImage(imageProperties.getImages().get("git-pull"))
@@ -509,8 +529,22 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
             throw new BaseRuntimeException("不支持的仓库类型");
         }
 
-        if (needBuild == 1) {
-            switch (buildTool) {
+        if(projectBuild.getRunPreShellScript()) {
+            containers.add(new ContainerBuilder()
+                    .withName("pre-shell")
+                    .withImage(imageProperties.getImages().get("shell"))
+                    .withImagePullPolicy("Always")
+                    .withEnv(fetchEnv(env))
+                    .addNewEnv()
+                    .withName("SHELL_TYPE")
+                    .withValue("PRE")
+                    .endEnv()
+                    .withVolumeMounts(volumeMounts)
+                    .build());
+        }
+
+        if (projectBuild.getNeedBuildProject() == 1) {
+            switch (projectBuild.getBuildTool()) {
                 case "maven":
                     containers.add(new ContainerBuilder()
                             .withName("maven-build")
@@ -535,7 +569,21 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
             }
         }
 
-        if (needPersistent == 1) {
+        if(projectBuild.getRunPostShellScript()) {
+            containers.add(new ContainerBuilder()
+                    .withName("post-shell")
+                    .withImage(imageProperties.getImages().get("shell"))
+                    .withImagePullPolicy("Always")
+                    .withEnv(fetchEnv(env))
+                    .addNewEnv()
+                    .withName("SHELL_TYPE")
+                    .withValue("POST")
+                    .endEnv()
+                    .withVolumeMounts(volumeMounts)
+                    .build());
+        }
+
+        if (projectBuild.getPersistentBuildFile() == 1) {
             containers.add(new ContainerBuilder()
                     .withName("persistence")
                     .withImage(imageProperties.getImages().get("persistence"))
@@ -545,7 +593,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .build());
         }
 
-        if (needBuildImage == 1) {
+        if (projectBuild.getNeedBuildImage() == 1) {
             containers.add(new ContainerBuilder()
                     .withName("docker-build")
                     .withImage(imageProperties.getImages().get("docker-build"))

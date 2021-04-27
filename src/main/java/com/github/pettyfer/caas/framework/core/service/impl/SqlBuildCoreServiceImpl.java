@@ -25,7 +25,6 @@ import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.batch.Job;
 import io.fabric8.kubernetes.api.model.batch.JobBuilder;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,8 +40,6 @@ public class SqlBuildCoreServiceImpl implements ISqlBuildCoreService {
 
     private final BuildImageProperties imageProperties;
 
-    private final Environment environment;
-
     private final IBizSqlBuildService bizSqlBuildService;
 
     private final IBizSqlBuildHistoryService bizSqlBuildHistoryService;
@@ -55,9 +52,8 @@ public class SqlBuildCoreServiceImpl implements ISqlBuildCoreService {
 
     private final IJobService jobService;
 
-    public SqlBuildCoreServiceImpl(BuildImageProperties imageProperties, Environment environment, IBizSqlBuildService bizSqlBuildService, IBizSqlBuildHistoryService bizSqlBuildHistoryService, IBizNamespaceService bizNamespaceService, IBizUserConfigurationService userConfigurationService, IBizGlobalConfigurationService globalConfigurationService, IJobService jobService) {
+    public SqlBuildCoreServiceImpl(BuildImageProperties imageProperties, IBizSqlBuildService bizSqlBuildService, IBizSqlBuildHistoryService bizSqlBuildHistoryService, IBizNamespaceService bizNamespaceService, IBizUserConfigurationService userConfigurationService, IBizGlobalConfigurationService globalConfigurationService, IJobService jobService) {
         this.imageProperties = imageProperties;
-        this.environment = environment;
         this.bizSqlBuildService = bizSqlBuildService;
         this.bizSqlBuildHistoryService = bizSqlBuildHistoryService;
         this.bizNamespaceService = bizNamespaceService;
@@ -152,6 +148,8 @@ public class SqlBuildCoreServiceImpl implements ISqlBuildCoreService {
                         .withName(jobName)
                         .endMetadata()
                         .withNewSpec()
+                        .withActiveDeadlineSeconds(1800L)
+                        .withTtlSecondsAfterFinished(2592000)
                         .withBackoffLimit(0)
                         .withNewTemplate()
                         .withNewMetadata()

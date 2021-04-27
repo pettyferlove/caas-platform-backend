@@ -18,4 +18,6 @@ public interface BizProjectBuildHistoryMapper extends BaseMapper<BizProjectBuild
 
     List<ProjectBuildHistorySelectView> historySelect(String id);
 
+    BizProjectBuildHistory queryLastBuild(String id);
+
 }
