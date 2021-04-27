@@ -327,8 +327,12 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 env.put("PROJECT_NAME", projectBuild.getProjectName());
                 env.put("BUILD_TARGET_PATH", projectBuild.getBuildTargetPath());
                 env.put("BUILD_TARGET_NAME", projectBuild.getBuildTargetName());
-                env.put("USERNAME", userConfiguration.getSubversionUsername());
-                env.put("PASSWORD", userConfiguration.getSubversionPassword());
+                if(DepositoryType.Subversion.getValue().equals(projectBuild.getDepositoryType())){
+                    Preconditions.checkNotNull(userConfiguration.getSubversionUsername(), "未配置SVN账号，请前往个人配置页面配置");
+                    Preconditions.checkNotNull(userConfiguration.getSubversionPassword(), "未配置SVN密码，请前往个人配置页面配置");
+                    env.put("USERNAME", userConfiguration.getSubversionUsername());
+                    env.put("PASSWORD", userConfiguration.getSubversionPassword());
+                }
                 env.put("JOB_NAME", jobName);
                 env.put("FILE_ID", jobName);
                 env.put("USER_ID", projectBuild.getCreator());
