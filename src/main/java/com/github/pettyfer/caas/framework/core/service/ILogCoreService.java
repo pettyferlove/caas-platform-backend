@@ -5,6 +5,8 @@ package com.github.pettyfer.caas.framework.core.service;
  */
 public interface ILogCoreService {
 
-    String log(String namespaceId, String podName, String containerName);
+    String buildLog(String namespaceId, String podName, String containerName);
+
+    String applicationLog(String namespaceId, String podName);
 
 }

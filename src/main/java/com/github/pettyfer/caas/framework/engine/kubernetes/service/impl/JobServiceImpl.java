@@ -44,7 +44,12 @@ public class JobServiceImpl implements IJobService {
 
     @Override
     public String log(String namespace, String podName, String containerName) {
-        return kubernetesClient.pods().inNamespace(namespace).withName(podName).inContainer(containerName).tailingLines(2000).getLog();
+        return kubernetesClient.pods().inNamespace(namespace).withName(podName).inContainer(containerName).getLog();
+    }
+
+    @Override
+    public String log(String namespace, String podName) {
+        return kubernetesClient.pods().inNamespace(namespace).withName(podName).tailingLines(2000).getLog();
     }
 
     @Override

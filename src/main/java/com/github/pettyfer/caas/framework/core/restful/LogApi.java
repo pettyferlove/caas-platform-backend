@@ -22,8 +22,14 @@ public class LogApi {
     }
 
     @GetMapping("build/{namespaceId}/{podName}/{containerName}")
-    public R<String> log(@PathVariable String namespaceId, @PathVariable String podName, @PathVariable String containerName) {
-        return new R<String>(logCoreService.log(namespaceId, podName, containerName));
+    public R<String> buildLog(@PathVariable String namespaceId, @PathVariable String podName, @PathVariable String containerName) {
+        return new R<String>(logCoreService.buildLog(namespaceId, podName, containerName));
+    }
+
+
+    @GetMapping("application/{namespaceId}/{podName}")
+    public R<String> applicationLog(@PathVariable String namespaceId, @PathVariable String podName) {
+        return new R<String>(logCoreService.applicationLog(namespaceId, podName));
     }
 
 }

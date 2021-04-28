@@ -23,5 +23,8 @@ public interface IJobService {
 
     String log(String namespace, String podName, String containerName);
 
+    String log(String namespace, String podName);
+
     void delete(String namespace, String jobId);
+
 }

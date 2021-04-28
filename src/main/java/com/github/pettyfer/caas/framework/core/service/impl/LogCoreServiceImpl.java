@@ -27,11 +27,26 @@ public class LogCoreServiceImpl implements ILogCoreService {
     }
 
     @Override
-    public String log(String namespaceId, String podName, String containerName) {
+    public String buildLog(String namespaceId, String podName, String containerName) {
         Optional<BizNamespace> namespaceOptional = Optional.ofNullable(bizNamespaceService.get(namespaceId));
         if (namespaceOptional.isPresent()) {
             try {
                 return jobService.log(namespaceOptional.get().getName(), podName, containerName);
+            } catch (Exception e) {
+                return "没有日志输出";
+            }
+
+        } else {
+            throw new BaseRuntimeException("命名空间不存在");
+        }
+    }
+
+    @Override
+    public String applicationLog(String namespaceId, String podName) {
+        Optional<BizNamespace> namespaceOptional = Optional.ofNullable(bizNamespaceService.get(namespaceId));
+        if (namespaceOptional.isPresent()) {
+            try {
+                return jobService.log(namespaceOptional.get().getName(), podName);
             } catch (Exception e) {
                 return "没有日志输出";
             }
