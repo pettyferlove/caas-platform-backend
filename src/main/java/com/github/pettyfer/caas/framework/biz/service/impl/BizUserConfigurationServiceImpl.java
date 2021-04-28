@@ -151,7 +151,7 @@ public class BizUserConfigurationServiceImpl extends ServiceImpl<BizUserConfigur
             updateWrapper.eq(BizUserConfiguration::getId, bizUserConfiguration.getId());
             this.update(updateWrapper);
         } catch (Exception e) {
-            throw new BaseRuntimeException("密钥更新失败");
+            throw new BaseRuntimeException("密钥生成失败，请检查GitLab设置");
         }
 
         return true;
