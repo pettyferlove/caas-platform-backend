@@ -63,7 +63,7 @@ public class BizApplicationDeploymentServiceImpl extends ServiceImpl<BizApplicat
         if (detailOptional.isPresent()) {
             ApplicationDeploymentDetailView detail = detailOptional.get();
             Optional<BizServiceDiscovery> bizNetworkOptional = Optional.ofNullable(bizServiceDiscoveryService.getOne(Wrappers.<BizServiceDiscovery>lambdaQuery().eq(BizServiceDiscovery::getDeploymentId, id).eq(BizServiceDiscovery::getDelFlag, 0)));
-            if (bizNetworkOptional.isPresent()) {
+            if(bizNetworkOptional.isPresent()) {
                 BizServiceDiscovery bizServiceDiscovery = bizNetworkOptional.get();
                 detail.setPorts(bizServiceDiscovery.getPorts());
                 detail.setNetwork(bizServiceDiscovery.getNetwork());
@@ -71,7 +71,7 @@ public class BizApplicationDeploymentServiceImpl extends ServiceImpl<BizApplicat
                 detail.setExternalIp(bizServiceDiscovery.getExternalIp());
             }
             Optional<List<BizApplicationDeploymentMount>> systemApplicationDeploymentMounts = Optional.ofNullable(bizApplicationDeploymentMountService.list(
-                    Wrappers.<BizApplicationDeploymentMount>lambdaQuery().eq(BizApplicationDeploymentMount::getDeploymentId, id).eq(BizApplicationDeploymentMount::getDelFlag, 0)));
+                    Wrappers.<BizApplicationDeploymentMount>lambdaQuery().eq(BizApplicationDeploymentMount::getDeploymentId, id)));
             List<ApplicationDeploymentMountView> mounts = ConverterUtil.convertList(BizApplicationDeploymentMount.class, ApplicationDeploymentMountView.class, systemApplicationDeploymentMounts.orElseGet(ArrayList::new));
             detail.setMounts(mounts);
             return detail;

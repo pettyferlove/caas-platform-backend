@@ -1,8 +1,10 @@
 package com.github.pettyfer.caas.framework.biz.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.github.pettyfer.caas.global.entity.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -11,10 +13,11 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * <p>
- *
+ * 
  * </p>
  *
  * @author Petty
@@ -26,10 +29,13 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ApiModel(value = "BizApplicationDeploymentVolume对象", description = "")
-public class BizApplicationDeploymentMount extends BaseEntity<BizApplicationDeploymentMount> {
+@ApiModel(value="BizApplicationDeploymentVolume对象", description="")
+public class BizApplicationDeploymentMount extends Model<BizApplicationDeploymentMount> {
 
     private static final long serialVersionUID = 1L;
+
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private String id;
 
     private String deploymentId;
 
@@ -53,6 +59,14 @@ public class BizApplicationDeploymentMount extends BaseEntity<BizApplicationDepl
 
     @ApiModelProperty(value = "持久化存储ID")
     private String persistentStorageId;
+
+    private String creator;
+
+    private LocalDateTime createTime;
+
+    private String modifier;
+
+    private LocalDateTime modifyTime;
 
     @ApiModelProperty(value = "项目组ID")
     private String groupId;

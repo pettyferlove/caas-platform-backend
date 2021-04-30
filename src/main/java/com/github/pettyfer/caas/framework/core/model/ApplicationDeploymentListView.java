@@ -42,8 +42,14 @@ public class ApplicationDeploymentListView implements Serializable {
     @ApiModelProperty(value = "就绪副本数")
     private Integer readyReplicas;
 
+    @ApiModelProperty(value = "实例数量")
+    private Integer instancesNumber;
+
     @ApiModelProperty(value = "环境信息")
     private Integer envType;
+
+    @ApiModelProperty(value = "运行状态")
+    private String runStatus;
 
     @ApiModelProperty(value = "创建人")
     private String creator;

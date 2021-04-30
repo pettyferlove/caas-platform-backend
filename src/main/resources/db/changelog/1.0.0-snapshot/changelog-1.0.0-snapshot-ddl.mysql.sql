@@ -243,3 +243,30 @@ alter table biz_user_configuration add subversion_password varchar(400) null com
 
 --changeset Petty:caas-1.0.0-snapshot-ddl-33
 alter table biz_project_build add link_project bit default false null comment '是否需要关联其他项目' after parent_id;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-34
+alter table biz_application_deployment add run_status varchar(255) null comment '运行状态' after env_type;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-35
+alter table biz_application_deployment add open_liveness_probe bit default false null comment '是否开启存活探针' after node;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-36
+alter table biz_application_deployment add open_readiness_probe bit default false null comment '是否开启就绪探针' after open_liveness_probe;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-37
+alter table biz_application_deployment add liveness_probe json null comment '存活探针配置' after open_readiness_probe;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-38
+alter table biz_application_deployment add readiness_probe json null comment '就绪探针配置' after liveness_probe;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-39
+alter table biz_application_deployment modify environment_variable json null comment '应用环境变量';
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-40
+alter table biz_service_discovery modify match_label json null comment '匹配标签';
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-41
+alter table biz_service_discovery modify ports json null comment '端口映射表';
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-42
+alter table biz_application_deployment_mount drop column del_flag;

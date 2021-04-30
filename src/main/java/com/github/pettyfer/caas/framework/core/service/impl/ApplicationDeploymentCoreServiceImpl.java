@@ -1,5 +1,6 @@
 package com.github.pettyfer.caas.framework.core.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -20,8 +21,10 @@ import com.github.pettyfer.caas.framework.engine.kubernetes.service.IDeploymentS
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.INetworkService;
 import com.github.pettyfer.caas.global.constants.EnvConstant;
 import com.github.pettyfer.caas.global.constants.KubernetesConstant;
+import com.github.pettyfer.caas.global.constants.RunStatus;
 import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
 import com.github.pettyfer.caas.utils.ConverterUtil;
+import com.github.pettyfer.caas.utils.YamlUtil;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.*;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +32,8 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -75,9 +80,8 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
             try {
                 BizApplicationDeployment bizApplicationDeployment = new BizApplicationDeployment();
                 ConverterUtil.convert(deploymentDetail, bizApplicationDeployment);
+                bizApplicationDeployment.setRunStatus(RunStatus.Preparing.getValue());
                 String deploymentId = bizApplicationDeploymentService.create(namespaceId, bizApplicationDeployment);
-
-
                 BizServiceDiscovery bizServiceDiscovery = new BizServiceDiscovery();
                 ConverterUtil.convert(deploymentDetail, bizServiceDiscovery);
                 bizServiceDiscovery.setNamespaceId(namespaceId);
@@ -123,10 +127,9 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                 String deploymentId = deploymentDetail.getId();
                 BizApplicationDeployment bizApplicationDeployment = new BizApplicationDeployment();
                 ConverterUtil.convert(deploymentDetail, bizApplicationDeployment);
+                bizApplicationDeployment.setRunStatus(RunStatus.Updating.getValue());
                 Boolean update = bizApplicationDeploymentService.update(namespaceId, bizApplicationDeployment);
                 if (update) {
-
-
                     int count = bizServiceDiscoveryService.count(Wrappers.<BizServiceDiscovery>lambdaQuery().eq(BizServiceDiscovery::getDeploymentId, deploymentId).eq(BizServiceDiscovery::getDelFlag, 0));
                     BizServiceDiscovery bizServiceDiscovery = new BizServiceDiscovery();
                     ConverterUtil.convert(deploymentDetail, bizServiceDiscovery);
@@ -189,15 +192,42 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
             IPage<BizApplicationDeployment> queryPage = bizApplicationDeploymentService.page(namespaceId, bizApplicationDeployment, bizApplicationDeploymentPage);
             List<BizApplicationDeployment> records = queryPage.getRecords();
             List<ApplicationDeploymentListView> mapList = records.stream().map(i -> {
-                ApplicationDeploymentListView deploymentList = new ApplicationDeploymentListView();
-                ConverterUtil.convert(i, deploymentList);
+                ApplicationDeploymentListView listView = new ApplicationDeploymentListView();
+                ConverterUtil.convert(i, listView);
                 Optional<Deployment> deploymentOptional = Optional.ofNullable(deploymentService.get(namespaceOptional.get().getName(), i.getName()));
                 deploymentOptional.ifPresent(deployment -> {
                     DeploymentStatus status = deployment.getStatus();
-                    deploymentList.setReplicas(Optional.ofNullable(status.getReplicas()).orElse(0));
-                    deploymentList.setReadyReplicas(Optional.ofNullable(status.getReadyReplicas()).orElse(0));
+                    Integer replicas = Optional.ofNullable(status.getReplicas()).orElse(0);
+                    Integer readyReplicas = Optional.ofNullable(status.getReadyReplicas()).orElse(0);
+                    listView.setReplicas(replicas);
+                    listView.setReadyReplicas(readyReplicas);
+                    if (replicas == 0 && readyReplicas == 0) {
+                        listView.setRunStatus(RunStatus.Stopped.getValue());
+                    } else {
+                        if (replicas.equals(readyReplicas)) {
+                            listView.setRunStatus(RunStatus.Running.getValue());
+                        } else {
+                            LocalDateTime time;
+                            if (ObjectUtil.isNull(i.getModifyTime())) {
+                                time = i.getCreateTime();
+                            } else {
+                                time = i.getModifyTime();
+                            }
+                            if(RunStatus.Preparing.getValue().equals(i.getRunStatus()) || RunStatus.Updating.getValue().equals(i.getRunStatus())) {
+                                Duration duration = Duration.between(time, LocalDateTime.now());
+                                long minutes = duration.toMinutes();
+                                if (minutes > 5) {
+                                    listView.setRunStatus(RunStatus.Error.getValue());
+                                }
+                            }
+                        }
+                    }
+                    BizApplicationDeployment applicationDeployment = new BizApplicationDeployment();
+                    applicationDeployment.setId(listView.getId());
+                    applicationDeployment.setRunStatus(listView.getRunStatus());
+                    bizApplicationDeploymentService.updateById(applicationDeployment);
                 });
-                return deploymentList;
+                return listView;
             }).collect(Collectors.toList());
             result.setRecords(mapList);
             result.setCurrent(queryPage.getCurrent());
@@ -262,7 +292,6 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                     detailView.setImageName(imageName);
                     detailView.setImageTag(tag);
 
-
                     Deployment deployment = buildDeployment(namespace, detailView);
                     Optional<Deployment> optionalDeployment = Optional.ofNullable(deploymentService.get(namespace.getName(), detailView.getName()));
                     if (optionalDeployment.isPresent()) {
@@ -287,6 +316,7 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
 
                     applicationDeployment.setImageName(imageName);
                     applicationDeployment.setImageTag(tag);
+                    applicationDeployment.setRunStatus(RunStatus.Updating.getValue());
                     bizApplicationDeploymentService.updateForRobot(applicationDeployment);
                 } else {
                     log.warn("触发自动更新，但镜像名称与部署名称不一致，忽略更新");
@@ -294,6 +324,105 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
             }
         } catch (Exception e) {
             log.error("自动部署失败");
+        }
+    }
+
+    /**
+     * 关闭应用
+     *
+     * @param namespaceId 命名空间ID
+     * @param id          应用ID
+     * @return 是否成功
+     */
+    @Override
+    @Transactional(rollbackFor = Throwable.class)
+    public Boolean shutdown(String namespaceId, String id) {
+        Optional<BizNamespace> namespaceOptional = Optional.ofNullable(bizNamespaceService.get(namespaceId));
+        if (namespaceOptional.isPresent()) {
+            Optional<BizApplicationDeployment> applicationDeploymentOptional = Optional.ofNullable(bizApplicationDeploymentService.getById(id));
+            if (applicationDeploymentOptional.isPresent()) {
+                BizApplicationDeployment applicationDeployment = applicationDeploymentOptional.get();
+                applicationDeployment.setRunStatus(RunStatus.Stopping.getValue());
+                deploymentService.shutdown(namespaceOptional.get().getName(), applicationDeployment.getName());
+                bizApplicationDeploymentService.update(applicationDeployment);
+            } else {
+                throw new BaseRuntimeException("应用不存在");
+            }
+            return true;
+        } else {
+            throw new BaseRuntimeException("命名空间不存在");
+        }
+    }
+
+    /**
+     * 启动应用
+     *
+     * @param namespaceId 命名空间ID
+     * @param id          应用ID
+     * @return 是否成功
+     */
+    @Override
+    @Transactional(rollbackFor = Throwable.class)
+    public Boolean start(String namespaceId, String id) {
+        Optional<BizNamespace> namespaceOptional = Optional.ofNullable(bizNamespaceService.get(namespaceId));
+        if (namespaceOptional.isPresent()) {
+            Optional<BizApplicationDeployment> applicationDeploymentOptional = Optional.ofNullable(bizApplicationDeploymentService.getById(id));
+            if (applicationDeploymentOptional.isPresent()) {
+                BizApplicationDeployment applicationDeployment = applicationDeploymentOptional.get();
+                applicationDeployment.setRunStatus(RunStatus.Preparing.getValue());
+                deploymentService.start(namespaceOptional.get().getName(), applicationDeployment.getName(), applicationDeployment.getInstancesNumber());
+                bizApplicationDeploymentService.update(applicationDeployment);
+            } else {
+                throw new BaseRuntimeException("应用不存在");
+            }
+            return true;
+        } else {
+            throw new BaseRuntimeException("命名空间不存在");
+        }
+    }
+
+    /**
+     * 应用扩容
+     *
+     * @param namespaceId 命名空间ID
+     * @param id          应用ID
+     * @return 是否成功
+     */
+    @Override
+    @Transactional(rollbackFor = Throwable.class)
+    public Boolean scale(String namespaceId, String id, Integer number) {
+        Optional<BizNamespace> namespaceOptional = Optional.ofNullable(bizNamespaceService.get(namespaceId));
+        if (namespaceOptional.isPresent()) {
+            Optional<BizApplicationDeployment> applicationDeploymentOptional = Optional.ofNullable(bizApplicationDeploymentService.getById(id));
+            if (applicationDeploymentOptional.isPresent()) {
+                BizApplicationDeployment applicationDeployment = applicationDeploymentOptional.get();
+                applicationDeployment.setRunStatus(RunStatus.Scaling.getValue());
+                applicationDeployment.setInstancesNumber(number);
+                deploymentService.scale(namespaceOptional.get().getName(), applicationDeployment.getName(), number);
+                bizApplicationDeploymentService.update(applicationDeployment);
+            } else {
+                throw new BaseRuntimeException("应用不存在");
+            }
+            return true;
+        } else {
+            throw new BaseRuntimeException("命名空间不存在");
+        }
+    }
+
+    @Override
+    @Deprecated
+    public String yaml(String namespaceId, String id) {
+        Optional<BizNamespace> namespaceOptional = Optional.ofNullable(bizNamespaceService.get(namespaceId));
+        if (namespaceOptional.isPresent()) {
+            BizNamespace namespace = namespaceOptional.get();
+            ApplicationDeploymentDetailView detailView = bizApplicationDeploymentService.get(id);
+            Deployment deployment = buildDeployment(namespace, detailView);
+            io.fabric8.kubernetes.api.model.Service service = buildService(detailView);
+            System.out.println(YamlUtil.objToYaml(deployment));
+            System.out.println(YamlUtil.objToYaml(service));
+            return "";
+        } else {
+            throw new BaseRuntimeException("命名空间不存在");
         }
     }
 
@@ -320,20 +449,19 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                 .withName(deploymentDetail.getName())
                 .withLabels(fetchLabel(deploymentDetail.getName(), EnvConstant.transform(deploymentDetail.getEnvType()), deploymentDetail.getImageTag()))
                 .endMetadata();
+        ServiceFluent.SpecNested<ServiceBuilder> spec = builder.withNewSpec();
+        spec.addAllToPorts(servicePorts)
+                .withSelector(fetchMatchLabel(deploymentDetail.getName(), EnvConstant.transform(deploymentDetail.getEnvType())))
+                .withType(deploymentDetail.getNetworkType());
         if (StrUtil.isNotEmpty(deploymentDetail.getExternalIp())) {
-            builder.withNewSpec()
-                    .addAllToPorts(servicePorts)
-                    .withSelector(fetchMatchLabel(deploymentDetail.getName(), EnvConstant.transform(deploymentDetail.getEnvType())))
-                    .withType(deploymentDetail.getNetworkType())
-                    .withExternalIPs(deploymentDetail.getExternalIp().split(","))
-                    .endSpec();
+            spec.withExternalIPs(deploymentDetail.getExternalIp().split(","));
         } else {
-            builder.withNewSpec()
-                    .addAllToPorts(servicePorts)
-                    .withSelector(fetchMatchLabel(deploymentDetail.getName(), EnvConstant.transform(deploymentDetail.getEnvType())))
-                    .withType(deploymentDetail.getNetworkType())
-                    .endSpec();
+            // 内部服务集群IP设置为空，生成Headless服务
+            if ("internal".equals(deploymentDetail.getNetwork()) && "ClusterIP".equals(deploymentDetail.getNetworkType())) {
+                spec.withClusterIP("None");
+            }
         }
+        spec.endSpec();
         return builder.build();
     }
 
@@ -344,13 +472,19 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
      * @return Deployment
      */
     private Deployment buildDeployment(BizNamespace namespace, ApplicationDeploymentDetailView deploymentDetail) {
+        Integer instancesNumber = deploymentDetail.getInstancesNumber();
+        // 处于停止状态的应用，如果触发更新则设置实例数为1
+        if (RunStatus.Stopping.getValue().equals(deploymentDetail.getRunStatus()) || RunStatus.Stopped.getValue().equals(deploymentDetail.getRunStatus())) {
+            instancesNumber = 0;
+        }
+
         return new DeploymentBuilder()
                 .withNewMetadata()
                 .withName(deploymentDetail.getName())
                 .withLabels(fetchLabel(deploymentDetail.getName(), EnvConstant.transform(deploymentDetail.getEnvType()), deploymentDetail.getImageTag()))
                 .endMetadata()
                 .withNewSpec()
-                .withReplicas(deploymentDetail.getInstancesNumber())
+                .withReplicas(instancesNumber)
                 .withNewTemplate()
                 .withNewMetadata()
                 .withLabels(fetchLabel(deploymentDetail.getName(), EnvConstant.transform(deploymentDetail.getEnvType()), deploymentDetail.getImageTag()))
@@ -363,6 +497,8 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                 .withEnv(fetchEnv(deploymentDetail.getEnvironmentVariable()))
                 .withImagePullPolicy(deploymentDetail.getImagePullStrategy())
                 .withVolumeMounts(fetchVolumeMount(deploymentDetail.getMounts()))
+                .withReadinessProbe(deploymentDetail.getOpenReadinessProbe() ? fetchProbe(deploymentDetail.getReadinessProbe()) : null)
+                .withLivenessProbe(deploymentDetail.getOpenLivenessProbe() ? fetchProbe(deploymentDetail.getLivenessProbe()) : null)
                 .endContainer()
                 .withVolumes(fetchVolume(deploymentDetail.getMounts()))
                 .addNewImagePullSecret(namespace.getRegistrySecretName())
@@ -486,6 +622,75 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
         label.put(KubernetesConstant.GLOBAL_LABEL, name);
         label.put(KubernetesConstant.ENVIRONMENT_LABEL, envType);
         return label;
+    }
+
+    private Probe fetchProbe(String probeSettings) {
+        JSONObject probeObject = JSONObject.parseObject(probeSettings);
+        ProbeBuilder probeBuilder = new ProbeBuilder();
+        probeBuilder.withTimeoutSeconds(validProbeNumber(probeObject, "timeoutSeconds", 10))
+                // 探针频率
+                .withPeriodSeconds(validProbeNumber(probeObject, "periodSeconds", 10))
+                // 延迟多少秒执行
+                .withInitialDelaySeconds(validProbeNumber(probeObject, "initialDelaySeconds", 30))
+                .withSuccessThreshold(validProbeNumber(probeObject, "successThreshold", 1))
+                .withFailureThreshold(validProbeNumber(probeObject, "failureThreshold", 3));
+        JSONArray array = probeObject.getJSONArray("probes");
+        for (Object o : array) {
+            JSONObject object = (JSONObject) o;
+            if (object.containsKey("strategyType")) {
+                String strategyType = object.getString("strategyType");
+                switch (strategyType) {
+                    case "HTTPGet":
+                        if (object.containsKey("path") && object.containsKey("port")) {
+                            String path = object.getString("path");
+                            Integer port = object.getInteger("port");
+                            HTTPGetAction httpGetAction = new HTTPGetActionBuilder().withNewPath(path).withNewPort(port).withNewScheme("HTTP").build();
+                            probeBuilder.withHttpGet(httpGetAction);
+                        } else {
+                            throw new BaseRuntimeException("HTTPGet探针配置错误");
+                        }
+                        break;
+                    case "Exec":
+                        if (object.containsKey("command")) {
+                            String command = object.getString("command");
+                            ExecAction execAction = new ExecActionBuilder().withCommand(command).build();
+                            probeBuilder.withExec(execAction);
+                        } else {
+                            throw new BaseRuntimeException("Exec探针配置错误");
+                        }
+                        break;
+                    case "TCPSocket":
+                        if (object.containsKey("port")) {
+                            Integer port = object.getInteger("port");
+                            TCPSocketAction tcpSocketAction = new TCPSocketActionBuilder().withNewPort(port).build();
+                            probeBuilder.withTcpSocket(tcpSocketAction);
+                        } else {
+                            throw new BaseRuntimeException("TCPSocket探针配置错误");
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            } else {
+                throw new BaseRuntimeException("探针配置错误");
+            }
+        }
+        return probeBuilder.build();
+    }
+
+    private Integer validProbeNumber(JSONObject object, String key, int defaultValue) {
+        int s;
+        if (object.containsKey(key)) {
+            Integer integer = object.getInteger(key);
+            if (integer < 1) {
+                s = defaultValue;
+            } else {
+                s = integer;
+            }
+        } else {
+            s = defaultValue;
+        }
+        return s;
     }
 
 }

@@ -76,8 +76,23 @@ public class BizApplicationDeployment extends BaseEntity<BizApplicationDeploymen
     @ApiModelProperty(value = "指定部署节点")
     private String node;
 
+    @ApiModelProperty(value = "是否开启存活探针")
+    private Boolean openLivenessProbe;
+
+    @ApiModelProperty(value = "是否开启就绪探针")
+    private Boolean openReadinessProbe;
+
+    @ApiModelProperty(value = "存活探针配置")
+    private String livenessProbe;
+
+    @ApiModelProperty(value = "就绪探针配置")
+    private String readinessProbe;
+
     @ApiModelProperty(value = "环境类型")
     private Integer envType;
+
+    @ApiModelProperty(value = "运行状态")
+    private String runStatus;
 
     @ApiModelProperty(value = "项目组ID")
     private String groupId;

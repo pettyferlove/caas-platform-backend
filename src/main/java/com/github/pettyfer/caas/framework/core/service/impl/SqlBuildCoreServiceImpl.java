@@ -83,7 +83,7 @@ public class SqlBuildCoreServiceImpl implements ISqlBuildCoreService {
                     BizSqlBuildHistory history = new BizSqlBuildHistory();
                     history.setId(i.getHistoryId());
                     history.setBuildStatus(state);
-                    bizSqlBuildHistoryService.update(history);
+                    bizSqlBuildHistoryService.updateById(history);
                 }
             }
         }).collect(Collectors.toList());

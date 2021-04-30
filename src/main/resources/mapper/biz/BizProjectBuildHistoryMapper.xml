@@ -31,14 +31,14 @@
     </sql>
     <select id="historySelect"
             resultType="com.github.pettyfer.caas.framework.core.model.ProjectBuildHistorySelectView">
-        select h.file_id, h.build_status, h.create_time from biz_project_build_history h where h.build_id = #{id} order by create_time desc limit 5
+        select h.file_id, h.build_status, h.create_time from biz_project_build_history h where h.build_id = #{id} and h.del_flag = 0 order by create_time desc limit 5
     </select>
 
     <select id="queryLastBuild" resultType="com.github.pettyfer.caas.framework.biz.entity.BizProjectBuildHistory">
         select
         <include refid="Base_Column_List"></include>
         from biz_project_build_history h
-        where h.build_id = #{id} and h.build_status = 'success' order by create_time desc limit 1
+        where h.build_id = #{id} and h.build_status = 'success' and h.del_flag = 0 order by create_time desc limit 1
     </select>
 
 </mapper>

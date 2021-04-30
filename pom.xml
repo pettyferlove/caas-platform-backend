@@ -30,7 +30,7 @@
         <mybatis-plus.version>3.3.0</mybatis-plus.version>
         <druid.version>1.2.4</druid.version>
         <fastjson.version>1.2.72</fastjson.version>
-        <swagger2.version>3.0.0</swagger2.version>
+        <swagger.version>3.0.0</swagger.version>
         <hutool.version>4.5.1</hutool.version>
         <mysql.version>8.0.9-rc</mysql.version>
         <liquibase.version>3.8.7</liquibase.version>
@@ -130,18 +130,30 @@
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
-            <version>2.9.2</version>
+            <version>${swagger.version}</version>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.9.2</version>
+            <version>${swagger.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
-            <version>4.5.1</version>
+            <version>${hutool.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>20.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.28</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>

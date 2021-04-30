@@ -32,18 +32,33 @@ public class ApplicationDeploymentApi {
         return new R<>(applicationDeploymentCoreService.get(namespaceId, id));
     }
 
+    @PostMapping("/action/scale/{namespaceId}/{id}")
+    public R<Boolean> scale(@PathVariable String namespaceId, @PathVariable String id,@RequestParam Integer number) {
+        return new R<Boolean>(applicationDeploymentCoreService.scale(namespaceId, id, number));
+    }
+
+    @PostMapping("/action/shutdown/{namespaceId}/{id}")
+    public R<Boolean> shutdown(@PathVariable String namespaceId, @PathVariable String id) {
+        return new R<Boolean>(applicationDeploymentCoreService.shutdown(namespaceId, id));
+    }
+
+    @PostMapping("/action/start/{namespaceId}/{id}")
+    public R<Boolean> start(@PathVariable String namespaceId, @PathVariable String id) {
+        return new R<Boolean>(applicationDeploymentCoreService.start(namespaceId, id));
+    }
+
     @PostMapping("{namespaceId}")
-    public R<String> create(@PathVariable String namespaceId, @RequestBody ApplicationDeploymentDetailView deploymentDetail) {
+    public R<String> create(@PathVariable String namespaceId, @RequestBody ApplicationDeploymentDetailView deploymentDetail){
         return new R<>(applicationDeploymentCoreService.create(namespaceId, deploymentDetail));
     }
 
     @PutMapping("{namespaceId}")
-    public R<Boolean> update(@PathVariable String namespaceId, @RequestBody ApplicationDeploymentDetailView deploymentDetail) {
+    public R<Boolean> update(@PathVariable String namespaceId, @RequestBody ApplicationDeploymentDetailView deploymentDetail){
         return new R<>(applicationDeploymentCoreService.update(namespaceId, deploymentDetail));
     }
 
     @DeleteMapping("{namespaceId}/{id}")
-    public R<Object> delete(@PathVariable String namespaceId, @PathVariable String id) {
+    public R<Object> delete(@PathVariable String namespaceId ,@PathVariable String id){
         applicationDeploymentCoreService.delete(namespaceId, id);
         return new R<>();
     }

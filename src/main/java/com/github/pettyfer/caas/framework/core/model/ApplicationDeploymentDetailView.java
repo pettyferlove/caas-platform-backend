@@ -80,11 +80,26 @@ public class ApplicationDeploymentDetailView implements Serializable {
     @ApiModelProperty(value = "指定部署节点")
     private String node;
 
+    @ApiModelProperty(value = "是否开启存活探针")
+    private Boolean openLivenessProbe;
+
+    @ApiModelProperty(value = "是否开启就绪探针")
+    private Boolean openReadinessProbe;
+
+    @ApiModelProperty(value = "存活探针配置")
+    private String livenessProbe;
+
+    @ApiModelProperty(value = "就绪探针配置")
+    private String readinessProbe;
+
     @ApiModelProperty(value = "外部访问IP，以英文,分隔")
     private String externalIp;
 
     @ApiModelProperty(value = "环境信息")
     private Integer envType;
+
+    @ApiModelProperty(value = "运行状态")
+    private String runStatus;
 
     @ApiModelProperty(value = "创建人")
     private String creator;

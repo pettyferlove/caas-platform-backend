@@ -41,7 +41,16 @@ public class NetworkServiceImpl implements INetworkService {
                 }
             }
         }
-        kubernetesClient.services().inNamespace(namespace).withName(name).replace(service);
+
+        // 集群IP的服务需要先进行删除，再重新创建
+        if ("ClusterIP".equals(service.getSpec().getType())) {
+            Optional<Service> serviceOptional = Optional.ofNullable(kubernetesClient.services().inNamespace(namespace).withName(name).get());
+            if (serviceOptional.isPresent()) {
+                kubernetesClient.services().inNamespace(namespace).withName(name).delete();
+            }
+        }
+
+        kubernetesClient.services().inNamespace(namespace).withName(name).createOrReplace(service);
     }
 
     @Override
