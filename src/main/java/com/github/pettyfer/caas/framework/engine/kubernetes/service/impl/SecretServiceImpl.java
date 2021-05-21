@@ -64,4 +64,9 @@ public class SecretServiceImpl implements ISecretService {
         kubernetesClient.secrets().inNamespace(namespace).createOrReplace(secret);
         return name;
     }
+
+    @Override
+    public Secret get(String namespace, String name) {
+        return kubernetesClient.secrets().inNamespace(namespace).withName(name).get();
+    }
 }
