@@ -270,3 +270,6 @@ alter table biz_service_discovery modify ports json null comment '端口映射�
 
 --changeset Petty:caas-1.0.0-snapshot-ddl-42
 alter table biz_application_deployment_mount drop column del_flag;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-43
+alter table biz_project_build add project_describe varchar(400) null comment '描述信息' after project_name;

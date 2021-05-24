@@ -34,6 +34,9 @@ public class ProjectBuildListView implements Serializable {
     @ApiModelProperty(value = "项目名称")
     private String projectName;
 
+    @ApiModelProperty(value = "描述信息")
+    private String projectDescribe;
+
     @ApiModelProperty(value = "环境类型")
     private Integer envType;
 

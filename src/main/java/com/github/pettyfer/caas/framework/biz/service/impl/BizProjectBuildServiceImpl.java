@@ -39,6 +39,7 @@ public class BizProjectBuildServiceImpl extends ServiceImpl<BizProjectBuildMappe
         queryWrapper.eq(ObjectUtil.isNotNull(bizProjectBuild.getEnvType()), BizProjectBuild::getEnvType, bizProjectBuild.getEnvType());
         queryWrapper.eq(BizProjectBuild::getNamespaceId, bizProjectBuild.getNamespaceId());
         queryWrapper.likeRight(StrUtil.isNotEmpty(bizProjectBuild.getProjectName()), BizProjectBuild::getProjectName, bizProjectBuild.getProjectName());
+        queryWrapper.likeRight(StrUtil.isNotEmpty(bizProjectBuild.getProjectDescribe()), BizProjectBuild::getProjectDescribe, bizProjectBuild.getProjectDescribe());
         return baseMapper.queryProjectBuildList(page, queryWrapper);
     }
 

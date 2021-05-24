@@ -4,7 +4,7 @@ LABEL description="自动化工具-NodeJS构建镜像"
 
 RUN apk update &&\
     apk upgrade &&\
-    apk add --no-cache nodejs npm yarn
+    apk add --no-cache nodejs npm yarn make g++
 
 RUN npm config set registry https://registry.npm.taobao.org/
 RUN npm config set cache "/usr/cache/nodejs"
