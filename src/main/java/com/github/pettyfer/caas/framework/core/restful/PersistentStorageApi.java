@@ -47,8 +47,8 @@ public class PersistentStorageApi {
     }
 
     @GetMapping("select/{namespaceId}")
-    public R<List<PersistentStorageSelectView>> configSelect(@PathVariable String namespaceId) {
-        return new R<List<PersistentStorageSelectView>>(persistentStorageCoreService.select(namespaceId));
+    public R<List<PersistentStorageSelectView>> configSelect(@PathVariable String namespaceId, Integer envType) {
+        return new R<List<PersistentStorageSelectView>>(persistentStorageCoreService.select(namespaceId, envType));
     }
 
     @DeleteMapping("/{id}")

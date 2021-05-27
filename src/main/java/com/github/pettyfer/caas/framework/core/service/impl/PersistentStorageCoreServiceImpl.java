@@ -1,5 +1,6 @@
 package com.github.pettyfer.caas.framework.core.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -73,7 +74,7 @@ public class PersistentStorageCoreServiceImpl implements IPersistentStorageCoreS
         Optional<BizPersistentStorage> persistentStorageOptional = Optional.ofNullable(bizPersistentStorageService.get(id));
         if (persistentStorageOptional.isPresent()) {
             Optional<BizNamespace> namespaceOptional = Optional.ofNullable(bizNamespaceService.get(persistentStorageOptional.get().getNamespaceId()));
-            if (!namespaceOptional.isPresent()) {
+            if(!namespaceOptional.isPresent()){
                 throw new BaseRuntimeException("命名空间不存在");
             }
             return persistentStorageOptional.get();
@@ -113,10 +114,12 @@ public class PersistentStorageCoreServiceImpl implements IPersistentStorageCoreS
     }
 
     @Override
-    public List<PersistentStorageSelectView> select(String namespaceId) {
+    public List<PersistentStorageSelectView> select(String namespaceId, Integer envType) {
         Optional<BizNamespace> bizNamespaceOptional = Optional.ofNullable(bizNamespaceService.get(namespaceId));
         if (bizNamespaceOptional.isPresent()) {
             LambdaQueryWrapper<BizPersistentStorage> queryWrapper = Wrappers.<BizPersistentStorage>lambdaQuery();
+            queryWrapper.eq(BizPersistentStorage::getDelFlag, 0);
+            queryWrapper.eq(ObjectUtil.isNotNull(envType),BizPersistentStorage::getEnvType, envType);
             List<BizPersistentStorage> list = bizPersistentStorageService.list(queryWrapper);
             return Optional.ofNullable(ConverterUtil.convertList(BizPersistentStorage.class, PersistentStorageSelectView.class, list)).orElseGet(ArrayList::new);
         } else {

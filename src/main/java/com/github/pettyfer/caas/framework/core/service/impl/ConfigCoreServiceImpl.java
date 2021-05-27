@@ -1,5 +1,6 @@
 package com.github.pettyfer.caas.framework.core.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -99,16 +100,19 @@ public class ConfigCoreServiceImpl implements IConfigCoreService {
     }
 
     @Override
-    public List<ConfigSelectView> configSelect(String namespaceId) {
+    public List<ConfigSelectView> configSelect(String namespaceId, Integer envType) {
         Optional<BizNamespace> bizNamespaceOptional = Optional.ofNullable(bizNamespaceService.get(namespaceId));
         if (bizNamespaceOptional.isPresent()) {
             LambdaQueryWrapper<BizConfig> queryWrapper = Wrappers.<BizConfig>lambdaQuery();
+            queryWrapper.eq(BizConfig::getDelFlag, 0);
+            queryWrapper.eq(ObjectUtil.isNotNull(envType),BizConfig::getEnvType, envType);
             List<BizConfig> list = bizConfigService.list(queryWrapper);
             return Optional.ofNullable(ConverterUtil.convertList(BizConfig.class, ConfigSelectView.class, list)).orElseGet(ArrayList::new);
         } else {
             throw new BaseRuntimeException("命名空间不存在");
         }
     }
+
 
     private ConfigMap buildConfigMap(BizNamespace namespace, BizConfig config) {
         return new ConfigMapBuilder()
@@ -120,5 +124,7 @@ public class ConfigCoreServiceImpl implements IConfigCoreService {
                 .endMetadata()
                 .addToData(config.getFileName(), config.getContent())
                 .build();
+
     }
+
 }

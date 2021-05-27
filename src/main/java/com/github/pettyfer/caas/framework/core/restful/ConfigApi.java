@@ -52,8 +52,9 @@ public class ConfigApi {
     }
 
     @GetMapping("select/{namespaceId}")
-    public R<List<ConfigSelectView>> configSelect(@PathVariable String namespaceId) {
-        return new R<List<ConfigSelectView>>(configCoreService.configSelect(namespaceId));
+    public R<List<ConfigSelectView>> configSelect(@PathVariable String namespaceId, Integer envType) {
+        return new R<List<ConfigSelectView>>(configCoreService.configSelect(namespaceId, envType));
     }
+
 
 }

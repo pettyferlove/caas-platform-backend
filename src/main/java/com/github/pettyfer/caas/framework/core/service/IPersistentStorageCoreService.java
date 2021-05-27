@@ -21,7 +21,7 @@ public interface IPersistentStorageCoreService {
 
     String create(BizPersistentStorage persistentStorage);
 
-    List<PersistentStorageSelectView> select(String namespaceId);
+    List<PersistentStorageSelectView> select(String namespaceId, Integer envType);
 
     Boolean delete(String id);
 }
