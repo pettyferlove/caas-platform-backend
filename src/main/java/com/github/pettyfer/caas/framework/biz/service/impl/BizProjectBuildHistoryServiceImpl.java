@@ -30,7 +30,7 @@ public class BizProjectBuildHistoryServiceImpl extends ServiceImpl<BizProjectBui
 
     @Override
     public IPage<BizProjectBuildHistory> page(BizProjectBuildHistory bizProjectBuildHistory, Page<BizProjectBuildHistory> page) {
-        return this.page(page, Wrappers.lambdaQuery(bizProjectBuildHistory).orderByDesc(BizProjectBuildHistory::getCreateTime));
+        return this.page(page, Wrappers.lambdaQuery(bizProjectBuildHistory));
     }
 
     @Override

@@ -28,7 +28,7 @@ public class BizNamespaceServiceImpl extends ServiceImpl<BizNamespaceMapper, Biz
 
     @Override
     public IPage<BizNamespace> page(BizNamespace bizNamespace, Page<BizNamespace> page) {
-        LambdaQueryWrapper<BizNamespace> queryWrapper = Wrappers.<BizNamespace>lambdaQuery().orderByDesc(BizNamespace::getCreateTime);
+        LambdaQueryWrapper<BizNamespace> queryWrapper = Wrappers.<BizNamespace>lambdaQuery();
         queryWrapper.likeRight(StrUtil.isNotEmpty(bizNamespace.getName()), BizNamespace::getName, bizNamespace.getName());
         return this.page(page, queryWrapper);
     }
@@ -67,7 +67,7 @@ public class BizNamespaceServiceImpl extends ServiceImpl<BizNamespaceMapper, Biz
         queryWrapper.eq(BizNamespace::getCreator, SecurityUtil.getUser().getId());
         queryWrapper.eq(BizNamespace::getDelFlag, 0);
         int count = this.count(queryWrapper);
-        if (count < 1) {
+        if(count<1){
             throw new BaseRuntimeException("用户未配置命名空间");
         }
         return true;

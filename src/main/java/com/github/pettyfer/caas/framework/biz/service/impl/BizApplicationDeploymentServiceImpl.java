@@ -51,8 +51,7 @@ public class BizApplicationDeploymentServiceImpl extends ServiceImpl<BizApplicat
         LambdaQueryWrapper<BizApplicationDeployment> queryWrapper = Wrappers.<BizApplicationDeployment>lambdaQuery()
                 .eq(BizApplicationDeployment::getNamespaceId, namespaceId)
                 .likeRight(StrUtil.isNotEmpty(bizApplicationDeployment.getName()), BizApplicationDeployment::getName, bizApplicationDeployment.getName())
-                .eq(ObjectUtil.isNotNull(bizApplicationDeployment.getEnvType()), BizApplicationDeployment::getEnvType, bizApplicationDeployment.getEnvType())
-                .orderByDesc(BizApplicationDeployment::getCreateTime);
+                .eq(ObjectUtil.isNotNull(bizApplicationDeployment.getEnvType()), BizApplicationDeployment::getEnvType, bizApplicationDeployment.getEnvType());
         return this.page(page, queryWrapper);
     }
 

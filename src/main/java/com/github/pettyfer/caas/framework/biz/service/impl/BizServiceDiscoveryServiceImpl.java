@@ -19,7 +19,7 @@ import java.util.Objects;
 
 /**
  * <p>
- * 服务实现类
+ *  服务实现类
  * </p>
  *
  * @author Petty
@@ -34,8 +34,7 @@ public class BizServiceDiscoveryServiceImpl extends ServiceImpl<BizServiceDiscov
                 .eq(BizServiceDiscovery::getNamespaceId, namespaceId)
                 .ne(BizServiceDiscovery::getNetwork, "none")
                 .likeRight(StrUtil.isNotEmpty(bizServiceDiscovery.getName()), BizServiceDiscovery::getName, bizServiceDiscovery.getName())
-                .eq(ObjectUtil.isNotNull(bizServiceDiscovery.getEnvType()), BizServiceDiscovery::getEnvType, bizServiceDiscovery.getEnvType())
-                .orderByDesc(BizServiceDiscovery::getCreateTime);
+                .eq(ObjectUtil.isNotNull(bizServiceDiscovery.getEnvType()), BizServiceDiscovery::getEnvType, bizServiceDiscovery.getEnvType());
         return this.page(page, queryWrapper);
     }
 

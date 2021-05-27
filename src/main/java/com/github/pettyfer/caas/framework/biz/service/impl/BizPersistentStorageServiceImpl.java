@@ -33,8 +33,7 @@ public class BizPersistentStorageServiceImpl extends ServiceImpl<BizPersistentSt
         LambdaQueryWrapper<BizPersistentStorage> queryWrapper = Wrappers.<BizPersistentStorage>lambdaQuery()
                 .eq(BizPersistentStorage::getNamespaceId, namespaceId)
                 .likeRight(StrUtil.isNotEmpty(bizPersistentStorage.getName()), BizPersistentStorage::getName, bizPersistentStorage.getName())
-                .eq(ObjectUtil.isNotNull(bizPersistentStorage.getEnvType()), BizPersistentStorage::getEnvType, bizPersistentStorage.getEnvType())
-                .orderByDesc(BizPersistentStorage::getCreateTime);
+                .eq(ObjectUtil.isNotNull(bizPersistentStorage.getEnvType()), BizPersistentStorage::getEnvType, bizPersistentStorage.getEnvType());
         return this.page(page, queryWrapper);
     }
 

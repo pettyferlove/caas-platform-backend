@@ -6,12 +6,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.pettyfer.caas.framework.biz.entity.BizSqlBuildHistory;
-import com.github.pettyfer.caas.framework.biz.mapper.BizSqlBuildHistoryMapper;
-import com.github.pettyfer.caas.framework.biz.service.IBizSqlBuildHistoryService;
-import com.github.pettyfer.caas.framework.core.model.SqlBuildHistorySelectView;
-import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
-import com.github.pettyfer.caas.utils.SecurityUtil;
+import com.sinobest.caas.framework.biz.entity.BizSqlBuildHistory;
+import com.sinobest.caas.framework.biz.mapper.BizSqlBuildHistoryMapper;
+import com.sinobest.caas.framework.biz.service.IBizSqlBuildHistoryService;
+import com.sinobest.caas.framework.core.model.SqlBuildHistorySelectView;
+import com.sinobest.caas.global.exception.BaseRuntimeException;
+import com.sinobest.caas.utils.SecurityUtil;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,7 +31,7 @@ public class BizSqlBuildHistoryServiceImpl extends ServiceImpl<BizSqlBuildHistor
 
     @Override
     public IPage<BizSqlBuildHistory> page(BizSqlBuildHistory bizSqlBuildHistory, Page<BizSqlBuildHistory> page) {
-        LambdaQueryWrapper<BizSqlBuildHistory> queryWrapper = Wrappers.<BizSqlBuildHistory>lambdaQuery().orderByDesc(BizSqlBuildHistory::getCreateTime);
+        LambdaQueryWrapper<BizSqlBuildHistory> queryWrapper = Wrappers.<BizSqlBuildHistory>lambdaQuery();
         queryWrapper.eq(StrUtil.isNotEmpty(bizSqlBuildHistory.getBuildId()), BizSqlBuildHistory::getBuildId, bizSqlBuildHistory.getBuildId());
         return this.page(page, queryWrapper);
     }

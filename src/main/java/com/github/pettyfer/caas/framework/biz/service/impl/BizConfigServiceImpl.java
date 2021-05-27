@@ -30,7 +30,7 @@ public class BizConfigServiceImpl extends ServiceImpl<BizConfigMapper, BizConfig
 
     @Override
     public IPage<ConfigListView> page(BizConfig bizConfig, Page<BizConfig> page) {
-        LambdaQueryWrapper<BizConfig> queryWrapper = Wrappers.<BizConfig>lambdaQuery().orderByDesc(BizConfig::getCreateTime);
+        LambdaQueryWrapper<BizConfig> queryWrapper = Wrappers.<BizConfig>lambdaQuery();
         queryWrapper.eq(BizConfig::getNamespaceId, bizConfig.getNamespaceId());
         queryWrapper.eq(BizConfig::getDelFlag, 0);
         queryWrapper.likeRight(StrUtil.isNotEmpty(bizConfig.getConfigName()), BizConfig::getConfigName, bizConfig.getConfigName());
