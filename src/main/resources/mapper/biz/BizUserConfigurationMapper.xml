@@ -13,6 +13,7 @@
         <result column="gitlab_home_path" property="gitlabHomePath" />
         <result column="gitlab_api_token" property="gitlabApiToken" />
         <result column="private_key" property="privateKey" />
+        <result column="public_key" property="publicKey" />
         <result column="subversion_username" property="subversionUsername" />
         <result column="subversion_password" property="subversionPassword" />
         <result column="user_key_id" property="userKeyId" />
@@ -28,7 +29,7 @@
         create_time,
         modifier,
         modify_time,
-        gitlab_home_path, gitlab_api_token, private_key, subversion_username, subversion_password,user_key_id, group_id, tenant_id
+        gitlab_home_path, gitlab_api_token, private_key, public_key, subversion_username, subversion_password,user_key_id, group_id, tenant_id
     </sql>
 
 </mapper>

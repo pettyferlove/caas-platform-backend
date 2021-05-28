@@ -273,3 +273,11 @@ alter table biz_application_deployment_mount drop column del_flag;
 
 --changeset Petty:caas-1.0.0-snapshot-ddl-43
 alter table biz_project_build add project_describe varchar(400) null comment '描述信息' after project_name;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-44
+alter table biz_user_configuration add public_key varchar(1000) null comment 'RSA公钥' after id;
+
+alter table biz_user_configuration modify private_key varchar(1000) not null comment 'RSA私钥' after public_key;
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-45
+alter table biz_user_configuration modify user_key_id int null comment 'SSHkey ID';

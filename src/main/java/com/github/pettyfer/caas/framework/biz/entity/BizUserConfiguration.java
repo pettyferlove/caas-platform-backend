@@ -31,14 +31,17 @@ public class BizUserConfiguration extends BaseEntity<BizUserConfiguration> {
 
     private static final long serialVersionUID = 1L;
 
+    @ApiModelProperty(value = "RSA公钥")
+    private String publicKey;
+
+    @ApiModelProperty(value = "RSA私钥")
+    private String privateKey;
+
     @ApiModelProperty(value = "gitlab地址")
     private String gitlabHomePath;
 
     @ApiModelProperty(value = "Gitlab令牌")
     private String gitlabApiToken;
-
-    @ApiModelProperty(value = "RSA私钥")
-    private String privateKey;
 
     @ApiModelProperty(value = "SVN用户名")
     private String subversionUsername;

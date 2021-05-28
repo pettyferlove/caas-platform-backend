@@ -3,9 +3,11 @@ package com.github.pettyfer.caas.framework.biz.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.common.base.Preconditions;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.KeyPair;
 import com.github.pettyfer.caas.framework.biz.entity.BizUserConfiguration;
 import com.github.pettyfer.caas.framework.biz.mapper.BizUserConfigurationMapper;
 import com.github.pettyfer.caas.framework.biz.service.IBizUserConfigurationService;
@@ -13,9 +15,6 @@ import com.github.pettyfer.caas.framework.core.model.UserConfiguration;
 import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
 import com.github.pettyfer.caas.utils.ConverterUtil;
 import com.github.pettyfer.caas.utils.SecurityUtil;
-import com.google.common.base.Preconditions;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.KeyPair;
 import lombok.extern.slf4j.Slf4j;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.models.GitlabSSHKey;
@@ -51,21 +50,26 @@ public class BizUserConfigurationServiceImpl extends ServiceImpl<BizUserConfigur
         int type = KeyPair.RSA;
         JSch jsch = new JSch();
         String keyTitle = SecurityUtil.getUser().getUsername() + "_public_key_" + RandomUtil.randomString(5);
-        GitlabAPI gitlabAPI = GitlabAPI.connect(bizUserConfiguration.getGitlabHomePath(), bizUserConfiguration.getGitlabApiToken());
         try {
             KeyPair keyPair = KeyPair.genKeyPair(jsch, type);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             keyPair.writePrivateKey(baos);
             String privateKeyString = baos.toString();
             baos = new ByteArrayOutputStream();
-            keyPair.writePublicKey(baos, keyTitle);
+            keyPair.writePublicKey(baos, "");
             String publicKeyString = baos.toString();
             keyPair.dispose();
-            GitlabSSHKey sshKey = gitlabAPI.createSSHKey(keyTitle, publicKeyString);
             bizUserConfiguration.setPrivateKey(privateKeyString);
+            bizUserConfiguration.setPublicKey(publicKeyString);
+        } catch (Exception e) {
+            throw new BaseRuntimeException("RSA密钥生成失败");
+        }
+        try {
+            GitlabAPI gitlabAPI = GitlabAPI.connect(bizUserConfiguration.getGitlabHomePath(), bizUserConfiguration.getGitlabApiToken());
+            GitlabSSHKey sshKey = gitlabAPI.createSSHKey(keyTitle, bizUserConfiguration.getPublicKey());
             bizUserConfiguration.setUserKeyId(sshKey.getId());
         } catch (Exception e) {
-            throw new BaseRuntimeException("密钥生成失败");
+            log.error("Gitlab public_key add error");
         }
 
         bizUserConfiguration.setCreator(Objects.requireNonNull(SecurityUtil.getUser()).getId());
@@ -79,8 +83,6 @@ public class BizUserConfigurationServiceImpl extends ServiceImpl<BizUserConfigur
 
     @Override
     public Boolean update(BizUserConfiguration bizUserConfiguration) {
-        bizUserConfiguration.setPrivateKey(null);
-        bizUserConfiguration.setUserKeyId(null);
         bizUserConfiguration.setModifier(Objects.requireNonNull(SecurityUtil.getUser()).getId());
         bizUserConfiguration.setModifyTime(LocalDateTime.now());
         return this.updateById(bizUserConfiguration);
@@ -124,7 +126,6 @@ public class BizUserConfigurationServiceImpl extends ServiceImpl<BizUserConfigur
         if (ObjectUtil.isNull(bizUserConfiguration)) {
             throw new BaseRuntimeException("尚未填写个人设置，请先完善系统设置");
         }
-        String keyTitle = SecurityUtil.getUser().getUsername() + "_public_key_" + RandomUtil.randomString(5);
         GitlabAPI gitlabAPI = GitlabAPI.connect(bizUserConfiguration.getGitlabHomePath(), bizUserConfiguration.getGitlabApiToken());
         try {
             GitlabSSHKey sshKey = gitlabAPI.getSSHKey(bizUserConfiguration.getUserKeyId());
@@ -134,26 +135,28 @@ public class BizUserConfigurationServiceImpl extends ServiceImpl<BizUserConfigur
         }
         int type = KeyPair.RSA;
         JSch jsch = new JSch();
+        String keyTitle = SecurityUtil.getUser().getUsername() + "_public_key_" + RandomUtil.randomString(5);
         try {
             KeyPair keyPair = KeyPair.genKeyPair(jsch, type);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             keyPair.writePrivateKey(baos);
             String privateKeyString = baos.toString();
             baos = new ByteArrayOutputStream();
-            keyPair.writePublicKey(baos, keyTitle);
+            keyPair.writePublicKey(baos, "");
             String publicKeyString = baos.toString();
             keyPair.dispose();
-            GitlabSSHKey sshKey = gitlabAPI.createSSHKey(keyTitle, publicKeyString);
-
-            LambdaUpdateWrapper<BizUserConfiguration> updateWrapper = Wrappers.<BizUserConfiguration>lambdaUpdate();
-            updateWrapper.set(BizUserConfiguration::getPrivateKey, privateKeyString);
-            updateWrapper.set(BizUserConfiguration::getUserKeyId, sshKey.getId());
-            updateWrapper.eq(BizUserConfiguration::getId, bizUserConfiguration.getId());
-            this.update(updateWrapper);
+            bizUserConfiguration.setPublicKey(publicKeyString);
+            bizUserConfiguration.setPrivateKey(privateKeyString);
         } catch (Exception e) {
-            throw new BaseRuntimeException("密钥生成失败，请检查GitLab设置");
+            throw new BaseRuntimeException("RSA密钥更新失败");
         }
-
+        try {
+            GitlabSSHKey sshKey = gitlabAPI.createSSHKey(keyTitle, bizUserConfiguration.getPublicKey());
+            bizUserConfiguration.setUserKeyId(sshKey.getId());
+        } catch (Exception e) {
+            log.error("Gitlab public_key add error");
+        }
+        this.update(bizUserConfiguration);
         return true;
     }
 
