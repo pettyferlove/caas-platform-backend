@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.google.common.base.Preconditions;
 import com.github.pettyfer.caas.framework.biz.entity.BizNamespace;
 import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuild;
 import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuildHistory;
@@ -27,6 +26,7 @@ import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
 import com.github.pettyfer.caas.global.properties.BuildImageProperties;
 import com.github.pettyfer.caas.utils.LoadBalanceUtil;
 import com.github.pettyfer.caas.utils.URLResolutionUtil;
+import com.google.common.base.Preconditions;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.batch.Job;
 import io.fabric8.kubernetes.api.model.batch.JobBuilder;
@@ -147,6 +147,30 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         }
     }
 
+    /**
+     * 更新自动构建配置
+     *
+     * @param projectBuild 要更新的对象
+     * @return Boolean
+     */
+    @Override
+    @Transactional(rollbackFor = Throwable.class)
+    public Boolean update(BizProjectBuild projectBuild) {
+        Optional<BizNamespace> namespaceOptional = Optional.ofNullable(bizNamespaceService.get(projectBuild.getNamespaceId()));
+        if (namespaceOptional.isPresent()) {
+            if (DepositoryType.GitLabV4.getValue().equals(projectBuild.getDepositoryType())) {
+                if (StrUtil.isNotEmpty(projectBuild.getRemoteProjectId())) {
+                    String sourceProjectHookId = this.createSourceProjectHook(projectBuild.getId(), projectBuild.getRemoteProjectId());
+                    projectBuild.setProjectHookId(sourceProjectHookId);
+                }
+            }
+            bizProjectBuildService.update(projectBuild);
+            return true;
+        } else {
+            throw new BaseRuntimeException("命名空间不存在");
+        }
+    }
+
     @Override
     @Transactional(rollbackFor = Throwable.class)
     public Boolean delete(String id) {
@@ -187,7 +211,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         GlobalConfiguration globalConfiguration = bizGlobalConfigurationService.loadConfig();
         GitlabAPI connect = GitlabAPI.connect(userConfiguration.getGitlabHomePath(), userConfiguration.getGitlabApiToken());
         String server = LoadBalanceUtil.chooseServer(globalConfiguration.getClusterServer());
-        String projectHookUrl = StrUtil.format("http://{}/api/v1/hooks/gitlab/", server);
+        String projectHookUrl = StrUtil.format("http://{}/api/v1/hooks/gitlab/{}", server, id);
         GitlabProject project = connect.getProject(sourceProjectId);
         List<GitlabProjectHook> projectHooks = connect.getProjectHooks(project);
         List<GitlabProjectHook> collect = projectHooks.stream().filter(i -> projectHookUrl.equals(i.getUrl())).collect(Collectors.toList());
@@ -288,7 +312,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 parentQuery.eq(BizProjectBuild::getDelFlag, 0);
                 parentQuery.eq(BizProjectBuild::getOpenAutoBuild, 1);
                 List<BizProjectBuild> projectBuilds = bizProjectBuildService.list(parentQuery);
-                for (BizProjectBuild build:projectBuilds) {
+                for (BizProjectBuild build : projectBuilds) {
                     this.startBuild(build.getId());
                 }
                 buildMessage.setType("success");
@@ -328,7 +352,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 env.put("BUILD_TARGET_PATH", projectBuild.getBuildTargetPath());
                 env.put("BUILD_TARGET_NAME", projectBuild.getBuildTargetName());
 
-                if(DepositoryType.Subversion.getValue().equals(projectBuild.getDepositoryType())){
+                if (DepositoryType.Subversion.getValue().equals(projectBuild.getDepositoryType())) {
                     Preconditions.checkNotNull(userConfiguration.getSubversionUsername(), "未配置SVN账号，请前往个人配置页面配置");
                     Preconditions.checkNotNull(userConfiguration.getSubversionPassword(), "未配置SVN密码，请前往个人配置页面配置");
                     env.put("USERNAME", userConfiguration.getSubversionUsername());
@@ -340,7 +364,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 env.put("USER_ID", projectBuild.getCreator());
                 env.put("NOTIFICATION_FLAG", "project");
                 env.put("REMOTE_SERVER", LoadBalanceUtil.chooseServer(globalConfiguration.getClusterServer()));
-                if(projectBuild.getLinkProject()){
+                if (projectBuild.getLinkProject()) {
                     BizProjectBuild parentProject = bizProjectBuildService.get(projectBuild.getParentId());
                     Optional<BizProjectBuildHistory> historyOptional = Optional.ofNullable(bizProjectBuildHistoryService.queryLastBuild(parentProject.getId()));
                     historyOptional.ifPresent(bizProjectBuildHistory -> env.put("PARENT_PROJECT_LAST_BUILD_FILE", bizProjectBuildHistory.getFileId()));
@@ -376,8 +400,8 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
 
 
                 String envType = EnvConstant.transform(projectBuild.getEnvType());
-                List<VolumeMount> volumeMounts = fetchVolumeMount(projectBuild.getNeedBuildProject()==1, projectBuild.getBuildTool(), namespace.getName());
-                List<Volume> volumes = fetchVolume(projectBuild.getNeedBuildProject()==1, projectBuild.getBuildTool(), namespace.getName());
+                List<VolumeMount> volumeMounts = fetchVolumeMount(projectBuild.getNeedBuildProject() == 1, projectBuild.getBuildTool(), namespace.getName());
+                List<Volume> volumes = fetchVolume(projectBuild.getNeedBuildProject() == 1, projectBuild.getBuildTool(), namespace.getName());
 
                 Job job = new JobBuilder()
                         .withNewMetadata()
@@ -448,7 +472,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 .withName("work-dir")
                 .withEmptyDir(new EmptyDirVolumeSource())
                 .build());
-        if(needBuild) {
+        if (needBuild) {
             String cacheHostDir = "";
             switch (buildTool) {
                 case "maven":
@@ -484,7 +508,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 .withName("work-dir")
                 .withMountPath(GlobalConstant.BUILD_CODE_PATH)
                 .build());
-        if(needBuild) {
+        if (needBuild) {
             String cacheDir = "";
             switch (buildTool) {
                 case "maven":
@@ -523,7 +547,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .withEnv(fetchEnv(env))
                     .withVolumeMounts(volumeMounts)
                     .build());
-        } else if(DepositoryType.GitLabV4.getValue().equals(projectBuild.getDepositoryType())) {
+        } else if (DepositoryType.GitLabV4.getValue().equals(projectBuild.getDepositoryType())) {
             containers.add(new ContainerBuilder()
                     .withName("git-pull")
                     .withImage(imageProperties.getImages().get("git-pull"))
@@ -535,7 +559,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
             throw new BaseRuntimeException("不支持的仓库类型");
         }
 
-        if(projectBuild.getRunPreShellScript()) {
+        if (projectBuild.getRunPreShellScript()) {
             containers.add(new ContainerBuilder()
                     .withName("pre-shell")
                     .withImage(imageProperties.getImages().get("shell"))
@@ -575,7 +599,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
             }
         }
 
-        if(projectBuild.getRunPostShellScript()) {
+        if (projectBuild.getRunPostShellScript()) {
             containers.add(new ContainerBuilder()
                     .withName("post-shell")
                     .withImage(imageProperties.getImages().get("shell"))

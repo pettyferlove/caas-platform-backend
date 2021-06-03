@@ -21,12 +21,20 @@ public interface IProjectBuildCoreService {
     IPage<ProjectBuildListView> page(BizProjectBuild projectBuild, Page<BizProjectBuild> page);
 
     /**
-     * 创建自动构建
+     * 创建自动构建配置
      *
-     * @param projectBuildDetailView 要创建的对象
+     * @param projectBuild 要创建的对象
      * @return Boolean
      */
     String create(BizProjectBuild projectBuild);
+
+    /**
+     * 更新自动构建配置
+     *
+     * @param projectBuild 要更新的对象
+     * @return Boolean
+     */
+    Boolean update(BizProjectBuild projectBuild);
 
     /**
      * 删除自动构建
@@ -72,8 +80,22 @@ public interface IProjectBuildCoreService {
 
     void removeImagesDepositoryProject();
 
+    /**
+     * 查询历史记录下拉框数据
+     *
+     * @param id 构建ID
+     * @return 集合
+     */
     List<ProjectBuildHistorySelectView> historySelect(String id);
 
+    /**
+     * 查询历史记录列表
+     *
+     * @param buildId 构建ID
+     * @param history 历史基础查询条件
+     * @param page    分页参数
+     * @return 分页查询结果
+     */
     IPage<BizProjectBuildHistory> page(String buildId, BizProjectBuildHistory history, Page<BizProjectBuildHistory> page);
 
     BuildStepView logStep(String buildId, String jobId);
@@ -81,4 +103,6 @@ public interface IProjectBuildCoreService {
     Boolean deleteHistory(String historyId);
 
     void updateStatus(String jobId, BuildStatus status);
+
+
 }

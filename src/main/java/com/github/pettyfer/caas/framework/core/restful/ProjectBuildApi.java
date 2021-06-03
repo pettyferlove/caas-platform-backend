@@ -45,7 +45,7 @@ public class ProjectBuildApi {
 
     @PutMapping
     public R<Boolean> update(@Valid @RequestBody BizProjectBuild projectBuild) {
-        return new R<>(bizProjectBuildService.update(projectBuild));
+        return new R<>(projectBuildCoreService.update(projectBuild));
     }
 
     @PostMapping
