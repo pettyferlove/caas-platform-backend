@@ -5,6 +5,7 @@ target/
 !**/src/test/**
 logs/
 .flattened-pom.xml
+.scannerwork
 
 ### STS ###
 .apt_generated

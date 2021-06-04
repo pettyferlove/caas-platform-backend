@@ -27,6 +27,8 @@ public class ApplicationDeploymentListView implements Serializable {
     @ApiModelProperty(value = "ID")
     private String id;
 
+    private String keywords;
+
     @ApiModelProperty(value = "镜像名称")
     private String imageName;
 

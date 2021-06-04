@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * @author Pettyfer
@@ -21,7 +22,7 @@ import java.io.Serializable;
 public class UserMessage implements Serializable {
     private static final long serialVersionUID = 9053803488097823142L;
     private String message;
-    private String time;
+    private LocalDateTime time;
     private String deliver;
     private String content;
     private String id;

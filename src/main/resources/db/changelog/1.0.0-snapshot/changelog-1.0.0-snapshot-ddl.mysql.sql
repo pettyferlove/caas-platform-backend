@@ -281,3 +281,39 @@ alter table biz_user_configuration modify private_key varchar(1000) not null com
 
 --changeset Petty:caas-1.0.0-snapshot-ddl-45
 alter table biz_user_configuration modify user_key_id int null comment 'SSHkey ID';
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-46
+create table biz_keyword
+(
+    id          varchar(128)     not null
+        primary key,
+    name        varchar(255)     null comment '配置名称',
+    color       varchar(255)     null,
+    del_flag    bit default b'0' null comment '删除标记 0 未删除 1 删除',
+    creator     varchar(128)     null comment '创建人',
+    create_time datetime         null comment '创建时间',
+    modifier    varchar(128)     null comment '修改人',
+    modify_time datetime         null comment '修改时间',
+    group_id    varchar(128)     null comment '项目组ID',
+    tenant_id   varchar(128)     null comment '租户ID'
+);
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-47
+create table biz_keyword_map
+(
+    id         varchar(128) not null
+        primary key,
+    biz_id     varchar(255) null comment '业务ID',
+    biz_type   varchar(255) null comment '业务类型',
+    additional json         null comment '额外参数',
+    group_id   varchar(128) null comment '项目组ID',
+    tenant_id  varchar(128) null comment '租户ID'
+);
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-48
+create index biz_id_index on biz_keyword_map (biz_id);
+
+--changeset Petty:caas-1.0.0-snapshot-ddl-49
+alter table biz_keyword_map add keyword_id varchar(128) null comment '关键词ID' after id;
+
+create index keyword_id_index on biz_keyword_map (keyword_id);

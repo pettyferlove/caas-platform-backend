@@ -1,5 +1,6 @@
 package com.github.pettyfer.caas.framework.biz.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.pettyfer.caas.global.entity.BaseEntity;
@@ -33,6 +34,9 @@ public class BizApplicationDeployment extends BaseEntity<BizApplicationDeploymen
 
     @ApiModelProperty(value = "部署名称")
     private String name;
+
+    @TableField(exist = false)
+    private String keywords;
 
     @ApiModelProperty(value = "应用所属命名空间ID")
     private String namespaceId;

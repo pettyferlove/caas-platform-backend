@@ -50,9 +50,11 @@ public class BizApplicationDeploymentServiceImpl extends ServiceImpl<BizApplicat
     public IPage<BizApplicationDeployment> page(String namespaceId, BizApplicationDeployment bizApplicationDeployment, Page<BizApplicationDeployment> page) {
         LambdaQueryWrapper<BizApplicationDeployment> queryWrapper = Wrappers.<BizApplicationDeployment>lambdaQuery()
                 .eq(BizApplicationDeployment::getNamespaceId, namespaceId)
+                .eq(BizApplicationDeployment::getDelFlag, false)
                 .likeRight(StrUtil.isNotEmpty(bizApplicationDeployment.getName()), BizApplicationDeployment::getName, bizApplicationDeployment.getName())
                 .eq(ObjectUtil.isNotNull(bizApplicationDeployment.getEnvType()), BizApplicationDeployment::getEnvType, bizApplicationDeployment.getEnvType());
-        return this.page(page, queryWrapper);
+        queryWrapper.exists(StrUtil.isNotEmpty(bizApplicationDeployment.getKeywords()), "select km.biz_id from biz_keyword_map km where km.keyword_id in (" + bizApplicationDeployment.getKeywords() + ") and t.id = km.biz_id");
+        return baseMapper.page(page, queryWrapper);
     }
 
     @Override

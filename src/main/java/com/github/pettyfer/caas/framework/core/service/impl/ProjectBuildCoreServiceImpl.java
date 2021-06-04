@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.base.Preconditions;
 import com.github.pettyfer.caas.framework.biz.entity.BizNamespace;
 import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuild;
 import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuildHistory;
@@ -16,6 +17,7 @@ import com.github.pettyfer.caas.framework.biz.service.*;
 import com.github.pettyfer.caas.framework.core.event.GitlabPushDetails;
 import com.github.pettyfer.caas.framework.core.event.publisher.BuildEventPublisher;
 import com.github.pettyfer.caas.framework.core.model.*;
+import com.github.pettyfer.caas.framework.core.service.IKeywordCoreService;
 import com.github.pettyfer.caas.framework.core.service.IProjectBuildCoreService;
 import com.github.pettyfer.caas.framework.engine.docker.register.service.IHarborService;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.IJobService;
@@ -26,7 +28,6 @@ import com.github.pettyfer.caas.global.exception.BaseRuntimeException;
 import com.github.pettyfer.caas.global.properties.BuildImageProperties;
 import com.github.pettyfer.caas.utils.LoadBalanceUtil;
 import com.github.pettyfer.caas.utils.URLResolutionUtil;
-import com.google.common.base.Preconditions;
 import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.batch.Job;
 import io.fabric8.kubernetes.api.model.batch.JobBuilder;
@@ -69,11 +70,13 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
 
     private final IJobService jobService;
 
+    private final IKeywordCoreService keywordCoreService;
+
     private final BuildEventPublisher publisher;
 
     private final MessageEventPublisher messagePublisher;
 
-    public ProjectBuildCoreServiceImpl(BuildImageProperties imageProperties, IBizGlobalConfigurationService bizGlobalConfigurationService, IBizUserConfigurationService bizUserConfigurationService, IBizProjectBuildService bizProjectBuildService, IBizProjectBuildHistoryService bizProjectBuildHistoryService, IHarborService harborService, IBizImagesDepositoryService bizImagesDepositoryService, IBizUserConfigurationService userConfigurationService, IBizNamespaceService bizNamespaceService, IJobService jobService, BuildEventPublisher publisher, MessageEventPublisher messagePublisher) {
+    public ProjectBuildCoreServiceImpl(BuildImageProperties imageProperties, IBizGlobalConfigurationService bizGlobalConfigurationService, IBizUserConfigurationService bizUserConfigurationService, IBizProjectBuildService bizProjectBuildService, IBizProjectBuildHistoryService bizProjectBuildHistoryService, IHarborService harborService, IBizImagesDepositoryService bizImagesDepositoryService, IBizUserConfigurationService userConfigurationService, IBizNamespaceService bizNamespaceService, IJobService jobService, IKeywordCoreService keywordCoreService, BuildEventPublisher publisher, MessageEventPublisher messagePublisher) {
         this.imageProperties = imageProperties;
         this.bizGlobalConfigurationService = bizGlobalConfigurationService;
         this.bizUserConfigurationService = bizUserConfigurationService;
@@ -84,6 +87,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
         this.userConfigurationService = userConfigurationService;
         this.bizNamespaceService = bizNamespaceService;
         this.jobService = jobService;
+        this.keywordCoreService = keywordCoreService;
         this.publisher = publisher;
         this.messagePublisher = messagePublisher;
     }
@@ -140,6 +144,9 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
             String projectId = harborService.createProject(projectBuild.getImagesDepositoryAlias());
             bizImagesDepositoryService.create(projectId, projectBuild.getImagesDepositoryAlias());
             projectBuild.setImagesDepositoryId(projectId);
+
+            keywordCoreService.map(projectBuild.getKeywords(), id, "project_build");
+
             bizProjectBuildService.create(projectBuild);
             return id;
         } else {
@@ -164,6 +171,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     projectBuild.setProjectHookId(sourceProjectHookId);
                 }
             }
+            keywordCoreService.map(projectBuild.getKeywords(), projectBuild.getId(), "project_build");
             bizProjectBuildService.update(projectBuild);
             return true;
         } else {
@@ -312,7 +320,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 parentQuery.eq(BizProjectBuild::getDelFlag, 0);
                 parentQuery.eq(BizProjectBuild::getOpenAutoBuild, 1);
                 List<BizProjectBuild> projectBuilds = bizProjectBuildService.list(parentQuery);
-                for (BizProjectBuild build : projectBuilds) {
+                for (BizProjectBuild build:projectBuilds) {
                     this.startBuild(build.getId());
                 }
                 buildMessage.setType("success");
@@ -352,7 +360,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 env.put("BUILD_TARGET_PATH", projectBuild.getBuildTargetPath());
                 env.put("BUILD_TARGET_NAME", projectBuild.getBuildTargetName());
 
-                if (DepositoryType.Subversion.getValue().equals(projectBuild.getDepositoryType())) {
+                if(DepositoryType.Subversion.getValue().equals(projectBuild.getDepositoryType())){
                     Preconditions.checkNotNull(userConfiguration.getSubversionUsername(), "未配置SVN账号，请前往个人配置页面配置");
                     Preconditions.checkNotNull(userConfiguration.getSubversionPassword(), "未配置SVN密码，请前往个人配置页面配置");
                     env.put("USERNAME", userConfiguration.getSubversionUsername());
@@ -364,7 +372,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 env.put("USER_ID", projectBuild.getCreator());
                 env.put("NOTIFICATION_FLAG", "project");
                 env.put("REMOTE_SERVER", LoadBalanceUtil.chooseServer(globalConfiguration.getClusterServer()));
-                if (projectBuild.getLinkProject()) {
+                if(projectBuild.getLinkProject()){
                     BizProjectBuild parentProject = bizProjectBuildService.get(projectBuild.getParentId());
                     Optional<BizProjectBuildHistory> historyOptional = Optional.ofNullable(bizProjectBuildHistoryService.queryLastBuild(parentProject.getId()));
                     historyOptional.ifPresent(bizProjectBuildHistory -> env.put("PARENT_PROJECT_LAST_BUILD_FILE", bizProjectBuildHistory.getFileId()));
@@ -400,8 +408,8 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
 
 
                 String envType = EnvConstant.transform(projectBuild.getEnvType());
-                List<VolumeMount> volumeMounts = fetchVolumeMount(projectBuild.getNeedBuildProject() == 1, projectBuild.getBuildTool(), namespace.getName());
-                List<Volume> volumes = fetchVolume(projectBuild.getNeedBuildProject() == 1, projectBuild.getBuildTool(), namespace.getName());
+                List<VolumeMount> volumeMounts = fetchVolumeMount(projectBuild.getNeedBuildProject()==1, projectBuild.getBuildTool(), namespace.getName());
+                List<Volume> volumes = fetchVolume(projectBuild.getNeedBuildProject()==1, projectBuild.getBuildTool(), namespace.getName());
 
                 Job job = new JobBuilder()
                         .withNewMetadata()
@@ -472,7 +480,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 .withName("work-dir")
                 .withEmptyDir(new EmptyDirVolumeSource())
                 .build());
-        if (needBuild) {
+        if(needBuild) {
             String cacheHostDir = "";
             switch (buildTool) {
                 case "maven":
@@ -508,7 +516,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 .withName("work-dir")
                 .withMountPath(GlobalConstant.BUILD_CODE_PATH)
                 .build());
-        if (needBuild) {
+        if(needBuild) {
             String cacheDir = "";
             switch (buildTool) {
                 case "maven":
@@ -547,7 +555,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .withEnv(fetchEnv(env))
                     .withVolumeMounts(volumeMounts)
                     .build());
-        } else if (DepositoryType.GitLabV4.getValue().equals(projectBuild.getDepositoryType())) {
+        } else if(DepositoryType.GitLabV4.getValue().equals(projectBuild.getDepositoryType())) {
             containers.add(new ContainerBuilder()
                     .withName("git-pull")
                     .withImage(imageProperties.getImages().get("git-pull"))
@@ -559,7 +567,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
             throw new BaseRuntimeException("不支持的仓库类型");
         }
 
-        if (projectBuild.getRunPreShellScript()) {
+        if(projectBuild.getRunPreShellScript()) {
             containers.add(new ContainerBuilder()
                     .withName("pre-shell")
                     .withImage(imageProperties.getImages().get("shell"))
@@ -599,7 +607,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
             }
         }
 
-        if (projectBuild.getRunPostShellScript()) {
+        if(projectBuild.getRunPostShellScript()) {
             containers.add(new ContainerBuilder()
                     .withName("post-shell")
                     .withImage(imageProperties.getImages().get("shell"))

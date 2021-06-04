@@ -47,5 +47,12 @@
         modify_time,
         name, namespace_id, description_content, auto_build_id, images_depository_id, image_name, image_tag, environment_variable, image_pull_strategy, instances_number, strategy_type, max_surge, max_unavaible, revision_history_limit, node, open_liveness_probe, open_readiness_probe, liveness_probe, readiness_probe, env_type, run_status, group_id, tenant_id
     </sql>
+    <select id="page" resultType="com.github.pettyfer.caas.framework.biz.entity.BizApplicationDeployment">
+        select
+        <include refid="Base_Column_List"></include>,
+        (select concat('[',group_concat(json_object('name', bk.name, 'color', bk.color)), ']') from biz_keyword bk right join biz_keyword_map bkm on bk.id = bkm.keyword_id where bkm.biz_id = t.id and bkm.biz_type = 'application_deployment' group by bkm.biz_type) keywords
+        from biz_application_deployment t
+        ${ew.customSqlSegment}
+    </select>
 
 </mapper>

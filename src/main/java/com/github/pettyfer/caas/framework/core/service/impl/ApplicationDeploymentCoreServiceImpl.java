@@ -17,6 +17,7 @@ import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentListVi
 import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentMountView;
 import com.github.pettyfer.caas.framework.core.model.ApplicationDeploymentPortView;
 import com.github.pettyfer.caas.framework.core.service.IApplicationDeploymentCoreService;
+import com.github.pettyfer.caas.framework.core.service.IKeywordCoreService;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.IDeploymentService;
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.INetworkService;
 import com.github.pettyfer.caas.global.constants.EnvConstant;
@@ -61,7 +62,9 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
 
     private final INetworkService networkService;
 
-    public ApplicationDeploymentCoreServiceImpl(IBizApplicationDeploymentService bizApplicationDeploymentService, IBizServiceDiscoveryService bizServiceDiscoveryService, IBizApplicationDeploymentMountService bizApplicationDeploymentVolumeService, IBizConfigService bizConfigService, IBizPersistentStorageService bizPersistentStorageService, IDeploymentService deploymentService, IBizNamespaceService bizNamespaceService, INetworkService networkService) {
+    private final IKeywordCoreService keywordCoreService;
+
+    public ApplicationDeploymentCoreServiceImpl(IBizApplicationDeploymentService bizApplicationDeploymentService, IBizServiceDiscoveryService bizServiceDiscoveryService, IBizApplicationDeploymentMountService bizApplicationDeploymentVolumeService, IBizConfigService bizConfigService, IBizPersistentStorageService bizPersistentStorageService, IDeploymentService deploymentService, IBizNamespaceService bizNamespaceService, INetworkService networkService, IKeywordCoreService keywordCoreService) {
         this.bizApplicationDeploymentService = bizApplicationDeploymentService;
         this.bizServiceDiscoveryService = bizServiceDiscoveryService;
         this.bizApplicationDeploymentVolumeService = bizApplicationDeploymentVolumeService;
@@ -70,6 +73,7 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
         this.deploymentService = deploymentService;
         this.bizNamespaceService = bizNamespaceService;
         this.networkService = networkService;
+        this.keywordCoreService = keywordCoreService;
     }
 
     @Override
@@ -82,6 +86,9 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                 ConverterUtil.convert(deploymentDetail, bizApplicationDeployment);
                 bizApplicationDeployment.setRunStatus(RunStatus.Preparing.getValue());
                 String deploymentId = bizApplicationDeploymentService.create(namespaceId, bizApplicationDeployment);
+
+                keywordCoreService.map(deploymentDetail.getKeywords(), deploymentId, "application_deployment");
+
                 BizServiceDiscovery bizServiceDiscovery = new BizServiceDiscovery();
                 ConverterUtil.convert(deploymentDetail, bizServiceDiscovery);
                 bizServiceDiscovery.setNamespaceId(namespaceId);
@@ -129,6 +136,9 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
                 ConverterUtil.convert(deploymentDetail, bizApplicationDeployment);
                 bizApplicationDeployment.setRunStatus(RunStatus.Updating.getValue());
                 Boolean update = bizApplicationDeploymentService.update(namespaceId, bizApplicationDeployment);
+
+                keywordCoreService.map(deploymentDetail.getKeywords(), deploymentId, "application_deployment");
+
                 if (update) {
                     int count = bizServiceDiscoveryService.count(Wrappers.<BizServiceDiscovery>lambdaQuery().eq(BizServiceDiscovery::getDeploymentId, deploymentId).eq(BizServiceDiscovery::getDelFlag, 0));
                     BizServiceDiscovery bizServiceDiscovery = new BizServiceDiscovery();

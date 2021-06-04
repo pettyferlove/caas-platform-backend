@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.pettyfer.caas.framework.biz.mapper.BizKeywordMapMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.biz.entity.BizKeywordMap">
+        <id column="id" property="id" />
+        <result column="keyword_id" property="keywordId" />
+        <result column="biz_id" property="bizId" />
+        <result column="biz_type" property="bizType" />
+        <result column="additional" property="additional" />
+        <result column="group_id" property="groupId" />
+        <result column="tenant_id" property="tenantId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, keyword_id, biz_id, biz_type, additional, group_id, tenant_id
+    </sql>
+
+</mapper>

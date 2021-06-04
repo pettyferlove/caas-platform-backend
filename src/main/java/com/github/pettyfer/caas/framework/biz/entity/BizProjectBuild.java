@@ -1,5 +1,6 @@
 package com.github.pettyfer.caas.framework.biz.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.github.pettyfer.caas.global.entity.BaseEntity;
@@ -33,6 +34,9 @@ public class BizProjectBuild extends BaseEntity<BizProjectBuild> {
 
     @ApiModelProperty(value = "父项目ID")
     private String parentId;
+
+    @TableField(exist = false)
+    private String keywords;
 
     @ApiModelProperty(value = "是否需要关联其他项目")
     private Boolean linkProject;

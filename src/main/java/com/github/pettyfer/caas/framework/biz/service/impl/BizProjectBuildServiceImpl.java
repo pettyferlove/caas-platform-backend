@@ -7,13 +7,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.pettyfer.caas.framework.biz.entity.BizProjectBuild;
-import com.github.pettyfer.caas.framework.biz.mapper.BizProjectBuildMapper;
-import com.github.pettyfer.caas.framework.biz.service.IBizProjectBuildService;
-import com.github.pettyfer.caas.framework.core.model.ProjectBuildListView;
-import com.github.pettyfer.caas.framework.core.model.ProjectBuildSelect;
-import com.github.pettyfer.caas.utils.ConverterUtil;
-import com.github.pettyfer.caas.utils.SecurityUtil;
+import com.sinobest.caas.framework.biz.entity.BizProjectBuild;
+import com.sinobest.caas.framework.biz.mapper.BizProjectBuildMapper;
+import com.sinobest.caas.framework.biz.service.IBizProjectBuildService;
+import com.sinobest.caas.framework.core.model.ProjectBuildListView;
+import com.sinobest.caas.framework.core.model.ProjectBuildSelect;
+import com.sinobest.caas.utils.ConverterUtil;
+import com.sinobest.caas.utils.SecurityUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -29,17 +30,20 @@ import java.util.Optional;
  * @author Petty
  * @since 2020-07-03
  */
+@Slf4j
 @Service
 public class BizProjectBuildServiceImpl extends ServiceImpl<BizProjectBuildMapper, BizProjectBuild> implements IBizProjectBuildService {
 
     @Override
     public IPage<ProjectBuildListView> page(BizProjectBuild bizProjectBuild, Page<BizProjectBuild> page) {
+
         LambdaQueryWrapper<BizProjectBuild> queryWrapper = Wrappers.lambdaQuery(bizProjectBuild)
                 .eq(BizProjectBuild::getDelFlag, false);
         queryWrapper.eq(ObjectUtil.isNotNull(bizProjectBuild.getEnvType()), BizProjectBuild::getEnvType, bizProjectBuild.getEnvType());
         queryWrapper.eq(BizProjectBuild::getNamespaceId, bizProjectBuild.getNamespaceId());
         queryWrapper.likeRight(StrUtil.isNotEmpty(bizProjectBuild.getProjectName()), BizProjectBuild::getProjectName, bizProjectBuild.getProjectName());
         queryWrapper.likeRight(StrUtil.isNotEmpty(bizProjectBuild.getProjectDescribe()), BizProjectBuild::getProjectDescribe, bizProjectBuild.getProjectDescribe());
+        queryWrapper.exists(StrUtil.isNotEmpty(bizProjectBuild.getKeywords()), "select km.biz_id from biz_keyword_map km where km.keyword_id in (" + bizProjectBuild.getKeywords() + ") and t.id = km.biz_id");
         return baseMapper.queryProjectBuildList(page, queryWrapper);
     }
 

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.pettyfer.caas.framework.biz.mapper.BizKeywordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.github.pettyfer.caas.framework.biz.entity.BizKeyword">
+    <result column="id" property="id" />
+    <result column="del_flag" property="delFlag" />
+    <result column="creator" property="creator" />
+    <result column="create_time" property="createTime" />
+    <result column="modifier" property="modifier" />
+    <result column="modify_time" property="modifyTime" />
+        <result column="name" property="name" />
+        <result column="color" property="color" />
+        <result column="group_id" property="groupId" />
+        <result column="tenant_id" property="tenantId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id,
+        del_flag,
+        creator,
+        create_time,
+        modifier,
+        modify_time,
+        name, color, group_id, tenant_id
+    </sql>
+    <select id="selected" resultType="com.github.pettyfer.caas.framework.biz.entity.BizKeyword">
+        select bk.*
+        from biz_keyword bk
+                 right join biz_keyword_map bkm on bk.id = bkm.keyword_id
+        where bkm.biz_id = #{bizId}
+          and bkm.biz_type = #{bizType}
+    </select>
+    <select id="allSelected" resultType="com.github.pettyfer.caas.framework.biz.entity.BizKeyword">
+        select bk.*
+        from biz_keyword bk
+                 right join biz_keyword_map bkm on bk.id = bkm.keyword_id
+    </select>
+
+</mapper>

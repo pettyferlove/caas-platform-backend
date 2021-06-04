@@ -33,6 +33,8 @@ public class ApplicationDeploymentDetailView implements Serializable {
     @NotNull(message = "名称不能为空")
     private String name;
 
+    private String keywords;
+
     @ApiModelProperty(value = "详细描述")
     private String describe;
 

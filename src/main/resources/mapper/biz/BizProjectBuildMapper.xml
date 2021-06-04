@@ -61,6 +61,7 @@
     <select id="queryProjectBuildList" resultType="com.github.pettyfer.caas.framework.core.model.ProjectBuildListView">
         select
             <include refid="Base_Column_List"></include>,
+            (select concat('[',group_concat(json_object('name', bk.name, 'color', bk.color)), ']') from biz_keyword bk right join biz_keyword_map bkm on bk.id = bkm.keyword_id where bkm.biz_id = t.id and bkm.biz_type = 'project_build' group by bkm.biz_type) keywords,
             (select h.id from biz_project_build_history h where t.id = h.build_id and h.del_flag = 0 order by create_time desc limit 1) history_id,
             (select h.job_id from biz_project_build_history h where t.id = h.build_id and h.del_flag = 0 order by create_time desc limit 1) job,
             (select h.build_status from biz_project_build_history h where t.id = h.build_id and h.del_flag = 0 order by create_time desc limit 1) last_state,

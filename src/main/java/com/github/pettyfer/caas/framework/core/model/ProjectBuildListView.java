@@ -26,10 +26,15 @@ public class ProjectBuildListView implements Serializable {
     @ApiModelProperty(value = "ID")
     private String id;
 
+    private String keywords;
+
     @ApiModelProperty(value = "命名空间")
     private String namespaceId;
 
     private String historyId;
+
+    @ApiModelProperty(value = "源码拉取分支")
+    private String remoteBranch;
 
     @ApiModelProperty(value = "项目名称")
     private String projectName;
