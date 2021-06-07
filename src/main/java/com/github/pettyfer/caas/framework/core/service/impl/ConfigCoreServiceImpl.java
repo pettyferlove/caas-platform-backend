@@ -106,6 +106,7 @@ public class ConfigCoreServiceImpl implements IConfigCoreService {
             LambdaQueryWrapper<BizConfig> queryWrapper = Wrappers.<BizConfig>lambdaQuery();
             queryWrapper.eq(BizConfig::getDelFlag, 0);
             queryWrapper.eq(ObjectUtil.isNotNull(envType),BizConfig::getEnvType, envType);
+            queryWrapper.eq(BizConfig::getNamespaceId, namespaceId);
             List<BizConfig> list = bizConfigService.list(queryWrapper);
             return Optional.ofNullable(ConverterUtil.convertList(BizConfig.class, ConfigSelectView.class, list)).orElseGet(ArrayList::new);
         } else {
