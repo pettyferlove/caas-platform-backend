@@ -2,6 +2,7 @@ package com.github.pettyfer.caas.framework.engine.kubernetes.service.impl;
 
 import com.github.pettyfer.caas.framework.engine.kubernetes.service.INetworkService;
 import com.github.pettyfer.caas.global.constants.KubernetesConstant;
+import com.github.pettyfer.caas.global.constants.NetworkType;
 import io.fabric8.kubernetes.api.model.Service;
 import io.fabric8.kubernetes.api.model.ServicePort;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -30,9 +31,13 @@ public class NetworkServiceImpl implements INetworkService {
 
     @Override
     public void update(String namespace, String name, Service service) {
-        if ("NodePort".equals(service.getSpec().getType())) {
-            Optional<Service> optionalService = Optional.ofNullable(kubernetesClient.services().inNamespace(namespace).withName(name).get());
-            if (optionalService.isPresent()) {
+        Optional<Service> optionalService = Optional.ofNullable(kubernetesClient.services().inNamespace(namespace).withName(name).get());
+        if (optionalService.isPresent()) {
+            // 如果是集群IP则更新时删除原有的服务
+            if (NetworkType.ClusterIP.getValue().equals(service.getSpec().getType())) {
+                kubernetesClient.services().inNamespace(namespace).withName(name).delete();
+            }
+            if (NetworkType.NodePort.getValue().equals(service.getSpec().getType())) {
                 List<ServicePort> oldPorts = optionalService.get().getSpec().getPorts();
                 List<ServicePort> ports = service.getSpec().getPorts();
                 for (ServicePort port : ports) {
@@ -40,16 +45,10 @@ public class NetworkServiceImpl implements INetworkService {
                     first.ifPresent(servicePort -> port.setNodePort(servicePort.getNodePort()));
                 }
             }
-        }
-
-        // 集群IP的服务需要先进行删除，再重新创建
-        if ("ClusterIP".equals(service.getSpec().getType())) {
-            Optional<Service> serviceOptional = Optional.ofNullable(kubernetesClient.services().inNamespace(namespace).withName(name).get());
-            if (serviceOptional.isPresent()) {
+            if(NetworkType.ClusterIP.getValue().equals(optionalService.get().getSpec().getType()) && "None".equals(optionalService.get().getSpec().getClusterIP())) {
                 kubernetesClient.services().inNamespace(namespace).withName(name).delete();
             }
         }
-
         kubernetesClient.services().inNamespace(namespace).withName(name).createOrReplace(service);
     }
 
