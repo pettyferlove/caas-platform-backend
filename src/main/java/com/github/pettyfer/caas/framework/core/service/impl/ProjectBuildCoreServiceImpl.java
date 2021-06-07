@@ -133,7 +133,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
             String id = IdWorker.getIdStr();
             projectBuild.setId(id);
             projectBuild.setImagesDepositoryAlias(namespaceOptional.get().getName());
-            if (DepositoryType.GitLabV4.getValue().equals(projectBuild.getDepositoryType())) {
+            if (DepositoryType.GitLabV4.getValue().equals(projectBuild.getDepositoryType()) && 1==projectBuild.getOpenAutoBuild()) {
                 if (StrUtil.isNotEmpty(projectBuild.getRemoteProjectId())) {
                     String sourceProjectHookId = this.createSourceProjectHook(id, projectBuild.getRemoteProjectId());
                     projectBuild.setProjectHookId(sourceProjectHookId);
@@ -165,7 +165,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
     public Boolean update(BizProjectBuild projectBuild) {
         Optional<BizNamespace> namespaceOptional = Optional.ofNullable(bizNamespaceService.get(projectBuild.getNamespaceId()));
         if (namespaceOptional.isPresent()) {
-            if (DepositoryType.GitLabV4.getValue().equals(projectBuild.getDepositoryType())) {
+            if (DepositoryType.GitLabV4.getValue().equals(projectBuild.getDepositoryType()) && 1==projectBuild.getOpenAutoBuild()) {
                 if (StrUtil.isNotEmpty(projectBuild.getRemoteProjectId())) {
                     String sourceProjectHookId = this.createSourceProjectHook(projectBuild.getId(), projectBuild.getRemoteProjectId());
                     projectBuild.setProjectHookId(sourceProjectHookId);
