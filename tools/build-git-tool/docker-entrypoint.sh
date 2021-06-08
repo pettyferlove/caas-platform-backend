@@ -3,7 +3,7 @@ set -e
 
 function createKey() {
   if [ "$PRIVATE_KEY" ]; then
-    mkdir /root/.ssh/
+    mkdir -p /root/.ssh/
     echo -e "$PRIVATE_KEY" >/root/.ssh/id_rsa
     chmod 600 /root/.ssh/id_rsa
   fi
