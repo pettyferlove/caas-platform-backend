@@ -52,6 +52,8 @@ public class ServiceDiscoveryCoreServiceImpl implements IServiceDiscoveryCoreSer
             Page<BizServiceDiscovery> bizServiceDiscoveryPage = new Page<>();
             ConverterUtil.convert(serviceDiscoveryListView, bizServiceDiscovery);
             ConverterUtil.convert(page, bizServiceDiscoveryPage);
+            bizServiceDiscoveryPage.setCurrent(page.getCurrent());
+            bizServiceDiscoveryPage.setSize(page.getSize());
             IPage<ServiceDiscoveryListView> result = new Page<>();
             IPage<BizServiceDiscovery> queryPage = bizServiceDiscoveryService.page(namespaceId, bizServiceDiscovery, bizServiceDiscoveryPage);
             List<BizServiceDiscovery> records = queryPage.getRecords();

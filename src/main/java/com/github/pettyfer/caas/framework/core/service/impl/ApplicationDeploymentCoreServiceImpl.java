@@ -198,6 +198,8 @@ public class ApplicationDeploymentCoreServiceImpl implements IApplicationDeploym
             Page<BizApplicationDeployment> bizApplicationDeploymentPage = new Page<>();
             ConverterUtil.convert(applicationDeploymentListView, bizApplicationDeployment);
             ConverterUtil.convert(page, bizApplicationDeploymentPage);
+            bizApplicationDeploymentPage.setCurrent(page.getCurrent());
+            bizApplicationDeploymentPage.setSize(page.getSize());
             IPage<ApplicationDeploymentListView> result = new Page<>();
             IPage<BizApplicationDeployment> queryPage = bizApplicationDeploymentService.page(namespaceId, bizApplicationDeployment, bizApplicationDeploymentPage);
             List<BizApplicationDeployment> records = queryPage.getRecords();
