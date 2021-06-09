@@ -7,7 +7,8 @@ RUN apk update &&\
     apk add --no-cache nodejs npm yarn make g++
 
 RUN npm config set registry https://registry.npm.taobao.org/
-RUN npm config set cache "/usr/cache/nodejs"
+RUN npm config set cache "/usr/cache/nodejs/npm"
+RUN yarn config set cache-folder "/usr/cache/nodejs/yarn"
 
 RUN mkdir -p /tool
 WORKDIR /tool
