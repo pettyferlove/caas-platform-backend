@@ -32,7 +32,7 @@
         <fastjson.version>1.2.72</fastjson.version>
         <swagger.version>3.0.0</swagger.version>
         <hutool.version>4.5.1</hutool.version>
-        <mysql.version>8.0.9-rc</mysql.version>
+        <mysql.version>8.0.26</mysql.version>
         <liquibase.version>3.8.7</liquibase.version>
         <skipTests>true</skipTests>
     </properties>
