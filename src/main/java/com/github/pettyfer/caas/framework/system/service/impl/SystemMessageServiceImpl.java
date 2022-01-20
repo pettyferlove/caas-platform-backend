@@ -29,7 +29,9 @@ public class SystemMessageServiceImpl extends ServiceImpl<SystemMessageMapper, S
     public List<UserMessage> loadUnread(String userId) {
         List<SystemMessage> list = this.list(Wrappers.<SystemMessage>lambdaQuery().orderByDesc(SystemMessage::getCreateTime)
                 .eq(SystemMessage::getReceiver, userId)
-                .eq(SystemMessage::getState, 0));
+                .eq(SystemMessage::getState, 0)
+                .last("limit 10")
+        );
         Optional<List<UserMessage>> optionalUserGeneralMessages = Optional.ofNullable(ConverterUtil.convertList(SystemMessage.class, UserMessage.class, list));
         return optionalUserGeneralMessages.orElseGet(ArrayList::new);
     }
