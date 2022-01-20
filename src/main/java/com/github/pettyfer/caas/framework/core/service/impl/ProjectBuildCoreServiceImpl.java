@@ -103,11 +103,15 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 if (namespace.isPresent()) {
                     Job job = jobService.get(namespace.get().getName(), i.getJob());
                     String state = BuildStatus.Building.getValue();
-                    if (ObjectUtil.isNotNull(job.getStatus().getActive()) && job.getStatus().getActive() == 1) {
-                        state = BuildStatus.Building.getValue();
-                    } else if (ObjectUtil.isNotNull(job.getStatus().getFailed()) && job.getStatus().getFailed() == 1) {
-                        state = BuildStatus.Fail.getValue();
-                    } else if (ObjectUtil.isNotNull(job.getStatus().getSucceeded()) && job.getStatus().getSucceeded() == 1) {
+                    if (ObjectUtil.isNotNull(job)) {
+                        if (ObjectUtil.isNotNull(job.getStatus().getActive()) && job.getStatus().getActive() == 1) {
+                            state = BuildStatus.Building.getValue();
+                        } else if (ObjectUtil.isNotNull(job.getStatus().getFailed()) && job.getStatus().getFailed() == 1) {
+                            state = BuildStatus.Fail.getValue();
+                        } else if (ObjectUtil.isNotNull(job.getStatus().getSucceeded()) && job.getStatus().getSucceeded() == 1) {
+                            state = BuildStatus.Success.getValue();
+                        }
+                    } else {
                         state = BuildStatus.Success.getValue();
                     }
                     i.setLastState(state);
@@ -325,17 +329,17 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 }
                 buildMessage.setType("success");
                 buildMessage.setContent(projectBuild.getProjectName() + "自动构建成功");
+                if (StrUtil.isNotEmpty(history.getImageFullName())) {
+                    String[] image = history.getImageFullName().split(":");
+                    if (image.length == 2) {
+                        publisher.push(history.getBuildId(), image[0], image[1]);
+                    }
+                }
             } else {
                 buildMessage.setType("error");
                 buildMessage.setContent(projectBuild.getProjectName() + "自动构建失败，请检查日志");
             }
             buildMessage.setReceiver(projectBuild.getCreator());
-            if (StrUtil.isNotEmpty(history.getImageFullName())) {
-                String[] image = history.getImageFullName().split(":");
-                if (image.length == 2) {
-                    publisher.push(history.getBuildId(), image[0], image[1]);
-                }
-            }
             messagePublisher.push(buildMessage);
         }
     }
@@ -554,6 +558,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .withImagePullPolicy("Always")
                     .withEnv(fetchEnv(env))
                     .withVolumeMounts(volumeMounts)
+                    .withResources(fetchResource())
                     .build());
         } else if(DepositoryType.GitLabV4.getValue().equals(projectBuild.getDepositoryType())) {
             containers.add(new ContainerBuilder()
@@ -562,6 +567,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .withImagePullPolicy("Always")
                     .withEnv(fetchEnv(env))
                     .withVolumeMounts(volumeMounts)
+                    .withResources(fetchResource())
                     .build());
         } else {
             throw new BaseRuntimeException("不支持的仓库类型");
@@ -578,6 +584,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .withValue("PRE")
                     .endEnv()
                     .withVolumeMounts(volumeMounts)
+                    .withResources(fetchResource())
                     .build());
         }
 
@@ -590,6 +597,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                             .withImagePullPolicy("Always")
                             .withEnv(fetchEnv(env))
                             .withVolumeMounts(volumeMounts)
+                            .withResources(fetchResource())
                             .build());
                     break;
                 case "npm":
@@ -600,6 +608,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                             .withImagePullPolicy("Always")
                             .withEnv(fetchEnv(env))
                             .withVolumeMounts(volumeMounts)
+                            .withResources(fetchResource())
                             .build());
                     break;
                 default:
@@ -618,6 +627,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .withValue("POST")
                     .endEnv()
                     .withVolumeMounts(volumeMounts)
+                    .withResources(fetchResource())
                     .build());
         }
 
@@ -628,6 +638,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .withImagePullPolicy("Always")
                     .withEnv(fetchEnv(env))
                     .withVolumeMounts(volumeMounts)
+                    .withResources(fetchResource())
                     .build());
         }
 
@@ -638,10 +649,20 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                     .withImagePullPolicy("Always")
                     .withEnv(fetchEnv(env))
                     .withVolumeMounts(volumeMounts)
+                    .withResources(fetchResource())
                     .build());
         }
 
         return containers;
+    }
+
+    private ResourceRequirements fetchResource() {
+        return new ResourceRequirementsBuilder()
+                .addToRequests("memory", new Quantity("1", "Gi"))
+                .addToRequests("cpu", new Quantity("4"))
+                .addToLimits("memory", new Quantity("2", "Gi"))
+                .addToLimits("cpu", new Quantity("8"))
+                .build();
     }
 
     private List<Container> fetchContainer(Map<String, String> env) {
@@ -651,6 +672,7 @@ public class ProjectBuildCoreServiceImpl implements IProjectBuildCoreService {
                 .withImage(imageProperties.getImages().get("notification"))
                 .withImagePullPolicy("Always")
                 .withEnv(fetchEnv(env))
+                .withResources(fetchResource())
                 .build());
         return containers;
     }

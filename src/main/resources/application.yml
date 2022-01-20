@@ -3,7 +3,7 @@ spring:
     name: caas-platform
     group: caas
   profiles:
-    active: dev-ubuntu
+    active: dev-centos
 jasypt:
   encryptor:
     algorithm: PBEWithMD5AndDES
